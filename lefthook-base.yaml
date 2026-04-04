@@ -20,7 +20,8 @@ pre-commit:
       stage_fixed: true
     markdownlint:
       glob: "*.md"
-      run: markdownlint-cli2 {staged_files}
+      run: markdownlint-cli2 --fix {staged_files}
+      stage_fixed: true
     yaml:
       glob: "*.{yaml,yml}"
       run: yamlfmt {staged_files} && yamllint -c .yamllint.yaml {staged_files}

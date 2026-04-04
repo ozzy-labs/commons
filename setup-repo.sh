@@ -65,7 +65,7 @@ run_api() {
   fi
 
   local err
-  if ! err="$(gh api --method "${method}" "${endpoint}" "$@" 2>&1 >/dev/null)"; then
+  if ! err="$(gh api --method "${method}" "${endpoint}" "$@" 2>&1 1>/dev/null)"; then
     echo "  ⚠ ${method} ${endpoint} failed: ${err}" >&2
     return 1
   fi
@@ -82,7 +82,7 @@ run_api_with_input() {
   fi
 
   local err
-  if ! err="$(echo "${input}" | gh api --method "${method}" "${endpoint}" --input - 2>&1 >/dev/null)"; then
+  if ! err="$(echo "${input}" | gh api --method "${method}" "${endpoint}" --input - 2>&1 1>/dev/null)"; then
     echo "  ⚠ ${method} ${endpoint} failed: ${err}" >&2
     return 1
   fi
