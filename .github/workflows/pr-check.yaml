@@ -20,7 +20,7 @@ jobs:
               core.setFailed(
                 `PR title does not follow Conventional Commits format.\n\n` +
                 `Expected format: type(scope): description\n` +
-                `Valid types: feat, fix, docs, style, refactor, perf, test, chore\n\n` +
+                `Valid types: feat, fix, docs, style, refactor, perf, test, build, ci, chore\n\n` +
                 `Current title: ${title}`
               );
             } else {
@@ -47,7 +47,7 @@ jobs:
               core.setFailed(
                 `Branch name does not follow naming convention.\n\n` +
                 `Expected format: type/description\n` +
-                `Valid types: feat, fix, docs, style, refactor, perf, test, chore\n\n` +
+                `Valid types: feat, fix, docs, style, refactor, perf, test, build, ci, chore\n\n` +
                 `Current branch: ${branch}`
               );
             } else {

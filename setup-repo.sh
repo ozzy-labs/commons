@@ -136,10 +136,7 @@ echo "3. Branch protection (Rulesets)"
 RULESET_NAME="main-protection"
 
 # Check if ruleset already exists
-EXISTING_RULESET_ID=""
-if [[ "${DRY_RUN}" != true ]]; then
-  EXISTING_RULESET_ID="$(gh api "/repos/${REPO}/rulesets" --jq ".[] | select(.name == \"${RULESET_NAME}\") | .id" 2>/dev/null || true)"
-fi
+EXISTING_RULESET_ID="$(gh api "/repos/${REPO}/rulesets" --jq ".[] | select(.name == \"${RULESET_NAME}\") | .id" 2>/dev/null || true)"
 
 RULESET_BODY='{
   "name": "'"${RULESET_NAME}"'",
