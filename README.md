@@ -25,6 +25,11 @@ templates/           -> Copied on initial setup only (if not exists)
   .markdownlint-cli2.yaml
   .mise.toml
   .gitignore
+  .editorconfig
+  .gitattributes
+  .mdformat.toml
+  renovate.json
+  biome.json
 sync.sh              -> Sync script
 setup-repo.sh        -> GitHub repository setup script
 ```
@@ -82,6 +87,11 @@ Sets merge rules (squash only), branch protection (Rulesets), security settings,
 | `.markdownlint-cli2.yaml` | Markdown linter config |
 | `.mise.toml` | Tool version management baseline |
 | `.gitignore` | Common ignore patterns |
+| `.editorconfig` | Editor settings (charset, indent, line ending) |
+| `.gitattributes` | Line ending normalization, binary detection |
+| `.mdformat.toml` | Markdown formatter config |
+| `renovate.json` | Renovate dependency update config |
+| `biome.json` | Biome linter/formatter config |
 
 ## What stays in each repo
 

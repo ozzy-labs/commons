@@ -21,6 +21,11 @@ setup() {
   echo "template markdownlint" > "${SRC_DIR}/templates/.markdownlint-cli2.yaml"
   echo "template mise" > "${SRC_DIR}/templates/.mise.toml"
   echo "template gitignore" > "${SRC_DIR}/templates/.gitignore"
+  echo "template editorconfig" > "${SRC_DIR}/templates/.editorconfig"
+  echo "template gitattributes" > "${SRC_DIR}/templates/.gitattributes"
+  echo "template mdformat" > "${SRC_DIR}/templates/.mdformat.toml"
+  echo "template renovate" > "${SRC_DIR}/templates/renovate.json"
+  echo "template biome" > "${SRC_DIR}/templates/biome.json"
 
   # Init as git repo (needed for metadata commit hash)
   git -C "${SRC_DIR}" init -q

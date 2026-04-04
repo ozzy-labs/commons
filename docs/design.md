@@ -70,6 +70,11 @@ templates/.claude/settings.json        → <repo>/.claude/settings.json
 | `.markdownlint-cli2.yaml` | リポジトリルート | Markdown リンター設定 |
 | `.mise.toml` | リポジトリルート | ツールバージョン管理のベースライン。リポの技術スタックに合わせてツールを追加する |
 | `.gitignore` | リポジトリルート | 共通の無視パターン。フレームワーク固有のパターンは各リポで追加する |
+| `.editorconfig` | リポジトリルート | エディタ共通設定（文字コード、改行、インデント） |
+| `.gitattributes` | リポジトリルート | 改行コード正規化、バイナリファイル判定 |
+| `.mdformat.toml` | リポジトリルート | Markdown フォーマッター設定 |
+| `renovate.json` | リポジトリルート | Renovate 依存関係自動更新設定 |
+| `biome.json` | リポジトリルート | Biome リンター・フォーマッター設定。`files.includes` はリポの構造に合わせてカスタマイズする |
 
 ## 共有 vs テンプレートの判断基準
 
