@@ -20,6 +20,11 @@ templates/           -> Copied on initial setup only (if not exists)
     settings.json
     skills/lint-rules/
   .mcp.json
+  .yamlfmt.yaml
+  .yamllint.yaml
+  .markdownlint-cli2.yaml
+  .mise.toml
+  .gitignore
 sync.sh              -> Sync script
 setup-repo.sh        -> GitHub repository setup script
 ```
@@ -72,6 +77,11 @@ Sets merge rules (squash only), branch protection (Rulesets), security settings,
 | `.claude/skills/lint-rules/` | Linter command mapping (repo-specific) |
 | `SECURITY.md` | Security vulnerability reporting policy |
 | `.mcp.json` | MCP server configuration (Context7) |
+| `.yamlfmt.yaml` | YAML formatter config |
+| `.yamllint.yaml` | YAML linter config |
+| `.markdownlint-cli2.yaml` | Markdown linter config |
+| `.mise.toml` | Tool version management baseline |
+| `.gitignore` | Common ignore patterns |
 
 ## What stays in each repo
 

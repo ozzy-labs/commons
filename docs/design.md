@@ -65,6 +65,11 @@ templates/.claude/settings.json        → <repo>/.claude/settings.json
 | `.claude/skills/lint-rules/SKILL.md` | `.claude/skills/lint-rules/` | リンターコマンド対応表。リポの技術スタックに合わせてカスタマイズする |
 | `SECURITY.md` | リポジトリルート | 脆弱性報告ポリシー（Private Vulnerability Reporting 誘導） |
 | `.mcp.json` | リポジトリルート | MCP サーバー設定の雛形（Context7） |
+| `.yamlfmt.yaml` | リポジトリルート | YAML フォーマッター設定 |
+| `.yamllint.yaml` | リポジトリルート | YAML リンター設定 |
+| `.markdownlint-cli2.yaml` | リポジトリルート | Markdown リンター設定 |
+| `.mise.toml` | リポジトリルート | ツールバージョン管理のベースライン。リポの技術スタックに合わせてツールを追加する |
+| `.gitignore` | リポジトリルート | 共通の無視パターン。フレームワーク固有のパターンは各リポで追加する |
 
 ## 共有 vs テンプレートの判断基準
 

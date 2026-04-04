@@ -16,6 +16,11 @@ setup() {
   echo "template claude" > "${SRC_DIR}/templates/CLAUDE.md"
   echo "template security" > "${SRC_DIR}/templates/SECURITY.md"
   echo "template mcp" > "${SRC_DIR}/templates/.mcp.json"
+  echo "template yamlfmt" > "${SRC_DIR}/templates/.yamlfmt.yaml"
+  echo "template yamllint" > "${SRC_DIR}/templates/.yamllint.yaml"
+  echo "template markdownlint" > "${SRC_DIR}/templates/.markdownlint-cli2.yaml"
+  echo "template mise" > "${SRC_DIR}/templates/.mise.toml"
+  echo "template gitignore" > "${SRC_DIR}/templates/.gitignore"
 
   # Init as git repo (needed for metadata commit hash)
   git -C "${SRC_DIR}" init -q
