@@ -42,7 +42,7 @@ allowed-tools: Bash, Read, Grep, Glob, AskUserQuestion
 
 ```text
 完了:
-  コミット: abc1234 feat: ブログ記事を追加
+  コミット: abc1234 feat: add blog post
 ```
 
 ## 次のアクション提案（スキル完了後）
