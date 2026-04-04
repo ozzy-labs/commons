@@ -5,7 +5,7 @@
   "scripts": {
     "prepare": "lefthook install || true",
     "lint:md": "markdownlint-cli2 '**/*.md' '!node_modules'",
-    "lint:yaml": "yamlfmt -lint .commitlintrc.yaml .yamlfmt.yaml .yamllint.yaml lefthook.yaml && yamllint -c .yamllint.yaml .",
+    "lint:yaml": "yamlfmt -lint .commitlintrc.yaml .yamlfmt.yaml .yamllint.yaml lefthook.yaml shared/lefthook-base.yaml shared/.commitlintrc.yaml && yamllint -c .yamllint.yaml .",
     "lint:shell": "find . -name '*.sh' -not -path './node_modules/*' -exec shellcheck {} + && find . -name '*.sh' -not -path './node_modules/*' -exec shfmt -d {} +",
     "lint:secrets": "gitleaks detect --no-banner",
     "lint:all": "pnpm run lint:md && pnpm run lint:yaml && pnpm run lint:shell && pnpm run lint:secrets",
