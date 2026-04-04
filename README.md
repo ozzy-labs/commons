@@ -13,6 +13,9 @@ shared/              -> Synced to every repo (always overwrite)
     rules/           -> Shared rules
   lefthook-base.yaml -> Shared lefthook base config
   .commitlintrc.yaml -> Shared commitlint config
+  .editorconfig      -> Editor settings
+  .gitattributes     -> Line ending normalization
+  .mdformat.toml     -> Markdown formatter config
 templates/           -> Copied on initial setup only (if not exists)
   CLAUDE.md
   SECURITY.md
@@ -25,11 +28,16 @@ templates/           -> Copied on initial setup only (if not exists)
   .markdownlint-cli2.yaml
   .mise.toml
   .gitignore
-  .editorconfig
-  .gitattributes
-  .mdformat.toml
   renovate.json
   biome.json
+  LICENSE
+  CONTRIBUTING.md
+  .github/
+    pull_request_template.md
+    ISSUE_TEMPLATE/
+  .vscode/
+    settings.json
+    extensions.json
 sync.sh              -> Sync script
 setup-repo.sh        -> GitHub repository setup script
 ```
@@ -72,6 +80,9 @@ Sets merge rules (squash only), branch protection (Rulesets), security settings,
 | Rules | git-workflow.md | Branch, commit, PR conventions |
 | Config | lefthook-base.yaml | Shared lefthook base (commit-msg + common linters) |
 | Config | .commitlintrc.yaml | Conventional Commits validation |
+| Config | .editorconfig | Editor settings (charset, indent, line ending) |
+| Config | .gitattributes | Line ending normalization, binary detection |
+| Config | .mdformat.toml | Markdown formatter config |
 
 ## What is templated
 
@@ -87,11 +98,14 @@ Sets merge rules (squash only), branch protection (Rulesets), security settings,
 | `.markdownlint-cli2.yaml` | Markdown linter config |
 | `.mise.toml` | Tool version management baseline |
 | `.gitignore` | Common ignore patterns |
-| `.editorconfig` | Editor settings (charset, indent, line ending) |
-| `.gitattributes` | Line ending normalization, binary detection |
-| `.mdformat.toml` | Markdown formatter config |
 | `renovate.json` | Renovate dependency update config |
 | `biome.json` | Biome linter/formatter config |
+| `LICENSE` | MIT License |
+| `CONTRIBUTING.md` | Contribution policy |
+| `.github/pull_request_template.md` | PR template |
+| `.github/ISSUE_TEMPLATE/` | Issue templates (bug report, feature request) |
+| `.vscode/settings.json` | VS Code editor settings baseline |
+| `.vscode/extensions.json` | VS Code recommended extensions baseline |
 
 ## What stays in each repo
 
