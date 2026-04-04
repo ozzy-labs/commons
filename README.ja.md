@@ -7,36 +7,49 @@ OzzyLabs リポジトリ共通の AI エージェント設定。
 ## 構成
 
 ```text
-claude/
-  skills/   -> 共通ワークフロースキル
-  rules/    -> 共通ルール
-sync.sh     -> 同期スクリプト（claude/ -> .claude/）
+shared/          -> 全リポジトリに同期（毎回上書き）
+  .claude/
+    skills/      -> 共通ワークフロースキル
+    rules/       -> 共通ルール
+templates/       -> 初期セットアップ用（存在しない場合のみコピー）
+  CLAUDE.md
+  .claude/
+    settings.json
+    skills/lint-rules/
+sync.sh          -> 同期スクリプト
 ```
 
 ## 使い方
 
-対象リポジトリから同期スクリプトを実行する:
-
 ```bash
+# 確認付きで同期
 /path/to/ai-config/sync.sh /path/to/target-repo
+
+# 確認なしで同期
+/path/to/ai-config/sync.sh --force /path/to/target-repo
 ```
 
-`claude/` 内の全ファイルが対象リポジトリの `.claude/` にコピーされる。リポジトリ固有のファイル（test, lint-rules, settings.json, CLAUDE.md 等）には影響しない。
+共有ファイルは毎回上書きされる。テンプレートは対象ファイルが存在しない場合のみコピーされる。
 
 ## 共有対象
 
 | 種別 | ファイル | 用途 |
 |------|----------|------|
-| スキル | commit, commit-conventions, drive, implement, lint, pr, review, ship | ワークフロー制御 |
+| スキル | commit, commit-conventions, drive, implement, lint, pr, review, ship, test | ワークフロー制御 |
 | ルール | git-workflow.md | ブランチ・コミット・PR 規約 |
+
+## テンプレート
+
+| ファイル | 用途 |
+|----------|------|
+| `CLAUDE.md` | プロジェクト概要、コマンド、検証手順 |
+| `.claude/settings.json` | 許可ツール・権限設定 |
+| `.claude/skills/lint-rules/` | リンターコマンド対応表（リポジトリ固有） |
 
 ## リポジトリ固有のまま残すもの
 
-- `CLAUDE.md` — プロジェクト概要、技術スタック、コマンド、検証手順
-- `.claude/settings.json` — 許可ツール・権限設定
-- `.claude/skills/test/` — テストコマンド（リポジトリ固有）
-- `.claude/skills/lint-rules/` — リンターコマンド（リポジトリ固有）
 - ドメイン固有のスキル・ルール
+- カスタマイズ済みの CLAUDE.md、settings.json、lint-rules
 
 ## 言語
 

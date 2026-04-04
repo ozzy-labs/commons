@@ -2,14 +2,25 @@
 set -euo pipefail
 
 # ai-config sync script
-# Usage: sync.sh <target-repo-path>
-# Copies claude/ -> .claude/ in the target repository
+# Usage:
+#   sync.sh <target-repo-path>          Sync with confirmation
+#   sync.sh --force <target-repo-path>  Sync without confirmation
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-SOURCE_DIR="${SCRIPT_DIR}/claude"
+SHARED_DIR="${SCRIPT_DIR}/shared"
+TEMPLATES_DIR="${SCRIPT_DIR}/templates"
+
+# Parse arguments
+FORCE=false
+if [[ "${1:-}" == "--force" ]]; then
+  FORCE=true
+  shift
+fi
 
 if [[ $# -lt 1 ]]; then
-  echo "Usage: $0 <target-repo-path>" >&2
+  echo "Usage:" >&2
+  echo "  $0 <target-repo-path>" >&2
+  echo "  $0 --force <target-repo-path>" >&2
   exit 1
 fi
 
@@ -20,22 +31,104 @@ if [[ ! -d "${TARGET_DIR}/.git" ]]; then
   exit 1
 fi
 
-if [[ ! -d "${SOURCE_DIR}" ]]; then
-  echo "Error: claude/ directory not found at ${SOURCE_DIR}" >&2
-  exit 1
+# Collect shared files and check for changes
+shared_new=()
+shared_changed=()
+shared_unchanged=()
+
+if [[ -d "${SHARED_DIR}" ]]; then
+  while IFS= read -r src_path; do
+    rel_path="${src_path#"${SHARED_DIR}/"}"
+    dest_path="${TARGET_DIR}/${rel_path}"
+
+    if [[ ! -f "${dest_path}" ]]; then
+      shared_new+=("${rel_path}")
+    elif ! diff -q "${src_path}" "${dest_path}" > /dev/null 2>&1; then
+      shared_changed+=("${rel_path}")
+    else
+      shared_unchanged+=("${rel_path}")
+    fi
+  done < <(find "${SHARED_DIR}" -type f | sort)
 fi
 
-copied=0
+# Collect template files
+template_new=()
+template_skip=()
 
-while IFS= read -r src_path; do
-  rel_path="${src_path#"${SOURCE_DIR}/"}"
-  dest_path="${TARGET_DIR}/.claude/${rel_path}"
+if [[ -d "${TEMPLATES_DIR}" ]]; then
+  while IFS= read -r src_path; do
+    rel_path="${src_path#"${TEMPLATES_DIR}/"}"
+    dest_path="${TARGET_DIR}/${rel_path}"
 
-  mkdir -p "$(dirname "${dest_path}")"
-  cp "${src_path}" "${dest_path}"
-  echo "  copy: claude/${rel_path} -> .claude/${rel_path}"
-  copied=$((copied + 1))
-done < <(find "${SOURCE_DIR}" -type f | sort)
+    if [[ ! -f "${dest_path}" ]]; then
+      template_new+=("${rel_path}")
+    else
+      template_skip+=("${rel_path}")
+    fi
+  done < <(find "${TEMPLATES_DIR}" -type f | sort)
+fi
+
+# Display summary
+echo "Shared files:"
+for f in "${shared_new[@]+"${shared_new[@]}"}"; do
+  echo "  new:       ${f}"
+done
+for f in "${shared_changed[@]+"${shared_changed[@]}"}"; do
+  echo "  changed:   ${f}"
+done
+for f in "${shared_unchanged[@]+"${shared_unchanged[@]}"}"; do
+  echo "  unchanged: ${f}"
+done
 
 echo ""
-echo "Sync complete: ${copied} files copied"
+echo "Templates:"
+for f in "${template_new[@]+"${template_new[@]}"}"; do
+  echo "  new:  ${f}"
+done
+for f in "${template_skip[@]+"${template_skip[@]}"}"; do
+  echo "  skip: ${f} (already exists)"
+done
+
+# Count actionable items
+total_copy=$(( ${#shared_new[@]} + ${#shared_changed[@]} + ${#template_new[@]} ))
+
+if [[ ${total_copy} -eq 0 ]]; then
+  echo ""
+  echo "Nothing to sync."
+  exit 0
+fi
+
+echo ""
+echo "${total_copy} file(s) to copy (${#shared_new[@]} new shared, ${#shared_changed[@]} changed shared, ${#template_new[@]} new templates)"
+
+# Confirm unless --force
+if [[ "${FORCE}" != true ]]; then
+  read -r -p "Overwrite all / Cancel? [Y/n] " answer
+  if [[ "${answer}" =~ ^[Nn] ]]; then
+    echo "Cancelled."
+    exit 0
+  fi
+fi
+
+# Copy shared files (new + changed)
+for f in "${shared_new[@]+"${shared_new[@]}"}" "${shared_changed[@]+"${shared_changed[@]}"}"; do
+  [[ -z "${f}" ]] && continue
+  src="${SHARED_DIR}/${f}"
+  dest="${TARGET_DIR}/${f}"
+  mkdir -p "$(dirname "${dest}")"
+  cp "${src}" "${dest}"
+  echo "  copy: ${f}"
+done
+
+# Copy template files (new only)
+for f in "${template_new[@]+"${template_new[@]}"}"; do
+  [[ -z "${f}" ]] && continue
+  src="${TEMPLATES_DIR}/${f}"
+  dest="${TARGET_DIR}/${f}"
+  mkdir -p "$(dirname "${dest}")"
+  cp "${src}" "${dest}"
+  echo "  copy: ${f} (template)"
+done
+
+echo ""
+echo "Sync complete."

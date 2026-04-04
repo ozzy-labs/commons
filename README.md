@@ -7,36 +7,49 @@ Shared AI agent configurations for OzzyLabs repositories.
 ## Structure
 
 ```text
-claude/
-  skills/   -> Shared workflow skills
-  rules/    -> Shared rules
-sync.sh     -> Sync script (claude/ -> .claude/)
+shared/          -> Synced to every repo (always overwrite)
+  .claude/
+    skills/      -> Shared workflow skills
+    rules/       -> Shared rules
+templates/       -> Copied on initial setup only (if not exists)
+  CLAUDE.md
+  .claude/
+    settings.json
+    skills/lint-rules/
+sync.sh          -> Sync script
 ```
 
 ## Usage
 
-Run the sync script from the target repository:
-
 ```bash
+# Sync with confirmation
 /path/to/ai-config/sync.sh /path/to/target-repo
+
+# Sync without confirmation
+/path/to/ai-config/sync.sh --force /path/to/target-repo
 ```
 
-All files in `claude/` are copied to `.claude/` in the target repository. Repository-specific files (test, lint-rules, settings.json, CLAUDE.md, etc.) are not affected.
+Shared files are always overwritten. Templates are copied only if the target file does not exist.
 
 ## What is shared
 
 | Type | Files | Purpose |
 |------|-------|---------|
-| Skills | commit, commit-conventions, drive, implement, lint, pr, review, ship | Workflow orchestration |
+| Skills | commit, commit-conventions, drive, implement, lint, pr, review, ship, test | Workflow orchestration |
 | Rules | git-workflow.md | Branch, commit, PR conventions |
+
+## What is templated
+
+| File | Purpose |
+|------|---------|
+| `CLAUDE.md` | Project overview, commands, verification steps |
+| `.claude/settings.json` | Allowed tools and permissions |
+| `.claude/skills/lint-rules/` | Linter command mapping (repo-specific) |
 
 ## What stays in each repo
 
-- `CLAUDE.md` — Project overview, tech stack, commands, verification steps
-- `.claude/settings.json` — Allowed tools and permissions
-- `.claude/skills/test/` — Test commands (repo-specific)
-- `.claude/skills/lint-rules/` — Linter commands (repo-specific)
 - Domain-specific skills and rules
+- Customized CLAUDE.md, settings.json, lint-rules (after initial setup)
 
 ## Language
 
