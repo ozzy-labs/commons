@@ -6,9 +6,10 @@
 
 ### 含むもの
 
-- **共有ファイル（`shared/`）**: 全リポジトリで同一であるべきスキル・ルール。毎回上書きで同期
+- **共有ファイル（`shared/`）**: 全リポジトリで同一であるべきスキル・ルール・設定。毎回上書きで同期
 - **テンプレート（`templates/`）**: 新規リポジトリの初期セットアップ用雛形。存在しない場合のみコピー
 - **同期スクリプト（`sync.sh`）**: 上記2種のファイルを対象リポジトリにコピー
+- **リポジトリ初期設定スクリプト（`setup-repo.sh`）**: GitHub リポジトリの設定（マージルール、ブランチ保護、セキュリティ等）を `gh` CLI で自動化
 
 ### 含まないもの
 
@@ -86,6 +87,65 @@ synced_at: <ISO 8601 UTC タイムスタンプ>
 - 実際のファイルコピーが発生した場合のみ書き込む（変更なしの場合はスキップ）
 - 対象リポジトリにコミットする想定（`.gitignore` に入れない）
 - `--dry-run` 時は書き込まない
+
+## リポジトリ初期設定（setup-repo.sh）
+
+`setup-repo.sh` は GitHub リポジトリの設定を `gh` CLI で自動化する。`sync.sh` がファイル同期を担当するのに対し、`setup-repo.sh` は GitHub 側の設定を担当する。
+
+### 設定内容
+
+#### マージ設定
+
+| 設定 | デフォルト | 変更後 | 理由 |
+|------|-----------|--------|------|
+| Merge commit | 許可 | 禁止 | squash merge のみの運用 |
+| Rebase merge | 許可 | 禁止 | 同上 |
+| ブランチ自動削除 | 無効 | 有効 | マージ後のブランチ削除を自動化 |
+| Auto merge | 無効 | 有効 | CI 通過後の自動マージを許可（PR ごとに opt-in） |
+
+#### ブランチ保護（Rulesets）
+
+| ルール | 理由 |
+|--------|------|
+| main への直接 push 禁止 | git-workflow ルール |
+| force push 禁止 | git-workflow ルール |
+| main の削除禁止 | デフォルトブランチの保護 |
+| PR 必須（承認数 0） | PR 作成を強制しつつソロ開発に対応 |
+| linear history 必須 | squash merge と整合 |
+
+- bypass は禁止（admin 含む）
+- CI ステータスチェックは含めない（リポごとに手動設定）
+
+#### セキュリティ
+
+| 設定 | 理由 |
+|------|------|
+| Secret scanning | gitleaks と二重防御 |
+| Push protection | シークレット漏洩防止 |
+| Dependabot alerts | 依存関係の脆弱性検知 |
+| Dependabot security updates | 脆弱性の自動修正 PR |
+| Private Vulnerability Reporting | SECURITY.md との整合（public リポのみ） |
+
+#### リポジトリ設定
+
+| 設定 | デフォルト | 変更後 | 理由 |
+|------|-----------|--------|------|
+| Wiki | 有効 | 無効 | ドキュメントはリポ内で管理 |
+
+#### ラベル
+
+GitHub デフォルトラベル（9 個）を削除し、Conventional Commits の type に合わせたラベルに置換する:
+
+`feat`, `fix`, `docs`, `style`, `refactor`, `perf`, `test`, `build`, `ci`, `chore`
+
+### sync.sh との棲み分け
+
+| 観点 | sync.sh | setup-repo.sh |
+|------|---------|---------------|
+| 対象 | ファイル（スキル、ルール、設定ファイル） | GitHub リポジトリ設定（API） |
+| 実行頻度 | dev-config 更新時に毎回 | リポジトリ作成時に 1 回 |
+| 冪等性 | あり（差分検出） | 部分的（Rulesets は既存チェックが必要） |
+| 依存 | git | gh CLI（認証済み） |
 
 ## マルチエージェント対応
 
