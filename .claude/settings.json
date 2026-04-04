@@ -34,7 +34,8 @@
       "Bash(gh pr *)",
       "Bash(gh auth *)",
       "Bash(gh api *)",
-      "Bash(./sync.sh *)"
+      "Bash(./sync.sh *)",
+      "Bash(./setup-repo.sh *)"
     ]
   }
 }

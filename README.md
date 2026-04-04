@@ -21,6 +21,7 @@ templates/           -> Copied on initial setup only (if not exists)
     skills/lint-rules/
   .mcp.json
 sync.sh              -> Sync script
+setup-repo.sh        -> GitHub repository setup script
 ```
 
 ## Usage
@@ -40,6 +41,18 @@ sync.sh              -> Sync script
 ```
 
 Shared files are always overwritten. Templates are copied only if the target file does not exist. After sync, a metadata file (`.claude/.dev-config-sync`) is written to the target with the source commit hash and timestamp.
+
+### Repository setup
+
+```bash
+# Configure GitHub repository settings
+/path/to/dev-config/setup-repo.sh owner/repo
+
+# Preview changes without applying
+/path/to/dev-config/setup-repo.sh --dry-run owner/repo
+```
+
+Sets merge rules (squash only), branch protection (Rulesets), security settings, and Conventional Commits labels. See [ADR-0004](docs/adr/0004-repo-setup-with-rulesets.md) for design decisions.
 
 ## What is shared
 
