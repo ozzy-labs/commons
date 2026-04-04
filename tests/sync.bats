@@ -8,6 +8,7 @@ setup() {
   mkdir -p "${SRC_DIR}/shared/.claude/skills/commit"
   mkdir -p "${SRC_DIR}/shared/.claude/rules"
   mkdir -p "${SRC_DIR}/templates/.claude/skills/lint-rules"
+  mkdir -p "${SRC_DIR}/templates/.claude"
   echo "shared skill" > "${SRC_DIR}/shared/.claude/skills/commit/SKILL.md"
   echo "shared rule" > "${SRC_DIR}/shared/.claude/rules/git-workflow.md"
   echo "shared lefthook" > "${SRC_DIR}/shared/lefthook-base.yaml"
@@ -37,6 +38,8 @@ setup() {
   mkdir -p "${SRC_DIR}/templates/.vscode"
   echo "template vscode settings" > "${SRC_DIR}/templates/.vscode/settings.json"
   echo "template vscode extensions" > "${SRC_DIR}/templates/.vscode/extensions.json"
+  echo "template lefthook" > "${SRC_DIR}/templates/lefthook.yaml"
+  echo "template settings" > "${SRC_DIR}/templates/.claude/settings.json"
 
   # Init as git repo (needed for metadata commit hash)
   git -C "${SRC_DIR}" init -q
