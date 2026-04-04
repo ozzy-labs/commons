@@ -27,9 +27,12 @@ sync.sh          -> Sync script
 
 # Sync without confirmation
 /path/to/ai-config/sync.sh --force /path/to/target-repo
+
+# Preview changes without copying
+/path/to/ai-config/sync.sh --dry-run /path/to/target-repo
 ```
 
-Shared files are always overwritten. Templates are copied only if the target file does not exist.
+Shared files are always overwritten. Templates are copied only if the target file does not exist. After sync, a metadata file (`.claude/.ai-config-sync`) is written to the target with the source commit hash and timestamp.
 
 ## What is shared
 

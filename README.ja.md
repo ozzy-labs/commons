@@ -27,9 +27,12 @@ sync.sh          -> 同期スクリプト
 
 # 確認なしで同期
 /path/to/ai-config/sync.sh --force /path/to/target-repo
+
+# コピーせず差分のみ表示
+/path/to/ai-config/sync.sh --dry-run /path/to/target-repo
 ```
 
-共有ファイルは毎回上書きされる。テンプレートは対象ファイルが存在しない場合のみコピーされる。
+共有ファイルは毎回上書きされる。テンプレートは対象ファイルが存在しない場合のみコピーされる。同期後、対象リポジトリの `.claude/.ai-config-sync` にソースのコミットハッシュとタイムスタンプが記録される。
 
 ## 共有対象
 
