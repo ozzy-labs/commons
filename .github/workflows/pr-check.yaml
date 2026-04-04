@@ -4,10 +4,14 @@ on:
   pull_request:
     types: [opened, edited, synchronize, reopened]
 
+permissions:
+  contents: read
+  pull-requests: read
+
 jobs:
   pr-title-check:
     name: PR Title Format Check
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     steps:
       - name: Check PR title format
         uses: actions/github-script@v8
@@ -29,7 +33,7 @@ jobs:
 
   branch-name-check:
     name: Branch Name Check
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     steps:
       - name: Check branch name format
         uses: actions/github-script@v8
