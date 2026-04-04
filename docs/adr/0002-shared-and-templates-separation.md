@@ -6,7 +6,7 @@ Accepted (2026-04-04)
 
 ## Context
 
-ai-config が配布するファイルには2種類ある:
+dev-config が配布するファイルには2種類ある:
 
 - **共有ファイル**: 全リポジトリで同一であるべき（ワークフロースキル、ルール）
 - **テンプレート**: 初期セットアップ用の雛形（CLAUDE.md、settings.json、lint-rules）

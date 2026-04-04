@@ -3,8 +3,8 @@
 setup() {
   TEST_DIR="$(mktemp -d)"
 
-  # Create fake ai-config source repo
-  SRC_DIR="${TEST_DIR}/ai-config"
+  # Create fake dev-config source repo
+  SRC_DIR="${TEST_DIR}/dev-config"
   mkdir -p "${SRC_DIR}/shared/.claude/skills/commit"
   mkdir -p "${SRC_DIR}/shared/.claude/rules"
   mkdir -p "${SRC_DIR}/templates/.claude/skills/lint-rules"
@@ -84,21 +84,21 @@ teardown() {
   [ ! -f "${TARGET_DIR}/.claude/skills/commit/SKILL.md" ]
   [ ! -f "${TARGET_DIR}/CLAUDE.md" ]
   # Metadata should NOT exist
-  [ ! -f "${TARGET_DIR}/.claude/.ai-config-sync" ]
+  [ ! -f "${TARGET_DIR}/.claude/.dev-config-sync" ]
 }
 
 @test "writes metadata file with commit hash and timestamp" {
   run "${SRC_DIR}/sync.sh" --force "${TARGET_DIR}"
   [ "$status" -eq 0 ]
-  [ -f "${TARGET_DIR}/.claude/.ai-config-sync" ]
+  [ -f "${TARGET_DIR}/.claude/.dev-config-sync" ]
 
   local meta
-  meta="$(cat "${TARGET_DIR}/.claude/.ai-config-sync")"
+  meta="$(cat "${TARGET_DIR}/.claude/.dev-config-sync")"
   [[ "$meta" == *"commit: "* ]]
   [[ "$meta" == *"synced_at: "* ]]
   # Verify commit hash is a valid short hash (hex chars)
   local hash
-  hash="$(grep '^commit:' "${TARGET_DIR}/.claude/.ai-config-sync" | awk '{print $2}')"
+  hash="$(grep '^commit:' "${TARGET_DIR}/.claude/.dev-config-sync" | awk '{print $2}')"
   [[ "$hash" =~ ^[0-9a-f]+$ ]]
 }
 

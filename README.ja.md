@@ -1,8 +1,8 @@
 [English](README.md) | 日本語
 
-# ai-config
+# dev-config
 
-OzzyLabs リポジトリ共通の AI エージェント設定。
+OzzyLabs リポジトリ共通の開発設定。
 
 ## 構成
 
@@ -23,16 +23,16 @@ sync.sh          -> 同期スクリプト
 
 ```bash
 # 確認付きで同期
-/path/to/ai-config/sync.sh /path/to/target-repo
+/path/to/dev-config/sync.sh /path/to/target-repo
 
 # 確認なしで同期
-/path/to/ai-config/sync.sh --force /path/to/target-repo
+/path/to/dev-config/sync.sh --force /path/to/target-repo
 
 # コピーせず差分のみ表示
-/path/to/ai-config/sync.sh --dry-run /path/to/target-repo
+/path/to/dev-config/sync.sh --dry-run /path/to/target-repo
 ```
 
-共有ファイルは毎回上書きされる。テンプレートは対象ファイルが存在しない場合のみコピーされる。同期後、対象リポジトリの `.claude/.ai-config-sync` にソースのコミットハッシュとタイムスタンプが記録される。
+共有ファイルは毎回上書きされる。テンプレートは対象ファイルが存在しない場合のみコピーされる。同期後、対象リポジトリの `.claude/.dev-config-sync` にソースのコミットハッシュとタイムスタンプが記録される。
 
 ## 共有対象
 
