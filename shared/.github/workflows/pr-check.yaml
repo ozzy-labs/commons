@@ -18,7 +18,7 @@ jobs:
         with:
           script: |
             const title = context.payload.pull_request.title;
-            const pattern = /^(feat|fix|docs|style|refactor|perf|test|build|ci|chore)(\(.+\))?!?:.+/;
+            const pattern = /^(feat|fix|docs|style|refactor|perf|test|build|ci|chore)(\(.+\))?!?:\s.+/;
 
             if (!pattern.test(title)) {
               core.setFailed(

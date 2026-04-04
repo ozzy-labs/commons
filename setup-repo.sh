@@ -158,7 +158,14 @@ RULESET_BODY='{
     { "type": "deletion" },
     { "type": "non_fast_forward" },
     { "type": "required_linear_history" },
-    { "type": "pull_request" }
+    {
+      "type": "pull_request",
+      "parameters": {
+        "required_approving_review_count": 0,
+        "dismiss_stale_reviews_on_push": false,
+        "require_last_push_approval": false
+      }
+    }
   ]
 }'
 
