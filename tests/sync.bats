@@ -15,6 +15,8 @@ setup() {
   echo "shared editorconfig" > "${SRC_DIR}/shared/.editorconfig"
   echo "shared gitattributes" > "${SRC_DIR}/shared/.gitattributes"
   echo "shared mdformat" > "${SRC_DIR}/shared/.mdformat.toml"
+  mkdir -p "${SRC_DIR}/shared/.github/workflows"
+  echo "shared pr-check" > "${SRC_DIR}/shared/.github/workflows/pr-check.yaml"
   echo "template lint" > "${SRC_DIR}/templates/.claude/skills/lint-rules/SKILL.md"
   echo "template claude" > "${SRC_DIR}/templates/CLAUDE.md"
   echo "template security" > "${SRC_DIR}/templates/SECURITY.md"

@@ -58,6 +58,7 @@ templates/.claude/settings.json        → <repo>/.claude/settings.json
 | .editorconfig | エディタ共通設定（文字コード、改行、インデント） |
 | .gitattributes | 改行コード正規化、バイナリファイル判定 |
 | .mdformat.toml | Markdown フォーマッター設定 |
+| .github/workflows/pr-check.yaml | PR タイトル・ブランチ名の Conventional Commits 検証 |
 
 ## テンプレート一覧
 

@@ -16,6 +16,8 @@ shared/              -> 全リポジトリに同期（毎回上書き）
   .editorconfig      -> エディタ共通設定
   .gitattributes     -> 改行コード正規化
   .mdformat.toml     -> Markdown フォーマッター設定
+  .github/workflows/
+    pr-check.yaml    -> PR タイトル・ブランチ名検証
 templates/           -> 初期セットアップ用（存在しない場合のみコピー）
   CLAUDE.md
   SECURITY.md
@@ -83,6 +85,7 @@ setup-repo.sh        -> GitHub リポジトリ初期設定スクリプト
 | 設定 | .editorconfig | エディタ共通設定 |
 | 設定 | .gitattributes | 改行コード正規化 |
 | 設定 | .mdformat.toml | Markdown フォーマッター設定 |
+| ワークフロー | .github/workflows/pr-check.yaml | PR タイトル・ブランチ名の Conventional Commits 検証 |
 
 ## テンプレート
 
