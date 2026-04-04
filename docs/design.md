@@ -55,6 +55,9 @@ templates/.claude/settings.json        → <repo>/.claude/settings.json
 |----------|------|
 | lefthook-base.yaml | lefthook の共通ベース設定（commit-msg + 共通リンター）。各リポの lefthook.yaml から `extends` で参照 |
 | .commitlintrc.yaml | Conventional Commits の検証設定 |
+| .editorconfig | エディタ共通設定（文字コード、改行、インデント） |
+| .gitattributes | 改行コード正規化、バイナリファイル判定 |
+| .mdformat.toml | Markdown フォーマッター設定 |
 
 ## テンプレート一覧
 
@@ -70,11 +73,15 @@ templates/.claude/settings.json        → <repo>/.claude/settings.json
 | `.markdownlint-cli2.yaml` | リポジトリルート | Markdown リンター設定 |
 | `.mise.toml` | リポジトリルート | ツールバージョン管理のベースライン。リポの技術スタックに合わせてツールを追加する |
 | `.gitignore` | リポジトリルート | 共通の無視パターン。フレームワーク固有のパターンは各リポで追加する |
-| `.editorconfig` | リポジトリルート | エディタ共通設定（文字コード、改行、インデント） |
-| `.gitattributes` | リポジトリルート | 改行コード正規化、バイナリファイル判定 |
-| `.mdformat.toml` | リポジトリルート | Markdown フォーマッター設定 |
 | `renovate.json` | リポジトリルート | Renovate 依存関係自動更新設定 |
 | `biome.json` | リポジトリルート | Biome リンター・フォーマッター設定。`files.includes` はリポの構造に合わせてカスタマイズする |
+| `LICENSE` | リポジトリルート | MIT ライセンス |
+| `CONTRIBUTING.md` | リポジトリルート | コントリビューションポリシー |
+| `.github/pull_request_template.md` | `.github/` | PR テンプレート（Summary, Type of Change, Checklist） |
+| `.github/ISSUE_TEMPLATE/bug_report.yaml` | `.github/ISSUE_TEMPLATE/` | バグ報告テンプレート |
+| `.github/ISSUE_TEMPLATE/feature_request.yaml` | `.github/ISSUE_TEMPLATE/` | 機能リクエストテンプレート |
+| `.vscode/settings.json` | `.vscode/` | VS Code エディタ設定のベースライン。フレームワーク固有の設定は各リポで追加する |
+| `.vscode/extensions.json` | `.vscode/` | VS Code 推奨拡張のベースライン。フレームワーク固有の拡張は各リポで追加する |
 
 ## 共有 vs テンプレートの判断基準
 
