@@ -59,7 +59,11 @@ run_api() {
     return 0
   fi
 
-  gh api --method "${method}" "${endpoint}" "$@" >/dev/null 2>&1
+  local err
+  if ! err="$(gh api --method "${method}" "${endpoint}" "$@" 2>&1 >/dev/null)"; then
+    echo "  ⚠ ${method} ${endpoint} failed: ${err}" >&2
+    return 1
+  fi
 }
 
 run_api_with_input() {
@@ -72,7 +76,11 @@ run_api_with_input() {
     return 0
   fi
 
-  echo "${input}" | gh api --method "${method}" "${endpoint}" --input - >/dev/null 2>&1
+  local err
+  if ! err="$(echo "${input}" | gh api --method "${method}" "${endpoint}" --input - 2>&1 >/dev/null)"; then
+    echo "  ⚠ ${method} ${endpoint} failed: ${err}" >&2
+    return 1
+  fi
 }
 
 # ── 1. Repository settings ──────────────────────────────────────────
@@ -100,22 +108,22 @@ run_api_with_input PATCH "/repos/${REPO}" '{
     "secret_scanning": { "status": "enabled" },
     "secret_scanning_push_protection": { "status": "enabled" }
   }
-}'
+}' || true
 echo "  ✓ Secret scanning: enabled"
 echo "  ✓ Push protection: enabled"
 
-run_api PUT "/repos/${REPO}/vulnerability-alerts"
+run_api PUT "/repos/${REPO}/vulnerability-alerts" || true
 echo "  ✓ Dependabot alerts: enabled"
 
 run_api_with_input PATCH "/repos/${REPO}" '{
   "security_and_analysis": {
     "dependabot_security_updates": { "status": "enabled" }
   }
-}'
+}' || true
 echo "  ✓ Dependabot security updates: enabled"
 
 if [[ "${VISIBILITY}" == "PUBLIC" ]]; then
-  run_api PUT "/repos/${REPO}/private-vulnerability-reporting"
+  run_api PUT "/repos/${REPO}/private-vulnerability-reporting" || true
   echo "  ✓ Private vulnerability reporting: enabled"
 else
   echo "  - Private vulnerability reporting: skipped (private repo)"
