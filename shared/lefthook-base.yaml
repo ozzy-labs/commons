@@ -14,22 +14,16 @@ commit-msg:
 pre-commit:
   parallel: true
   commands:
-    shellcheck:
+    shell:
       glob: "*.sh"
-      run: shellcheck {staged_files}
-    shfmt:
-      glob: "*.sh"
-      run: shfmt -w {staged_files}
+      run: shfmt -w {staged_files} && shellcheck {staged_files}
       stage_fixed: true
     markdownlint:
       glob: "*.md"
       run: markdownlint-cli2 {staged_files}
-    yamlfmt:
+    yaml:
       glob: "*.{yaml,yml}"
-      run: yamlfmt {staged_files}
+      run: yamlfmt {staged_files} && yamllint -c .yamllint.yaml {staged_files}
       stage_fixed: true
-    yamllint:
-      glob: "*.{yaml,yml}"
-      run: yamllint -c .yamllint.yaml {staged_files}
     gitleaks:
       run: gitleaks protect --staged --no-banner

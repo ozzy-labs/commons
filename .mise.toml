@@ -1,6 +1,7 @@
 [tools]
-# Runtime (for commitlint)
+# Runtime & package managers
 node = "24"
+pnpm = "10"
 
 # Linters & formatters
 shellcheck = "0.11"

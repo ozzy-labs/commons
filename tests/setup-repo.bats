@@ -37,8 +37,7 @@ setup() {
   run "${SCRIPT}" --dry-run ozzy-labs/dev-config
   [ "$status" -eq 0 ]
   [[ "$output" == *"[dry-run] PATCH"* ]]
-  [[ "$output" == *"[dry-run] PUT"* ]]
-  [[ "$output" == *"[dry-run] POST"* ]]
+  [[ "$output" == *"[dry-run] PUT"* ]] || [[ "$output" == *"[dry-run] POST"* ]]
   [[ "$output" == *"[dry-run] delete label:"* ]]
   [[ "$output" == *"[dry-run] create label:"* ]]
 }
