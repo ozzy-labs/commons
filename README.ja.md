@@ -7,16 +7,20 @@ OzzyLabs リポジトリ共通の開発設定。
 ## 構成
 
 ```text
-shared/          -> 全リポジトリに同期（毎回上書き）
+shared/              -> 全リポジトリに同期（毎回上書き）
   .claude/
-    skills/      -> 共通ワークフロースキル
-    rules/       -> 共通ルール
-templates/       -> 初期セットアップ用（存在しない場合のみコピー）
+    skills/          -> 共通ワークフロースキル
+    rules/           -> 共通ルール
+  lefthook-base.yaml -> 共通 lefthook ベース設定
+  .commitlintrc.yaml -> 共通 commitlint 設定
+templates/           -> 初期セットアップ用（存在しない場合のみコピー）
   CLAUDE.md
+  SECURITY.md
   .claude/
     settings.json
     skills/lint-rules/
-sync.sh          -> 同期スクリプト
+  .mcp.json
+sync.sh              -> 同期スクリプト
 ```
 
 ## 使い方
@@ -30,6 +34,9 @@ sync.sh          -> 同期スクリプト
 
 # コピーせず差分のみ表示
 /path/to/dev-config/sync.sh --dry-run /path/to/target-repo
+
+# 共有ファイルの同期状態をチェック（CI 用）
+/path/to/dev-config/sync.sh --check /path/to/target-repo
 ```
 
 共有ファイルは毎回上書きされる。テンプレートは対象ファイルが存在しない場合のみコピーされる。同期後、対象リポジトリの `.claude/.dev-config-sync` にソースのコミットハッシュとタイムスタンプが記録される。
@@ -40,6 +47,8 @@ sync.sh          -> 同期スクリプト
 |------|----------|------|
 | スキル | commit, commit-conventions, drive, implement, lint, pr, review, ship, test | ワークフロー制御 |
 | ルール | git-workflow.md | ブランチ・コミット・PR 規約 |
+| 設定 | lefthook-base.yaml | 共通 lefthook ベース（commit-msg + 共通リンター） |
+| 設定 | .commitlintrc.yaml | Conventional Commits 検証 |
 
 ## テンプレート
 
@@ -48,6 +57,8 @@ sync.sh          -> 同期スクリプト
 | `CLAUDE.md` | プロジェクト概要、コマンド、検証手順 |
 | `.claude/settings.json` | 許可ツール・権限設定 |
 | `.claude/skills/lint-rules/` | リンターコマンド対応表（リポジトリ固有） |
+| `SECURITY.md` | 脆弱性報告ポリシー |
+| `.mcp.json` | MCP サーバー設定（Context7） |
 
 ## リポジトリ固有のまま残すもの
 

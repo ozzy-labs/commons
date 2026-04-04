@@ -7,6 +7,7 @@ set -euo pipefail
 # Options:
 #   --force     Sync without confirmation
 #   --dry-run   Show what would be synced without copying
+#   --check     Exit 1 if shared files are out of sync (for CI)
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 SHARED_DIR="${SCRIPT_DIR}/shared"
@@ -15,6 +16,7 @@ TEMPLATES_DIR="${SCRIPT_DIR}/templates"
 # Parse arguments
 FORCE=false
 DRY_RUN=false
+CHECK=false
 while [[ "${1:-}" == --* ]]; do
   case "$1" in
   --force)
@@ -23,6 +25,10 @@ while [[ "${1:-}" == --* ]]; do
     ;;
   --dry-run)
     DRY_RUN=true
+    shift
+    ;;
+  --check)
+    CHECK=true
     shift
     ;;
   *)
@@ -38,6 +44,7 @@ if [[ $# -lt 1 ]]; then
   echo "  Options:" >&2
   echo "    --force     Sync without confirmation" >&2
   echo "    --dry-run   Show what would be synced without copying" >&2
+  echo "    --check     Exit 1 if shared files are out of sync (for CI)" >&2
   exit 1
 fi
 
@@ -108,6 +115,17 @@ done
 
 # Count actionable items
 total_copy=$((${#shared_new[@]} + ${#shared_changed[@]} + ${#template_new[@]}))
+
+# Check mode: exit 1 if shared files are out of sync
+if [[ "${CHECK}" == true ]]; then
+  out_of_sync=$((${#shared_new[@]} + ${#shared_changed[@]}))
+  if [[ ${out_of_sync} -gt 0 ]]; then
+    echo "Shared files are out of sync."
+    exit 1
+  fi
+  echo "Shared files are up to date."
+  exit 0
+fi
 
 if [[ ${total_copy} -eq 0 ]]; then
   echo ""

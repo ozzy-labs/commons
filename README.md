@@ -7,16 +7,20 @@ Shared configurations for OzzyLabs repositories.
 ## Structure
 
 ```text
-shared/          -> Synced to every repo (always overwrite)
+shared/              -> Synced to every repo (always overwrite)
   .claude/
-    skills/      -> Shared workflow skills
-    rules/       -> Shared rules
-templates/       -> Copied on initial setup only (if not exists)
+    skills/          -> Shared workflow skills
+    rules/           -> Shared rules
+  lefthook-base.yaml -> Shared lefthook base config
+  .commitlintrc.yaml -> Shared commitlint config
+templates/           -> Copied on initial setup only (if not exists)
   CLAUDE.md
+  SECURITY.md
   .claude/
     settings.json
     skills/lint-rules/
-sync.sh          -> Sync script
+  .mcp.json
+sync.sh              -> Sync script
 ```
 
 ## Usage
@@ -30,6 +34,9 @@ sync.sh          -> Sync script
 
 # Preview changes without copying
 /path/to/dev-config/sync.sh --dry-run /path/to/target-repo
+
+# Check if shared files are in sync (for CI)
+/path/to/dev-config/sync.sh --check /path/to/target-repo
 ```
 
 Shared files are always overwritten. Templates are copied only if the target file does not exist. After sync, a metadata file (`.claude/.dev-config-sync`) is written to the target with the source commit hash and timestamp.
@@ -40,6 +47,8 @@ Shared files are always overwritten. Templates are copied only if the target fil
 |------|-------|---------|
 | Skills | commit, commit-conventions, drive, implement, lint, pr, review, ship, test | Workflow orchestration |
 | Rules | git-workflow.md | Branch, commit, PR conventions |
+| Config | lefthook-base.yaml | Shared lefthook base (commit-msg + common linters) |
+| Config | .commitlintrc.yaml | Conventional Commits validation |
 
 ## What is templated
 
@@ -48,6 +57,8 @@ Shared files are always overwritten. Templates are copied only if the target fil
 | `CLAUDE.md` | Project overview, commands, verification steps |
 | `.claude/settings.json` | Allowed tools and permissions |
 | `.claude/skills/lint-rules/` | Linter command mapping (repo-specific) |
+| `SECURITY.md` | Security vulnerability reporting policy |
+| `.mcp.json` | MCP server configuration (Context7) |
 
 ## What stays in each repo
 

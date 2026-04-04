@@ -10,8 +10,12 @@ setup() {
   mkdir -p "${SRC_DIR}/templates/.claude/skills/lint-rules"
   echo "shared skill" > "${SRC_DIR}/shared/.claude/skills/commit/SKILL.md"
   echo "shared rule" > "${SRC_DIR}/shared/.claude/rules/git-workflow.md"
+  echo "shared lefthook" > "${SRC_DIR}/shared/lefthook-base.yaml"
+  echo "shared commitlint" > "${SRC_DIR}/shared/.commitlintrc.yaml"
   echo "template lint" > "${SRC_DIR}/templates/.claude/skills/lint-rules/SKILL.md"
   echo "template claude" > "${SRC_DIR}/templates/CLAUDE.md"
+  echo "template security" > "${SRC_DIR}/templates/SECURITY.md"
+  echo "template mcp" > "${SRC_DIR}/templates/.mcp.json"
 
   # Init as git repo (needed for metadata commit hash)
   git -C "${SRC_DIR}" init -q
@@ -108,6 +112,40 @@ teardown() {
   run "${SRC_DIR}/sync.sh" --force "${TARGET_DIR}"
   [ "$status" -eq 0 ]
   [[ "$output" == *"Nothing to sync."* ]]
+}
+
+@test "--check exits 0 when shared files are up to date" {
+  "${SRC_DIR}/sync.sh" --force "${TARGET_DIR}"
+
+  run "${SRC_DIR}/sync.sh" --check "${TARGET_DIR}"
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"up to date"* ]]
+}
+
+@test "--check exits 1 when shared files are out of sync" {
+  run "${SRC_DIR}/sync.sh" --check "${TARGET_DIR}"
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"out of sync"* ]]
+}
+
+@test "--check exits 1 when shared files have changed" {
+  "${SRC_DIR}/sync.sh" --force "${TARGET_DIR}"
+
+  # Modify source
+  echo "updated skill" > "${SRC_DIR}/shared/.claude/skills/commit/SKILL.md"
+
+  run "${SRC_DIR}/sync.sh" --check "${TARGET_DIR}"
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"out of sync"* ]]
+}
+
+@test "--check does not copy files" {
+  run "${SRC_DIR}/sync.sh" --check "${TARGET_DIR}"
+  [ "$status" -eq 1 ]
+  # Files should NOT exist in target
+  [ ! -f "${TARGET_DIR}/.claude/skills/commit/SKILL.md" ]
+  # Metadata should NOT exist
+  [ ! -f "${TARGET_DIR}/.claude/.dev-config-sync" ]
 }
 
 @test "errors when target is not a git repository" {
