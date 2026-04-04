@@ -76,6 +76,7 @@ templates/.claude/settings.json        → <repo>/.claude/settings.json
 | `.gitignore` | リポジトリルート | 共通の無視パターン。フレームワーク固有のパターンは各リポで追加する |
 | `renovate.json` | リポジトリルート | Renovate 依存関係自動更新設定 |
 | `biome.json` | リポジトリルート | Biome リンター・フォーマッター設定。`files.includes` はリポの構造に合わせてカスタマイズする |
+| `lefthook.yaml` | リポジトリルート | 共通ベース（`lefthook-base.yaml`）を `extends` で参照。リポ固有のフック（biome, ruff 等）は各リポで追記する |
 | `LICENSE` | リポジトリルート | MIT ライセンス |
 | `CONTRIBUTING.md` | リポジトリルート | コントリビューションポリシー |
 | `.github/pull_request_template.md` | `.github/` | PR テンプレート（Summary, Type of Change, Checklist） |

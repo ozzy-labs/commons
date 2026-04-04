@@ -32,6 +32,7 @@ templates/           -> Copied on initial setup only (if not exists)
   .gitignore
   renovate.json
   biome.json
+  lefthook.yaml
   LICENSE
   CONTRIBUTING.md
   .github/
@@ -103,6 +104,7 @@ Sets merge rules (squash only), branch protection (Rulesets), security settings,
 | `.gitignore` | Common ignore patterns |
 | `renovate.json` | Renovate dependency update config |
 | `biome.json` | Biome linter/formatter config |
+| `lefthook.yaml` | Lefthook config extending shared base |
 | `LICENSE` | MIT License |
 | `CONTRIBUTING.md` | Contribution policy |
 | `.github/pull_request_template.md` | PR template |
