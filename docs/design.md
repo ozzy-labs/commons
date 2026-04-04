@@ -26,6 +26,36 @@ templates/CLAUDE.md                    → <repo>/CLAUDE.md
 templates/.claude/settings.json        → <repo>/.claude/settings.json
 ```
 
+## 共有ファイル一覧
+
+### スキル（`shared/.claude/skills/`）
+
+| スキル | 役割 |
+|--------|------|
+| commit | ステージング＆コミット |
+| commit-conventions | コミットメッセージ生成ルール（参照用） |
+| drive | implement→ship→review 自律ループ |
+| implement | ブランチ作成・実装 |
+| lint | リンター実行（lint-rules を参照） |
+| pr | プッシュ＆PR 作成 |
+| review | コードレビュー |
+| ship | lint→commit→pr パイプライン |
+| test | ビルド・テスト実行（CLAUDE.md の検証セクションを参照） |
+
+### ルール（`shared/.claude/rules/`）
+
+| ルール | 役割 |
+|--------|------|
+| git-workflow.md | ブランチ・コミット・PR 規約、禁止事項 |
+
+## テンプレート一覧
+
+| ファイル | コピー先 | 役割 |
+|----------|----------|------|
+| `CLAUDE.md` | リポジトリルート | プロジェクト概要、コマンド、検証手順の雛形 |
+| `.claude/settings.json` | `.claude/` | 許可コマンドの雛形 |
+| `.claude/skills/lint-rules/SKILL.md` | `.claude/skills/lint-rules/` | リンターコマンド対応表の雛形 |
+
 ## 共有 vs テンプレートの判断基準
 
 | 基準 | shared/ | templates/ |
