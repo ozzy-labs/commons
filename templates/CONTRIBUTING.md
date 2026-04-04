@@ -4,7 +4,7 @@ This is a personal project maintained by [ozzy-labs](https://github.com/ozzy-lab
 
 ## Bug Reports & Feature Requests
 
-If you find a bug or have an idea for improvement, please open an [issue](../../issues).
+If you find a bug or have an idea for improvement, please open an issue.
 
 ## License
 

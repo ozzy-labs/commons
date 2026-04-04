@@ -32,7 +32,12 @@ fi
 
 REPO="$1"
 
-# Verify gh CLI is authenticated
+# Verify gh CLI is installed and authenticated
+if ! command -v gh &>/dev/null; then
+  echo "Error: gh CLI is not installed. See https://cli.github.com/" >&2
+  exit 1
+fi
+
 if ! gh auth status >/dev/null 2>&1; then
   echo "Error: gh CLI is not authenticated. Run 'gh auth login' first." >&2
   exit 1
