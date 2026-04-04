@@ -48,6 +48,13 @@ templates/.claude/settings.json        → <repo>/.claude/settings.json
 |--------|------|
 | git-workflow.md | ブランチ・コミット・PR 規約、禁止事項 |
 
+### 共通設定ファイル（`shared/`）
+
+| ファイル | 役割 |
+|----------|------|
+| lefthook-base.yaml | lefthook の共通ベース設定（commit-msg + 共通リンター）。各リポの lefthook.yaml から `extends` で参照 |
+| .commitlintrc.yaml | Conventional Commits の検証設定 |
+
 ## テンプレート一覧
 
 | ファイル | コピー先 | 役割 |
@@ -55,6 +62,8 @@ templates/.claude/settings.json        → <repo>/.claude/settings.json
 | `CLAUDE.md` | リポジトリルート | プロジェクト概要、コマンド、検証手順の雛形 |
 | `.claude/settings.json` | `.claude/` | 許可コマンドの雛形 |
 | `.claude/skills/lint-rules/SKILL.md` | `.claude/skills/lint-rules/` | リンターコマンド対応表の雛形 |
+| `SECURITY.md` | リポジトリルート | 脆弱性報告ポリシー（Private Vulnerability Reporting 誘導） |
+| `.mcp.json` | リポジトリルート | MCP サーバー設定の雛形（Context7） |
 
 ## 共有 vs テンプレートの判断基準
 
