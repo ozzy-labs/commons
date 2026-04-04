@@ -32,7 +32,12 @@ fi
 
 REPO="$1"
 
-# Verify gh CLI is authenticated
+# Verify gh CLI is installed and authenticated
+if ! command -v gh &>/dev/null; then
+  echo "Error: gh CLI is not installed. See https://cli.github.com/" >&2
+  exit 1
+fi
+
 if ! gh auth status >/dev/null 2>&1; then
   echo "Error: gh CLI is not authenticated. Run 'gh auth login' first." >&2
   exit 1
@@ -136,7 +141,7 @@ echo "3. Branch protection (Rulesets)"
 RULESET_NAME="main-protection"
 
 # Check if ruleset already exists
-EXISTING_RULESET_ID="$(gh api "/repos/${REPO}/rulesets" --jq ".[] | select(.name == \"${RULESET_NAME}\") | .id" 2>/dev/null || true)"
+EXISTING_RULESET_ID="$(gh api "/repos/${REPO}/rulesets" 2>/dev/null | jq -r --arg name "${RULESET_NAME}" '.[] | select(.name == $name) | .id' 2>/dev/null || true)"
 
 RULESET_BODY='{
   "name": "'"${RULESET_NAME}"'",
