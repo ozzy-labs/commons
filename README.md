@@ -1,8 +1,8 @@
 English | [日本語](README.ja.md)
 
-# ai-config
+# dev-config
 
-Shared AI agent configurations for OzzyLabs repositories.
+Shared configurations for OzzyLabs repositories.
 
 ## Structure
 
@@ -23,16 +23,16 @@ sync.sh          -> Sync script
 
 ```bash
 # Sync with confirmation
-/path/to/ai-config/sync.sh /path/to/target-repo
+/path/to/dev-config/sync.sh /path/to/target-repo
 
 # Sync without confirmation
-/path/to/ai-config/sync.sh --force /path/to/target-repo
+/path/to/dev-config/sync.sh --force /path/to/target-repo
 
 # Preview changes without copying
-/path/to/ai-config/sync.sh --dry-run /path/to/target-repo
+/path/to/dev-config/sync.sh --dry-run /path/to/target-repo
 ```
 
-Shared files are always overwritten. Templates are copied only if the target file does not exist. After sync, a metadata file (`.claude/.ai-config-sync`) is written to the target with the source commit hash and timestamp.
+Shared files are always overwritten. Templates are copied only if the target file does not exist. After sync, a metadata file (`.claude/.dev-config-sync`) is written to the target with the source commit hash and timestamp.
 
 ## What is shared
 
