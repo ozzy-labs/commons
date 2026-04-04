@@ -3,8 +3,10 @@ set -euo pipefail
 
 # ai-config sync script
 # Usage:
-#   sync.sh <target-repo-path>          Sync with confirmation
-#   sync.sh --force <target-repo-path>  Sync without confirmation
+#   sync.sh [options] <target-repo-path>
+# Options:
+#   --force     Sync without confirmation
+#   --dry-run   Show what would be synced without copying
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 SHARED_DIR="${SCRIPT_DIR}/shared"
