@@ -16,6 +16,8 @@ shared/              -> Synced to every repo (always overwrite)
   .editorconfig      -> Editor settings
   .gitattributes     -> Line ending normalization
   .mdformat.toml     -> Markdown formatter config
+  .github/workflows/
+    pr-check.yaml    -> PR title & branch name validation
 templates/           -> Copied on initial setup only (if not exists)
   CLAUDE.md
   SECURITY.md
@@ -83,6 +85,7 @@ Sets merge rules (squash only), branch protection (Rulesets), security settings,
 | Config | .editorconfig | Editor settings (charset, indent, line ending) |
 | Config | .gitattributes | Line ending normalization, binary detection |
 | Config | .mdformat.toml | Markdown formatter config |
+| Workflow | .github/workflows/pr-check.yaml | PR title & branch name Conventional Commits validation |
 
 ## What is templated
 
