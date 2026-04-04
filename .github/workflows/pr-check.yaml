@@ -1,0 +1,55 @@
+name: PR Check
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened]
+
+jobs:
+  pr-title-check:
+    name: PR Title Format Check
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Check PR title format
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const title = context.payload.pull_request.title;
+            const pattern = /^(feat|fix|docs|style|refactor|perf|test|build|ci|chore)(\(.+\))?!?:.+/;
+
+            if (!pattern.test(title)) {
+              core.setFailed(
+                `PR title does not follow Conventional Commits format.\n\n` +
+                `Expected format: type(scope): description\n` +
+                `Valid types: feat, fix, docs, style, refactor, perf, test, chore\n\n` +
+                `Current title: ${title}`
+              );
+            } else {
+              core.info('PR title follows Conventional Commits format');
+            }
+
+  branch-name-check:
+    name: Branch Name Check
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Check branch name format
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const branch = context.payload.pull_request.head.ref;
+            const pattern = /^(feat|fix|docs|style|refactor|perf|test|build|ci|chore)\/.+/;
+
+            if (branch === 'main') {
+              core.info('Branch is main, skipping check');
+              return;
+            }
+
+            if (!pattern.test(branch)) {
+              core.setFailed(
+                `Branch name does not follow naming convention.\n\n` +
+                `Expected format: type/description\n` +
+                `Valid types: feat, fix, docs, style, refactor, perf, test, chore\n\n` +
+                `Current branch: ${branch}`
+              );
+            } else {
+              core.info('Branch name follows naming convention');
+            }
