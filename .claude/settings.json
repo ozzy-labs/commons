@@ -6,8 +6,17 @@
       "Read(.env*)"
     ],
     "allow": [
+      "Bash(mise *)",
+      "Bash(pnpm *)",
+      "Bash(npx *)",
+      "Bash(lefthook *)",
+      "Bash(bats *)",
       "Bash(shellcheck *)",
       "Bash(shfmt *)",
+      "Bash(markdownlint-cli2 *)",
+      "Bash(yamlfmt *)",
+      "Bash(yamllint *)",
+      "Bash(gitleaks *)",
       "Bash(git status*)",
       "Bash(git diff*)",
       "Bash(git log*)",

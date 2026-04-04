@@ -1,0 +1,17 @@
+[tools]
+# Runtime (for commitlint)
+node = "24"
+
+# Linters & formatters
+shellcheck = "0.11"
+shfmt = "3"
+"npm:markdownlint-cli2" = "0.21"
+"pipx:yamllint" = "1"
+yamlfmt = "0.21"
+gitleaks = "8"
+
+# Testing
+"npm:bats" = "1"
+
+# Git hooks
+lefthook = "2"

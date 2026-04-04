@@ -5,3 +5,7 @@ Thumbs.db
 # Editor
 *.swp
 *~
+
+# Dependencies
+node_modules/
+pnpm-lock.yaml
