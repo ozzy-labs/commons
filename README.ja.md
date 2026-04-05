@@ -7,40 +7,26 @@ OzzyLabs リポジトリ共通の開発設定。
 ## 構成
 
 ```text
-shared/              -> 全リポジトリに同期（毎回上書き）
+dist/                -> 全リポジトリに配布
   .claude/
-    skills/          -> 共通ワークフロースキル
-    rules/           -> 共通ルール
+    skills/          -> ワークフロースキル
+    rules/           -> ルール
+    settings.json    -> 許可ツール・権限設定
+  .devcontainer/     -> devcontainer 設定
+  .github/
+    workflows/       -> PR タイトル・ブランチ名検証
+    ISSUE_TEMPLATE/  -> Issue テンプレート
+    pull_request_template.md
+  .vscode/           -> VS Code 設定・推奨拡張
   lefthook-base.yaml -> 共通 lefthook ベース設定
+  lefthook.yaml      -> 共通ベースを参照する lefthook 設定
   .commitlintrc.yaml -> 共通 commitlint 設定
   .editorconfig      -> エディタ共通設定
   .gitattributes     -> 改行コード正規化
   .mdformat.toml     -> Markdown フォーマッター設定
-  .github/workflows/
-    pr-check.yaml    -> PR タイトル・ブランチ名検証
-templates/           -> 初期セットアップ用（存在しない場合のみコピー）
-  CLAUDE.md
-  SECURITY.md
-  .claude/
-    settings.json
-    skills/lint-rules/
-  .mcp.json
-  .yamlfmt.yaml
-  .yamllint.yaml
-  .markdownlint-cli2.yaml
-  .mise.toml
-  .gitignore
-  renovate.json
-  biome.json
-  lefthook.yaml
-  LICENSE
-  CONTRIBUTING.md
-  .github/
-    pull_request_template.md
-    ISSUE_TEMPLATE/
-  .vscode/
-    settings.json
-    extensions.json
+  .mise.toml         -> ツールバージョン管理
+  CLAUDE.md          -> プロジェクト概要の雛形
+  ...
 sync.sh              -> 同期スクリプト
 setup-repo.sh        -> GitHub リポジトリ初期設定スクリプト
 ```
@@ -48,20 +34,27 @@ setup-repo.sh        -> GitHub リポジトリ初期設定スクリプト
 ## 使い方
 
 ```bash
-# 確認付きで同期
+# 対話的に同期（差分のあるファイルは確認あり）
 /path/to/dev-config/sync.sh /path/to/target-repo
 
-# 確認なしで同期
+# 確認なしで同期（差分のあるファイルを全て上書き）
 /path/to/dev-config/sync.sh --force /path/to/target-repo
 
 # コピーせず差分のみ表示
 /path/to/dev-config/sync.sh --dry-run /path/to/target-repo
 
-# 共有ファイルの同期状態をチェック（CI 用）
+# 同期状態をチェック（CI 用、差分があれば exit 1）
 /path/to/dev-config/sync.sh --check /path/to/target-repo
+
+# pin を解除
+/path/to/dev-config/sync.sh --unpin CLAUDE.md /path/to/target-repo
 ```
 
-共有ファイルは毎回上書きされる。テンプレートは対象ファイルが存在しない場合のみコピーされる。同期後、対象リポジトリの `.claude/.dev-config-sync` にソースのコミットハッシュとタイムスタンプが記録される。
+全ファイルに同一の同期ポリシーを適用する。対話モードでは差分のあるファイルについて更新・スキップ・pin（永続スキップ）を選択できる。pinned ファイルは `--force` を含む全モードでスキップされる。同期後、対象リポジトリの `.dev-config/sync.yaml` にメタデータが記録される。
+
+### Pin
+
+ターゲットリポジトリで意図的にカスタマイズしたファイルを **pin** すると、以降の同期で上書きされなくなる。対話的同期時に `pin` を選択するか、`.dev-config/sync.yaml` を直接編集する。
 
 ### リポジトリ初期設定
 
@@ -75,47 +68,10 @@ setup-repo.sh        -> GitHub リポジトリ初期設定スクリプト
 
 マージルール（squash のみ）、ブランチ保護（Rulesets）、セキュリティ設定、Conventional Commits ラベルを設定する。設計方針は [ADR-0004](docs/adr/0004-repo-setup-with-rulesets.md) を参照。
 
-## 共有対象
-
-| 種別 | ファイル | 用途 |
-|------|----------|------|
-| スキル | commit, commit-conventions, drive, implement, lint, pr, review, ship, test | ワークフロー制御 |
-| ルール | git-workflow.md | ブランチ・コミット・PR 規約 |
-| 設定 | lefthook-base.yaml | 共通 lefthook ベース（commit-msg + 共通リンター） |
-| 設定 | .commitlintrc.yaml | Conventional Commits 検証 |
-| 設定 | .editorconfig | エディタ共通設定 |
-| 設定 | .gitattributes | 改行コード正規化 |
-| 設定 | .mdformat.toml | Markdown フォーマッター設定 |
-| ワークフロー | .github/workflows/pr-check.yaml | PR タイトル・ブランチ名の Conventional Commits 検証 |
-
-## テンプレート
-
-| ファイル | 用途 |
-|----------|------|
-| `CLAUDE.md` | プロジェクト概要、コマンド、検証手順 |
-| `.claude/settings.json` | 許可ツール・権限設定 |
-| `.claude/skills/lint-rules/` | リンターコマンド対応表（リポジトリ固有） |
-| `SECURITY.md` | 脆弱性報告ポリシー |
-| `.mcp.json` | MCP サーバー設定（Context7） |
-| `.yamlfmt.yaml` | YAML フォーマッター設定 |
-| `.yamllint.yaml` | YAML リンター設定 |
-| `.markdownlint-cli2.yaml` | Markdown リンター設定 |
-| `.mise.toml` | ツールバージョン管理のベースライン |
-| `.gitignore` | 共通の無視パターン |
-| `renovate.json` | Renovate 依存関係自動更新設定 |
-| `biome.json` | Biome リンター・フォーマッター設定 |
-| `lefthook.yaml` | 共通ベースを参照する Lefthook 設定 |
-| `LICENSE` | MIT ライセンス |
-| `CONTRIBUTING.md` | コントリビューションポリシー |
-| `.github/pull_request_template.md` | PR テンプレート |
-| `.github/ISSUE_TEMPLATE/` | Issue テンプレート（バグ報告、機能リクエスト） |
-| `.vscode/settings.json` | VS Code エディタ設定のベースライン |
-| `.vscode/extensions.json` | VS Code 推奨拡張のベースライン |
-
 ## リポジトリ固有のまま残すもの
 
 - ドメイン固有のスキル・ルール
-- カスタマイズ済みの CLAUDE.md、settings.json、lint-rules
+- カスタマイズ済みのファイル（pin して上書きを防止）
 
 ## 言語
 

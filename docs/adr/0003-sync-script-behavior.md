@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted (2026-04-04)
+Superseded by [ADR-0005](0005-unified-dist-with-pin.md) (2026-04-05)
 
 ## Context
 
