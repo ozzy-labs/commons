@@ -89,7 +89,7 @@ dist/.devcontainer/Dockerfile        → <repo>/.devcontainer/Dockerfile
 
 全ファイルに同一のポリシーを適用する（[ADR-0005](adr/0005-unified-dist-with-pin.md)）。
 
-| ファイル状態 | 対話モード | `--force` | `--check`（CI） | `--dry-run` |
+| ファイル状態 | 対話モード | `-y` / `--yes` | `--check`（CI） | `--dry-run` |
 |---|---|---|---|---|
 | 未存在 | コピー | コピー | exit 1 | 表示 |
 | 同一 | スキップ | スキップ | OK | 表示 |
@@ -100,15 +100,18 @@ dist/.devcontainer/Dockerfile        → <repo>/.devcontainer/Dockerfile
 
 ターゲットリポジトリ側で意図的な乖離を宣言する仕組み:
 
-- 対話モードで差分をスキップする際に pin するか選択: `[y/N/pin]`
+- 対話モードで差分のあるファイルについて選択: `[y/N/pin/all]`（y=更新, N=スキップ, pin=永続スキップ, all=残り全て更新）
 - pinned ファイルは全モードでスキップ（意図的な乖離を尊重）
-- 解除: `sync.sh --unpin <path>` または `.dev-config/sync.yaml` を手動編集
+- 設定: 対話モードで `pin` を選択、または `.dev-config/sync.yaml` を手動編集
+- 解除: `.dev-config/sync.yaml` から該当行を削除
 
 ### 同期メタデータ
 
 `sync.sh` は同期完了後、対象リポジトリの `.dev-config/sync.yaml` にメタデータを書き込む:
 
 ```yaml
+# Auto-updated by dev-config sync.sh
+# 'pinned' is user-editable — add or remove paths freely
 commit: abc1234
 synced_at: 2026-04-05T00:00:00Z
 pinned:
