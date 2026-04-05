@@ -37,20 +37,17 @@ setup-repo.sh        -> GitHub リポジトリ初期設定スクリプト
 # 対話的に同期（差分のあるファイルは確認あり）
 /path/to/dev-config/sync.sh /path/to/target-repo
 
-# 確認なしで同期（差分のあるファイルを全て上書き）
-/path/to/dev-config/sync.sh --force /path/to/target-repo
+# 確認なしで同期（pinned 以外の差分ファイルを全て上書き）
+/path/to/dev-config/sync.sh -y /path/to/target-repo
 
 # コピーせず差分のみ表示
 /path/to/dev-config/sync.sh --dry-run /path/to/target-repo
 
 # 同期状態をチェック（CI 用、差分があれば exit 1）
 /path/to/dev-config/sync.sh --check /path/to/target-repo
-
-# pin を解除
-/path/to/dev-config/sync.sh --unpin CLAUDE.md /path/to/target-repo
 ```
 
-全ファイルに同一の同期ポリシーを適用する。対話モードでは差分のあるファイルについて更新・スキップ・pin（永続スキップ）を選択できる。pinned ファイルは `--force` を含む全モードでスキップされる。同期後、対象リポジトリの `.dev-config/sync.yaml` にメタデータが記録される。
+全ファイルに同一の同期ポリシーを適用する。対話モードでは差分のあるファイルについて更新・スキップ・pin（永続スキップ）・全て更新を選択できる。pinned ファイルは `-y` を含む全モードでスキップされる。同期後、対象リポジトリの `.dev-config/sync.yaml` にメタデータが記録される。
 
 ### Pin
 
