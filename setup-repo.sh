@@ -134,9 +134,20 @@ else
   echo "  - Private vulnerability reporting: skipped (private repo)"
 fi
 
-# ── 3. Branch protection (Rulesets) ─────────────────────────────────
+# ── 3. Actions permissions ─────────────────────────────────────────
 echo ""
-echo "3. Branch protection (Rulesets)"
+echo "3. Actions permissions"
+
+run_api_with_input PUT "/repos/${REPO}/actions/permissions/workflow" '{
+  "default_workflow_permissions": "write",
+  "can_approve_pull_request_reviews": true
+}'
+echo "  ✓ Workflow permissions: read-write"
+echo "  ✓ Allow creating and approving PRs: enabled"
+
+# ── 4. Branch protection (Rulesets) ─────────────────────────────────
+echo ""
+echo "4. Branch protection (Rulesets)"
 
 RULESET_NAME="main-protection"
 
@@ -185,9 +196,9 @@ echo "    - Pull request: required (0 approvals)"
 echo "    - Linear history: required"
 echo "    - Bypass: none"
 
-# ── 4. Labels ───────────────────────────────────────────────────────
+# ── 5. Labels ───────────────────────────────────────────────────────
 echo ""
-echo "4. Labels"
+echo "5. Labels"
 
 # Default GitHub labels to remove
 DEFAULT_LABELS=(
