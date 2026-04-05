@@ -72,7 +72,14 @@ read_pinned() {
     fi
     if ${in_pinned}; then
       if [[ "${line}" =~ ^[[:space:]]*-[[:space:]]+(.*) ]]; then
-        echo "${BASH_REMATCH[1]}"
+        local val="${BASH_REMATCH[1]}"
+        # Strip surrounding quotes and trailing whitespace
+        val="${val#\"}"
+        val="${val%\"}"
+        val="${val#\'}"
+        val="${val%\'}"
+        val="${val%"${val##*[! ]}"}"
+        echo "${val}"
       else
         break
       fi
@@ -101,6 +108,7 @@ write_metadata() {
   fi
   SYNCED_AT="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
 
+  local tmp_file="${METADATA_FILE}.tmp.$$"
   {
     echo "# Auto-updated by dev-config sync.sh"
     echo "# 'pinned' is user-editable — add or remove paths freely"
@@ -112,7 +120,7 @@ write_metadata() {
         echo "  - ${p}"
       done
     fi
-  } >"${METADATA_FILE}"
+  } >"${tmp_file}" && mv "${tmp_file}" "${METADATA_FILE}"
 }
 
 # --- Collect files ---
