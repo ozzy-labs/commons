@@ -1,5 +1,5 @@
 ---
-description: 拡張子別リンター・フォーマッターのコマンド対応表。他スキルから参照される。
+description: 拡張子別リンター・フォーマッターのコマンド対応表と型チェックルール。他スキルから参照される。
 user-invocable: false
 ---
 
@@ -11,9 +11,19 @@ lint スキルから参照される。対象ファイルの拡張子に応じて
 
 | 拡張子 | コマンド |
 |--------|---------|
-| `.md` | `markdownlint-cli2 <file>` |
-| `.yaml` | `yamlfmt <file> && yamllint <file>` |
-| `.sh` | `shellcheck <file> && shfmt -w <file>` |
+| `.ts`, `.tsx`, `.js`, `.jsx`, `.json` | `biome check --write <file>` |
+| `.md` | `markdownlint-cli2 --fix <file>` |
+| `.yaml`, `.yml` | `yamlfmt <file> && yamllint -c .yamllint.yaml <file>` |
+| `.toml` | `taplo format <file>` |
+| `.sh` | `shfmt -w <file> && shellcheck <file>` |
+
+## 型チェック
+
+TypeScript / JavaScript / Astro ファイルが変更された場合、lint 完了後に型チェックを実行する:
+
+```bash
+pnpm run typecheck
+```
 
 ## セキュリティ
 

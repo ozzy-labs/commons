@@ -2,7 +2,7 @@
 description: コード変更や PR をレビューし、問題点・改善案を報告する
 argument-hint: "<#PR-number | (blank for working tree changes)>"
 disable-model-invocation: true
-allowed-tools: Bash, Read, Grep, Glob, AskUserQuestion
+allowed-tools: Bash, Read, Edit, Write, Grep, Glob, AskUserQuestion
 ---
 
 # review - コードレビュー
@@ -77,9 +77,9 @@ allowed-tools: Bash, Read, Grep, Glob, AskUserQuestion
 
 **PR レビューの場合:** レポート全体を `gh pr comment <N> --body "<レポート>"` で PR にコメントとして投稿する。
 
-### Step 5: 次のアクション確認
+### Step 5: 次のアクション提案
 
-AskUserQuestion を呼び出し、以下の選択肢を表示する:
+AskUserQuestion を呼び出す（`answers` パラメータは設定しない）。以下の選択肢を表示する:
 
 **指摘ありの場合:**
 

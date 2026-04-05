@@ -3,6 +3,8 @@
     "deny": [
       "Bash(curl*)",
       "Bash(wget*)",
+      "Bash(git push*--force*)",
+      "Bash(git push* -f*)",
       "Read(.env*)"
     ],
     "allow": [

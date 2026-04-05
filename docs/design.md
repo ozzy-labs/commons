@@ -37,6 +37,7 @@ dist/.devcontainer/Dockerfile        → <repo>/.devcontainer/Dockerfile
 | drive | implement→ship→review 自律ループ |
 | implement | ブランチ作成・実装 |
 | lint | リンター実行（lint-rules を参照） |
+| lint-rules | リンターコマンド対応表（参照用） |
 | pr | プッシュ＆PR 作成 |
 | review | コードレビュー |
 | ship | lint→commit→pr パイプライン |
@@ -56,7 +57,6 @@ dist/.devcontainer/Dockerfile        → <repo>/.devcontainer/Dockerfile
 | .commitlintrc.yaml | Conventional Commits の検証設定 |
 | .editorconfig | エディタ共通設定（文字コード、改行、インデント） |
 | .gitattributes | 改行コード正規化、バイナリファイル判定 |
-| .mdformat.toml | Markdown フォーマッター設定 |
 | .github/workflows/pr-check.yaml | PR タイトル・ブランチ名の Conventional Commits 検証 |
 | CLAUDE.md | プロジェクト概要、コマンド、検証手順の雛形 |
 | .claude/settings.json | 許可コマンドのベースライン。リポ固有のツールは各リポで追加する |
@@ -120,7 +120,7 @@ pinned:
 ```
 
 - `--check` は pinned 以外のファイルを検証対象とする
-- 実際のファイルコピーが発生した場合のみ書き込む（変更なしの場合はスキップ）
+- ファイルコピーが発生した場合、または pinned リストが存在する場合に書き込む（`-y` モードでは無条件に書き込む）
 - 対象リポジトリにコミットする想定（`.gitignore` に入れない）
 - `--dry-run` 時は書き込まない
 

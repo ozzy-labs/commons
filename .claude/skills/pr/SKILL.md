@@ -55,9 +55,9 @@ Closes #N <!-- Issue 起点の場合のみ -->
   PR: <PR URL>
 ```
 
-### Step 4: 次のアクション確認
+### Step 4: 次のアクション提案
 
-AskUserQuestion を呼び出し、以下の選択肢を表示する:
+AskUserQuestion を呼び出す（`answers` パラメータは設定しない）。以下の選択肢を表示する:
 
 - **「PR をレビューする」** → `.claude/skills/review/SKILL.md` を Read し、その手順に従う
 - **「PR をマージする」** → `gh pr merge --squash --delete-branch` でマージを実行し、結果を報告する
