@@ -16,11 +16,19 @@ RUN curl -fsSL https://claude.ai/install.sh | bash
 # Install mise
 RUN curl --proto '=https' --tlsv1.2 -fsSL https://mise.run | sh
 
-# Install oh-my-zsh plugins (static layer — placed before mise install for better caching)
+# Install oh-my-zsh plugins (pinned to known commits)
 RUN git clone --depth=1 https://github.com/zsh-users/zsh-autosuggestions \
         ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions \
+    && git -C ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions \
+        fetch --depth=1 origin 85919cd1ffa7d2d5412f6d3fe437ebdbeeec4fc5 \
+    && git -C ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions \
+        checkout 85919cd1ffa7d2d5412f6d3fe437ebdbeeec4fc5 \
     && git clone --depth=1 https://github.com/zsh-users/zsh-syntax-highlighting \
         ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting \
+    && git -C ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting \
+        fetch --depth=1 origin 1d85c692615a25fe2293bdd44b34c217d5d2bf04 \
+    && git -C ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting \
+        checkout 1d85c692615a25fe2293bdd44b34c217d5d2bf04 \
     && sed -i 's/^plugins=(git)$/plugins=(git zsh-autosuggestions zsh-syntax-highlighting)/' ~/.zshrc
 
 # Install tools defined in .mise.toml (cached in image layer)

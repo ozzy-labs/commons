@@ -19,7 +19,6 @@ setup() {
   echo "commitlint" > "${SRC_DIR}/dist/.commitlintrc.yaml"
   echo "editorconfig" > "${SRC_DIR}/dist/.editorconfig"
   echo "gitattributes" > "${SRC_DIR}/dist/.gitattributes"
-  echo "mdformat" > "${SRC_DIR}/dist/.mdformat.toml"
   echo "pr-check" > "${SRC_DIR}/dist/.github/workflows/pr-check.yaml"
   echo "claude md" > "${SRC_DIR}/dist/CLAUDE.md"
   echo "security" > "${SRC_DIR}/dist/SECURITY.md"
@@ -262,4 +261,62 @@ EOF
   meta="$(cat "${TARGET_DIR}/.dev-config/sync.yaml")"
   [[ "$meta" == *"pinned:"* ]]
   [[ "$meta" == *"CLAUDE.md"* ]]
+}
+
+@test "pinned files with YAML quotes are recognized" {
+  "${SRC_DIR}/sync.sh" -y "${TARGET_DIR}"
+
+  # Pin CLAUDE.md with YAML double quotes
+  mkdir -p "${TARGET_DIR}/.dev-config"
+  cat > "${TARGET_DIR}/.dev-config/sync.yaml" <<'EOF'
+commit: abc1234
+synced_at: 2026-04-05T00:00:00Z
+pinned:
+  - "CLAUDE.md"
+EOF
+
+  echo "my custom claude" > "${TARGET_DIR}/CLAUDE.md"
+  echo "updated claude md" > "${SRC_DIR}/dist/CLAUDE.md"
+
+  run "${SRC_DIR}/sync.sh" -y "${TARGET_DIR}"
+  [ "$status" -eq 0 ]
+  [ "$(cat "${TARGET_DIR}/CLAUDE.md")" = "my custom claude" ]
+}
+
+@test "pinned files with trailing spaces are recognized" {
+  "${SRC_DIR}/sync.sh" -y "${TARGET_DIR}"
+
+  # Pin CLAUDE.md with trailing spaces
+  mkdir -p "${TARGET_DIR}/.dev-config"
+  printf 'commit: abc1234\nsynced_at: 2026-04-05T00:00:00Z\npinned:\n  - CLAUDE.md   \n' \
+    > "${TARGET_DIR}/.dev-config/sync.yaml"
+
+  echo "my custom claude" > "${TARGET_DIR}/CLAUDE.md"
+  echo "updated claude md" > "${SRC_DIR}/dist/CLAUDE.md"
+
+  run "${SRC_DIR}/sync.sh" -y "${TARGET_DIR}"
+  [ "$status" -eq 0 ]
+  [ "$(cat "${TARGET_DIR}/CLAUDE.md")" = "my custom claude" ]
+}
+
+@test "metadata is written atomically via temp file" {
+  run "${SRC_DIR}/sync.sh" -y "${TARGET_DIR}"
+  [ "$status" -eq 0 ]
+  [ -f "${TARGET_DIR}/.dev-config/sync.yaml" ]
+  # No leftover temp files
+  local tmp_count
+  tmp_count="$(find "${TARGET_DIR}/.dev-config" -name 'sync.yaml.tmp.*' | wc -l)"
+  [ "$tmp_count" -eq 0 ]
+}
+
+@test "interactive mode: skip unchanged and respond to input" {
+  "${SRC_DIR}/sync.sh" -y "${TARGET_DIR}"
+
+  echo "updated skill" > "${SRC_DIR}/dist/.claude/skills/commit/SKILL.md"
+  echo "updated claude md" > "${SRC_DIR}/dist/CLAUDE.md"
+
+  # Provide "n" to skip the first changed file, then "y" for the second
+  run bash -c 'printf "n\ny\n" | "${1}" "${2}"' _ "${SRC_DIR}/sync.sh" "${TARGET_DIR}"
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"Sync complete."* ]]
 }
