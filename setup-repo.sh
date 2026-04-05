@@ -163,7 +163,9 @@ RULESET_BODY='{
       "parameters": {
         "required_approving_review_count": 0,
         "dismiss_stale_reviews_on_push": false,
-        "require_last_push_approval": false
+        "require_code_owner_review": false,
+        "require_last_push_approval": false,
+        "required_review_thread_resolution": false
       }
     }
   ]
