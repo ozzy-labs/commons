@@ -41,9 +41,9 @@ allowed-tools: Bash, Read, Grep, Glob, AskUserQuestion
   PR: <PR URL>
 ```
 
-### Step 5: 次のアクション確認
+### Step 5: 次のアクション提案
 
-AskUserQuestion を呼び出し、以下の選択肢を表示する:
+AskUserQuestion を呼び出す（`answers` パラメータは設定しない）。以下の選択肢を表示する:
 
 - **「PR をレビューする」** → `.claude/skills/review/SKILL.md` を Read し、その手順に従う
 - **「PR をマージする」** → `gh pr merge --squash --delete-branch` でマージを実行し、結果を報告する

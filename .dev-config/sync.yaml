@@ -4,7 +4,6 @@ commit: 09a4b1c
 synced_at: 2026-04-05T00:28:50Z
 pinned:
   - .claude/settings.json
-  - .claude/skills/lint-rules/SKILL.md
   - .gitignore
   - .mise.toml
   - CLAUDE.md

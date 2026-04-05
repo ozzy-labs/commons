@@ -1,7 +1,7 @@
 ---
 description: 全リンターを自動修正付きで実行し、結果を報告する
 disable-model-invocation: true
-allowed-tools: Bash, Read, AskUserQuestion
+allowed-tools: Bash, Read, Edit, AskUserQuestion
 ---
 
 # lint - 全リンターの実行

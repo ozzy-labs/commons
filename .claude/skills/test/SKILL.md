@@ -1,7 +1,7 @@
 ---
 description: ビルド・テスト・型チェックを実行し、結果を報告する
 disable-model-invocation: true
-allowed-tools: Bash, Read, AskUserQuestion
+allowed-tools: Bash, Read, Edit, Write, AskUserQuestion
 ---
 
 # test - ビルド・テストの実行
