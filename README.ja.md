@@ -23,7 +23,6 @@ dist/                -> 全リポジトリに配布
   .commitlintrc.yaml -> 共通 commitlint 設定
   .editorconfig      -> エディタ共通設定
   .gitattributes     -> 改行コード正規化
-  .mdformat.toml     -> Markdown フォーマッター設定
   .mise.toml         -> ツールバージョン管理
   CLAUDE.md          -> プロジェクト概要の雛形
   ...
