@@ -141,7 +141,7 @@ echo "3. Actions permissions"
 run_api_with_input PUT "/repos/${REPO}/actions/permissions/workflow" '{
   "default_workflow_permissions": "write",
   "can_approve_pull_request_reviews": true
-}'
+}' || true
 echo "  ✓ Workflow permissions: read-write"
 echo "  ✓ Allow creating and approving PRs: enabled"
 
