@@ -1,22 +1,4 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["config:recommended"],
-  "minimumReleaseAge": "3 days",
-  "automergeType": "pr",
-  "packageRules": [
-    {
-      "matchUpdateTypes": ["patch", "minor"],
-      "automerge": true
-    },
-    {
-      "matchUpdateTypes": ["major"],
-      "automerge": false,
-      "dependencyDashboardApproval": true
-    },
-    {
-      "matchDepTypes": ["devDependencies"],
-      "groupName": "devDependencies (non-major)",
-      "matchUpdateTypes": ["patch", "minor"]
-    }
-  ]
+  "extends": ["github>ozzy-labs/.github"]
 }
