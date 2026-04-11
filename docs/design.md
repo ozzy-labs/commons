@@ -66,9 +66,11 @@ dist/.devcontainer/Dockerfile        → <repo>/.devcontainer/Dockerfile
 | .yamlfmt.yaml | YAML フォーマッター設定 |
 | .yamllint.yaml | YAML リンター設定 |
 | .markdownlint-cli2.yaml | Markdown リンター設定 |
+| .mdformat.toml | Markdown フォーマッター設定（折り返しなし、LF 改行） |
 | .mise.toml | ツールバージョン管理のベースライン。リポの技術スタックに合わせてツールを追加する |
 | .gitignore | 共通の無視パターン。フレームワーク固有のパターンは各リポで追加する |
-| renovate.json | Renovate 依存関係自動更新設定 |
+| renovate.json | Renovate 依存関係自動更新設定（org shared preset `github>ozzy-labs/.github` を参照） |
+| trivy.yaml | Trivy セキュリティスキャナー設定（vuln + secret のみ。IaC/コンテナは各リポでカスタマイズ） |
 | biome.json | Biome リンター・フォーマッター設定 |
 | lefthook.yaml | 共通ベース（`lefthook-base.yaml`）を `extends` で参照。リポ固有のフック（biome, ruff 等）は各リポで追記する |
 | LICENSE | MIT ライセンス |

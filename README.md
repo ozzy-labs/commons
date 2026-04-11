@@ -23,7 +23,9 @@ dist/                -> Distributed to every repo
   .commitlintrc.yaml -> Commitlint config
   .editorconfig      -> Editor settings
   .gitattributes     -> Line ending normalization
+  .mdformat.toml     -> Markdown formatter config
   .mise.toml         -> Tool version management
+  trivy.yaml         -> Trivy security scanner config
   CLAUDE.md          -> Project overview template
   ...
 sync.sh              -> Sync script

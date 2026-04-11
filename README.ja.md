@@ -23,7 +23,9 @@ dist/                -> 全リポジトリに配布
   .commitlintrc.yaml -> 共通 commitlint 設定
   .editorconfig      -> エディタ共通設定
   .gitattributes     -> 改行コード正規化
+  .mdformat.toml     -> Markdown フォーマッター設定
   .mise.toml         -> ツールバージョン管理
+  trivy.yaml         -> Trivy セキュリティスキャナー設定
   CLAUDE.md          -> プロジェクト概要の雛形
   ...
 sync.sh              -> 同期スクリプト
