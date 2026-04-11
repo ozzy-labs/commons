@@ -36,6 +36,8 @@
       "Bash(taplo *)",
       "Bash(actionlint *)",
       "Bash(gitleaks *)",
+      "Bash(trivy *)",
+      "Bash(mdformat *)",
       "Bash(bats *)",
       "Bash(gh auth *)",
       "Bash(gh api *)",

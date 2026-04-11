@@ -13,7 +13,7 @@ taplo = "0.10"
 yamlfmt = "0.21"
 actionlint = "1"
 gitleaks = "8"
-trivy = "0.62"
+trivy = "0.69"
 "pipx:mdformat" = "0.7"
 
 # Git hooks

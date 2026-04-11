@@ -32,3 +32,9 @@ pnpm run typecheck
 ```bash
 gitleaks detect --no-banner
 ```
+
+全ファイルを対象に Trivy で脆弱性・シークレットスキャンを実行する:
+
+```bash
+trivy fs --scanners vuln,secret --exit-code 1 --no-progress .
+```
