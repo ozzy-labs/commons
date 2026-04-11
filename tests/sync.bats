@@ -59,6 +59,18 @@ teardown() {
   rm -rf "${TEST_DIR}"
 }
 
+@test "exits 1 with usage when no arguments given" {
+  run "${SRC_DIR}/sync.sh"
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"Usage:"* ]]
+}
+
+@test "exits 1 on unknown option" {
+  run "${SRC_DIR}/sync.sh" --invalid "${TARGET_DIR}"
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"Unknown option: --invalid"* ]]
+}
+
 @test "copies new files to target" {
   run "${SRC_DIR}/sync.sh" -y "${TARGET_DIR}"
   [ "$status" -eq 0 ]
@@ -299,6 +311,36 @@ EOF
   [ "$(cat "${TARGET_DIR}/CLAUDE.md")" = "my custom claude" ]
 }
 
+@test "multiple pinned files are all skipped" {
+  "${SRC_DIR}/sync.sh" -y "${TARGET_DIR}"
+
+  mkdir -p "${TARGET_DIR}/.dev-config"
+  cat > "${TARGET_DIR}/.dev-config/sync.yaml" <<'EOF'
+commit: abc1234
+synced_at: 2026-04-05T00:00:00Z
+pinned:
+  - CLAUDE.md
+  - .editorconfig
+EOF
+
+  echo "my claude" > "${TARGET_DIR}/CLAUDE.md"
+  echo "my editor" > "${TARGET_DIR}/.editorconfig"
+
+  echo "updated claude md" > "${SRC_DIR}/dist/CLAUDE.md"
+  echo "updated editorconfig" > "${SRC_DIR}/dist/.editorconfig"
+
+  run "${SRC_DIR}/sync.sh" -y "${TARGET_DIR}"
+  [ "$status" -eq 0 ]
+
+  # Both pinned files should NOT be overwritten
+  [ "$(cat "${TARGET_DIR}/CLAUDE.md")" = "my claude" ]
+  [ "$(cat "${TARGET_DIR}/.editorconfig")" = "my editor" ]
+
+  # Both should appear in pinned output
+  [[ "$output" == *"pinned:"*"CLAUDE.md"* ]]
+  [[ "$output" == *"pinned:"*".editorconfig"* ]]
+}
+
 @test "metadata is written atomically via temp file" {
   run "${SRC_DIR}/sync.sh" -y "${TARGET_DIR}"
   [ "$status" -eq 0 ]
@@ -307,6 +349,29 @@ EOF
   local tmp_count
   tmp_count="$(find "${TARGET_DIR}/.dev-config" -name 'sync.yaml.tmp.*' | wc -l)"
   [ "$tmp_count" -eq 0 ]
+}
+
+@test "interactive mode: new files are copied without prompting" {
+  # First sync to establish baseline
+  "${SRC_DIR}/sync.sh" -y "${TARGET_DIR}"
+
+  # Add a new file to source
+  echo "new-file-content" > "${SRC_DIR}/dist/NEW_FILE.md"
+  git -C "${SRC_DIR}" add . && git -C "${SRC_DIR}" commit -q -m "add new file"
+
+  # Also change an existing file so interactive prompt appears
+  echo "updated claude md" > "${SRC_DIR}/dist/CLAUDE.md"
+
+  # Provide "n" to skip the changed file — new file should still be copied
+  run bash -c 'printf "n\n" | "${1}" "${2}"' _ "${SRC_DIR}/sync.sh" "${TARGET_DIR}"
+  [ "$status" -eq 0 ]
+
+  # New file should have been copied without prompting
+  [ -f "${TARGET_DIR}/NEW_FILE.md" ]
+  [ "$(cat "${TARGET_DIR}/NEW_FILE.md")" = "new-file-content" ]
+
+  # Changed file should NOT be copied (we chose "n")
+  [ "$(cat "${TARGET_DIR}/CLAUDE.md")" = "claude md" ]
 }
 
 @test "interactive mode: skip unchanged and respond to input" {
@@ -319,4 +384,41 @@ EOF
   run bash -c 'printf "n\ny\n" | "${1}" "${2}"' _ "${SRC_DIR}/sync.sh" "${TARGET_DIR}"
   [ "$status" -eq 0 ]
   [[ "$output" == *"Sync complete."* ]]
+}
+
+@test "interactive mode: pin adds file to pinned list" {
+  "${SRC_DIR}/sync.sh" -y "${TARGET_DIR}"
+
+  echo "updated claude md" > "${SRC_DIR}/dist/CLAUDE.md"
+
+  # Choose "pin" for the changed file
+  run bash -c 'printf "pin\n" | "${1}" "${2}"' _ "${SRC_DIR}/sync.sh" "${TARGET_DIR}"
+  [ "$status" -eq 0 ]
+
+  # File should NOT be overwritten
+  [ "$(cat "${TARGET_DIR}/CLAUDE.md")" = "claude md" ]
+
+  # File should be in pinned list
+  local meta
+  meta="$(cat "${TARGET_DIR}/.dev-config/sync.yaml")"
+  [[ "$meta" == *"pinned:"* ]]
+  [[ "$meta" == *"CLAUDE.md"* ]]
+}
+
+@test "interactive mode: all copies remaining changed files without prompting" {
+  "${SRC_DIR}/sync.sh" -y "${TARGET_DIR}"
+
+  echo "updated skill" > "${SRC_DIR}/dist/.claude/skills/commit/SKILL.md"
+  echo "updated claude md" > "${SRC_DIR}/dist/CLAUDE.md"
+  echo "updated editorconfig" > "${SRC_DIR}/dist/.editorconfig"
+
+  # Choose "all" at the first prompt — remaining files should be copied
+  run bash -c 'printf "all\n" | "${1}" "${2}"' _ "${SRC_DIR}/sync.sh" "${TARGET_DIR}"
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"Sync complete."* ]]
+
+  # All changed files should be updated
+  [ "$(cat "${TARGET_DIR}/.claude/skills/commit/SKILL.md")" = "updated skill" ]
+  [ "$(cat "${TARGET_DIR}/CLAUDE.md")" = "updated claude md" ]
+  [ "$(cat "${TARGET_DIR}/.editorconfig")" = "updated editorconfig" ]
 }

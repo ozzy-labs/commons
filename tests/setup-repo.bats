@@ -23,14 +23,22 @@ setup() {
   [[ "$output" == *"not found"* ]]
 }
 
-@test "--dry-run shows all 4 sections without making changes" {
+@test "--dry-run shows all 5 sections without making changes" {
   run "${SCRIPT}" --dry-run ozzy-labs/dev-config
   [ "$status" -eq 0 ]
   [[ "$output" == *"1. Repository settings"* ]]
   [[ "$output" == *"2. Security settings"* ]]
-  [[ "$output" == *"3. Branch protection (Rulesets)"* ]]
-  [[ "$output" == *"4. Labels"* ]]
+  [[ "$output" == *"3. Actions permissions"* ]]
+  [[ "$output" == *"4. Branch protection (Rulesets)"* ]]
+  [[ "$output" == *"5. Labels"* ]]
   [[ "$output" == *"Setup complete."* ]]
+}
+
+@test "--dry-run shows Actions permissions settings" {
+  run "${SCRIPT}" --dry-run ozzy-labs/dev-config
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"Workflow permissions: read-write"* ]]
+  [[ "$output" == *"Allow creating and approving PRs: enabled"* ]]
 }
 
 @test "--dry-run shows [dry-run] markers for API calls" {
