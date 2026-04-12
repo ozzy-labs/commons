@@ -13,6 +13,8 @@ dist/                -> 全リポジトリに配布
     rules/           -> ルール
     settings.json    -> 許可ツール・権限設定
   .devcontainer/     -> devcontainer 設定
+  .gemini/
+    settings.json    -> Gemini CLI 設定（AGENTS.md を読み込む）
   .github/
     workflows/       -> PR タイトル・ブランチ名検証
     ISSUE_TEMPLATE/  -> Issue テンプレート
@@ -26,7 +28,8 @@ dist/                -> 全リポジトリに配布
   .mdformat.toml     -> Markdown フォーマッター設定
   .mise.toml         -> ツールバージョン管理
   trivy.yaml         -> Trivy セキュリティスキャナー設定
-  CLAUDE.md          -> プロジェクト概要の雛形
+  AGENTS.md          -> AI エージェント共通 instructions の雛形
+  CLAUDE.md          -> Claude Code 固有設定
   ...
 sync.sh              -> 同期スクリプト
 setup-repo.sh        -> GitHub リポジトリ初期設定スクリプト

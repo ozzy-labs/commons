@@ -13,6 +13,8 @@ dist/                -> Distributed to every repo
     rules/           -> Rules
     settings.json    -> Allowed tools and permissions
   .devcontainer/     -> Devcontainer config
+  .gemini/
+    settings.json    -> Gemini CLI config (loads AGENTS.md)
   .github/
     workflows/       -> PR title & branch name validation
     ISSUE_TEMPLATE/  -> Issue templates
@@ -26,7 +28,8 @@ dist/                -> Distributed to every repo
   .mdformat.toml     -> Markdown formatter config
   .mise.toml         -> Tool version management
   trivy.yaml         -> Trivy security scanner config
-  CLAUDE.md          -> Project overview template
+  AGENTS.md          -> Shared AI agent instructions template
+  CLAUDE.md          -> Claude Code specific config
   ...
 sync.sh              -> Sync script
 setup-repo.sh        -> GitHub repository setup script
