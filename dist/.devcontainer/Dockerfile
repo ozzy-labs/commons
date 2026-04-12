@@ -39,6 +39,10 @@ RUN ~/.local/bin/mise trust /home/vscode/.mise.toml \
     && ~/.local/bin/mise install \
     && rm /home/vscode/.mise.toml
 
+# Install AI agent CLIs (npm available after mise installs Node.js)
+RUN eval "$(/home/vscode/.local/bin/mise activate bash)" \
+    && npm install -g @openai/codex @google/gemini-cli
+
 # Switch back to root for remaining setup
 USER root
 RUN chsh -s /bin/zsh vscode \
