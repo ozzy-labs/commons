@@ -8,8 +8,10 @@ OzzyLabs リポジトリ共通の開発設定。
 
 ```text
 dist/                -> 全リポジトリに配布
+  .agents/
+    skills/          -> 共有スキル（agentskills.io 準拠、SSOT）
   .claude/
-    skills/          -> ワークフロースキル
+    skills/          -> Claude Code スキルオーバーレイ
     rules/           -> ルール
     settings.json    -> 許可ツール・権限設定
   .devcontainer/     -> devcontainer 設定

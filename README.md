@@ -8,8 +8,10 @@ Shared configurations for OzzyLabs repositories.
 
 ```text
 dist/                -> Distributed to every repo
+  .agents/
+    skills/          -> Shared skills (agentskills.io, SSOT)
   .claude/
-    skills/          -> Workflow skills
+    skills/          -> Claude Code skill overlays
     rules/           -> Rules
     settings.json    -> Allowed tools and permissions
   .devcontainer/     -> Devcontainer config
