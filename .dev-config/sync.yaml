@@ -1,9 +1,10 @@
 # Auto-updated by dev-config sync.sh
 # 'pinned' is user-editable — add or remove paths freely
-commit: 09a4b1c
-synced_at: 2026-04-05T00:28:50Z
+commit: 6a8bffd
+synced_at: 2026-04-18T07:06:22Z
 pinned:
   - .claude/settings.json
   - .gitignore
   - .mise.toml
+  - AGENTS.md
   - CLAUDE.md
