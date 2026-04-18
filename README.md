@@ -71,6 +71,18 @@ When a file is intentionally customized in a target repo, it can be **pinned** t
 
 Sets merge rules (squash only), branch protection (Rulesets), security settings, and Conventional Commits labels. See [ADR-0004](docs/adr/0004-repo-setup-with-rulesets.md) for design decisions.
 
+### Automated sync (scheduled PR)
+
+Consumer repos get a workflow distributed at `.github/workflows/sync-dev-config.yaml`. It runs weekly (Monday 00:00 UTC) and on manual dispatch, checks the repo against the latest `dev-config`, and — if any non-pinned file diverges — runs `sync.sh --yes` and opens a pull request. Review and merge manually; the workflow never auto-merges.
+
+Why a scheduled workflow and not Renovate: Renovate's built-in managers don't cover the "copy files from a sibling repo via a custom script" model. Custom `regexManagers` could track the commit SHA but can't execute `sync.sh`, and `postUpgradeTasks` is unavailable on the Mend Renovate GitHub App (self-hosted only). A scheduled GitHub Actions workflow fits the existing `sync.sh` / `.dev-config/sync.yaml` design without adding a second source of truth.
+
+First-time setup for a consumer repo:
+
+1. Run `sync.sh` manually once to pick up `sync-dev-config.yaml` into `.github/workflows/`
+2. The repo settings must allow creating PRs (already the case if `setup-repo.sh` was run)
+3. The weekly schedule takes over from the next Monday; `workflow_dispatch` lets you trigger it on demand
+
 ## What stays in each repo
 
 - Domain-specific skills and rules
