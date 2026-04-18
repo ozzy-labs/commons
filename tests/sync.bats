@@ -343,6 +343,44 @@ EOF
   [[ "$output" == *"pinned:"*".editorconfig"* ]]
 }
 
+@test "pinned parser skips interleaved comments and blank lines" {
+  "${SRC_DIR}/sync.sh" -y "${TARGET_DIR}"
+
+  mkdir -p "${TARGET_DIR}/.dev-config"
+  cat > "${TARGET_DIR}/.dev-config/sync.yaml" <<'EOF'
+commit: abc1234
+synced_at: 2026-04-05T00:00:00Z
+pinned:
+  # first group: customised on purpose
+  - CLAUDE.md
+
+  # second group: blocked upstream updates
+  - .editorconfig
+  - trivy.yaml
+EOF
+
+  echo "my claude" > "${TARGET_DIR}/CLAUDE.md"
+  echo "my editor" > "${TARGET_DIR}/.editorconfig"
+  echo "my trivy" > "${TARGET_DIR}/trivy.yaml"
+
+  echo "updated claude md" > "${SRC_DIR}/dist/CLAUDE.md"
+  echo "updated editorconfig" > "${SRC_DIR}/dist/.editorconfig"
+  echo "updated trivy" > "${SRC_DIR}/dist/trivy.yaml"
+
+  run "${SRC_DIR}/sync.sh" -y "${TARGET_DIR}"
+  [ "$status" -eq 0 ]
+
+  # All three pinned entries, including the ones after comments/blank lines,
+  # must be recognised and preserved.
+  [ "$(cat "${TARGET_DIR}/CLAUDE.md")" = "my claude" ]
+  [ "$(cat "${TARGET_DIR}/.editorconfig")" = "my editor" ]
+  [ "$(cat "${TARGET_DIR}/trivy.yaml")" = "my trivy" ]
+
+  [[ "$output" == *"pinned:"*"CLAUDE.md"* ]]
+  [[ "$output" == *"pinned:"*".editorconfig"* ]]
+  [[ "$output" == *"pinned:"*"trivy.yaml"* ]]
+}
+
 @test "metadata is written atomically via temp file" {
   run "${SRC_DIR}/sync.sh" -y "${TARGET_DIR}"
   [ "$status" -eq 0 ]
