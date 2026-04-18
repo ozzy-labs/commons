@@ -71,6 +71,10 @@ read_pinned() {
       continue
     fi
     if ${in_pinned}; then
+      # Skip blank lines and YAML comments interleaved within the pinned block
+      if [[ -z "${line}" ]] || [[ "${line}" =~ ^[[:space:]]*# ]]; then
+        continue
+      fi
       if [[ "${line}" =~ ^[[:space:]]*-[[:space:]]+(.*) ]]; then
         local val="${BASH_REMATCH[1]}"
         # Strip surrounding quotes and trailing whitespace
