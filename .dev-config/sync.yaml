@@ -6,4 +6,5 @@ pinned:
   - .claude/settings.json
   - .gitignore
   - .mise.toml
+  - AGENTS.md
   - CLAUDE.md
