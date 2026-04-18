@@ -10,9 +10,5 @@
     "lint:secrets": "gitleaks detect --no-banner",
     "lint:all": "pnpm run lint:md && pnpm run lint:yaml && pnpm run lint:shell && pnpm run lint:secrets",
     "test": "bats tests/"
-  },
-  "devDependencies": {
-    "@commitlint/cli": "^19.0.0",
-    "@commitlint/config-conventional": "^19.0.0"
   }
 }
