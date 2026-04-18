@@ -11,7 +11,7 @@ glob_matcher: doublestar
 commit-msg:
   commands:
     commitlint:
-      run: npx commitlint --edit {1}
+      run: commitlint --edit {1}
 
 pre-commit:
   parallel: true

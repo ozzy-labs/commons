@@ -19,5 +19,7 @@ trivy = "0.69"
 # Testing
 "npm:bats" = "1"
 
-# Git hooks
+# Git hooks & commit conventions
 lefthook = "2"
+"npm:@commitlint/cli" = "20"
+"npm:@commitlint/config-conventional" = "20"
