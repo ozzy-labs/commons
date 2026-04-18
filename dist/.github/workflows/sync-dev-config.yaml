@@ -1,0 +1,74 @@
+name: Sync dev-config
+
+# Automated sync of shared configuration from ozzy-labs/dev-config.
+#
+# Runs on a weekly schedule (configurable) and on manual dispatch. When
+# the upstream dev-config repo has changes that are not yet reflected
+# in this repo (per `.dev-config/sync.yaml` state, minus `pinned`
+# entries), the workflow runs `sync.sh --yes` and opens a pull request
+# with the resulting diff. The PR is never auto-merged; review it.
+#
+# Prerequisites in the consumer repo:
+#   - Workflow permissions must allow creating PRs (usually set by
+#     dev-config/setup-repo.sh)
+#   - `.dev-config/sync.yaml` exists (created on first manual sync.sh run)
+on:
+  schedule:
+    # Every Monday 00:00 UTC
+    - cron: "0 0 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  sync:
+    name: Sync dev-config defaults
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout this repo
+        uses: actions/checkout@v4
+
+      - name: Clone dev-config
+        uses: actions/checkout@v4
+        with:
+          repository: ozzy-labs/dev-config
+          path: .sync-dev-config
+          fetch-depth: 1
+
+      - name: Detect diff and run sync
+        id: sync
+        run: |
+          set -e
+          if bash .sync-dev-config/sync.sh --check "$GITHUB_WORKSPACE"; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "No changes to sync."
+            exit 0
+          fi
+          bash .sync-dev-config/sync.sh --yes "$GITHUB_WORKSPACE"
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+
+      - name: Remove temporary clone
+        if: steps.sync.outputs.changed == 'true'
+        run: rm -rf .sync-dev-config
+
+      - name: Create Pull Request
+        if: steps.sync.outputs.changed == 'true'
+        uses: peter-evans/create-pull-request@v7
+        with:
+          branch: chore/sync-dev-config
+          base: main
+          commit-message: |
+            chore: sync dev-config defaults
+
+            Automated sync from ozzy-labs/dev-config.
+          title: "chore: sync dev-config defaults"
+          body: |
+            Automated sync from [ozzy-labs/dev-config](https://github.com/ozzy-labs/dev-config).
+
+            Files listed under `pinned` in `.dev-config/sync.yaml` are excluded.
+
+            Triggered by the scheduled `Sync dev-config` workflow. Review the diff and merge when appropriate.
+          labels: chore
+          delete-branch: true

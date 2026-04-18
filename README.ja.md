@@ -71,6 +71,18 @@ setup-repo.sh        -> GitHub リポジトリ初期設定スクリプト
 
 マージルール（squash のみ）、ブランチ保護（Rulesets）、セキュリティ設定、Conventional Commits ラベルを設定する。設計方針は [ADR-0004](docs/adr/0004-repo-setup-with-rulesets.md) を参照。
 
+### 自動同期（定期 PR）
+
+各消費リポには `.github/workflows/sync-dev-config.yaml` が配布される。このワークフローは毎週（月曜 UTC 00:00）と手動起動で動作し、最新の `dev-config` と比較して差分があれば `sync.sh --yes` を実行し、プルリクエストを作成する。自動マージはせず、必ずレビューしてマージする。
+
+Renovate ではなく scheduled workflow にした理由: Renovate の組込 manager は「独自スクリプトで sibling repo からファイルをコピーする」モデルをサポートしない。Custom `regexManagers` で commit SHA は追跡できるが `sync.sh` 自体の実行は別手段が必要で、`postUpgradeTasks` は Mend Renovate GitHub App では使えない（self-hosted 限定）。Scheduled GitHub Actions なら既存の `sync.sh` / `.dev-config/sync.yaml` の設計を生かしたまま自動化できる。
+
+消費リポ側の初回セットアップ手順:
+
+1. 手動で一度 `sync.sh` を実行し、`sync-dev-config.yaml` を `.github/workflows/` に取り込む
+2. リポ設定で PR 作成が許可されていること（`setup-repo.sh` 実行済みなら OK）
+3. 翌週から scheduled で自動起動。`workflow_dispatch` で即時実行も可能
+
 ## リポジトリ固有のまま残すもの
 
 - ドメイン固有のスキル・ルール
