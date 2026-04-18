@@ -2,6 +2,7 @@
 # Runtime & package managers
 node = "24"
 pnpm = "10"
+uv = "latest"
 
 # Linters & formatters
 biome = "2"
@@ -15,6 +16,12 @@ actionlint = "1"
 gitleaks = "8"
 trivy = "0.69"
 "pipx:mdformat" = "0.7"
+
+# CLI utilities for AI-assisted development
+ast-grep = "latest"
+yq = "latest"
+just = "latest"
+zoxide = "latest"
 
 # Testing
 "npm:bats" = "1"

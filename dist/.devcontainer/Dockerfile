@@ -5,6 +5,15 @@ RUN apt-get update \
         build-essential \
         curl \
         git \
+        fd-find \
+        ffmpeg \
+        fzf \
+        jq \
+        ripgrep \
+        tesseract-ocr \
+        tesseract-ocr-jpn \
+        tree \
+        unzip \
     && rm -rf /var/lib/apt/lists/*
 
 # Install as vscode user
@@ -42,6 +51,10 @@ RUN ~/.local/bin/mise trust /home/vscode/.mise.toml \
 # Install AI agent CLIs (npm available after mise installs Node.js)
 RUN eval "$(/home/vscode/.local/bin/mise activate bash)" \
     && npm install -g @openai/codex @google/gemini-cli
+
+# Install markitdown (PDF/Office/image/audio → Markdown via uv tool)
+RUN eval "$(/home/vscode/.local/bin/mise activate bash)" \
+    && uv tool install "markitdown[all]"
 
 # Switch back to root for remaining setup
 USER root
