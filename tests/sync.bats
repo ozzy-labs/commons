@@ -3,8 +3,8 @@
 setup() {
   TEST_DIR="$(mktemp -d)"
 
-  # Create fake dev-config source repo
-  SRC_DIR="${TEST_DIR}/dev-config"
+  # Create fake commons source repo
+  SRC_DIR="${TEST_DIR}/commons"
   mkdir -p "${SRC_DIR}/dist/.claude/skills/commit"
   mkdir -p "${SRC_DIR}/dist/.claude/skills/lint-rules"
   mkdir -p "${SRC_DIR}/dist/.claude/rules"
@@ -206,7 +206,7 @@ teardown() {
   # Pin CLAUDE.md
   mkdir -p "${TARGET_DIR}/.dev-config"
   cat > "${TARGET_DIR}/.dev-config/sync.yaml" <<'EOF'
-# Auto-updated by dev-config sync.sh
+# Auto-updated by commons sync.sh
 # 'pinned' is user-editable — add or remove paths freely
 commit: abc1234
 synced_at: 2026-04-05T00:00:00Z
@@ -233,7 +233,7 @@ EOF
   # Pin and customize CLAUDE.md
   mkdir -p "${TARGET_DIR}/.dev-config"
   cat > "${TARGET_DIR}/.dev-config/sync.yaml" <<'EOF'
-# Auto-updated by dev-config sync.sh
+# Auto-updated by commons sync.sh
 # 'pinned' is user-editable — add or remove paths freely
 commit: abc1234
 synced_at: 2026-04-05T00:00:00Z
@@ -256,7 +256,7 @@ EOF
   # Pin a file
   mkdir -p "${TARGET_DIR}/.dev-config"
   cat > "${TARGET_DIR}/.dev-config/sync.yaml" <<'EOF'
-# Auto-updated by dev-config sync.sh
+# Auto-updated by commons sync.sh
 # 'pinned' is user-editable — add or remove paths freely
 commit: abc1234
 synced_at: 2026-04-05T00:00:00Z

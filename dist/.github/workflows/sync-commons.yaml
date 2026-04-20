@@ -1,16 +1,16 @@
-name: Sync dev-config
+name: Sync commons
 
-# Automated sync of shared configuration from ozzy-labs/dev-config.
+# Automated sync of shared configuration from ozzy-labs/commons.
 #
 # Runs on a weekly schedule (configurable) and on manual dispatch. When
-# the upstream dev-config repo has changes that are not yet reflected
+# the upstream commons repo has changes that are not yet reflected
 # in this repo (per `.dev-config/sync.yaml` state, minus `pinned`
 # entries), the workflow runs `sync.sh --yes` and opens a pull request
 # with the resulting diff. The PR is never auto-merged; review it.
 #
 # Prerequisites in the consumer repo:
 #   - Workflow permissions must allow creating PRs (usually set by
-#     dev-config/setup-repo.sh)
+#     commons/setup-repo.sh)
 #   - `.dev-config/sync.yaml` exists (created on first manual sync.sh run)
 on:
   schedule:
@@ -24,51 +24,51 @@ permissions:
 
 jobs:
   sync:
-    name: Sync dev-config defaults
+    name: Sync commons defaults
     runs-on: ubuntu-latest
     steps:
       - name: Checkout this repo
         uses: actions/checkout@v4
 
-      - name: Clone dev-config
+      - name: Clone commons
         uses: actions/checkout@v4
         with:
-          repository: ozzy-labs/dev-config
-          path: .sync-dev-config
+          repository: ozzy-labs/commons
+          path: .sync-commons
           fetch-depth: 1
 
       - name: Detect diff and run sync
         id: sync
         run: |
           set -e
-          if bash .sync-dev-config/sync.sh --check "$GITHUB_WORKSPACE"; then
+          if bash .sync-commons/sync.sh --check "$GITHUB_WORKSPACE"; then
             echo "changed=false" >> "$GITHUB_OUTPUT"
             echo "No changes to sync."
             exit 0
           fi
-          bash .sync-dev-config/sync.sh --yes "$GITHUB_WORKSPACE"
+          bash .sync-commons/sync.sh --yes "$GITHUB_WORKSPACE"
           echo "changed=true" >> "$GITHUB_OUTPUT"
 
       - name: Remove temporary clone
         if: steps.sync.outputs.changed == 'true'
-        run: rm -rf .sync-dev-config
+        run: rm -rf .sync-commons
 
       - name: Create Pull Request
         if: steps.sync.outputs.changed == 'true'
         uses: peter-evans/create-pull-request@v7
         with:
-          branch: chore/sync-dev-config
+          branch: chore/sync-commons
           base: main
           commit-message: |
-            chore: sync dev-config defaults
+            chore: sync commons defaults
 
-            Automated sync from ozzy-labs/dev-config.
-          title: "chore: sync dev-config defaults"
+            Automated sync from ozzy-labs/commons.
+          title: "chore: sync commons defaults"
           body: |
-            Automated sync from [ozzy-labs/dev-config](https://github.com/ozzy-labs/dev-config).
+            Automated sync from [ozzy-labs/commons](https://github.com/ozzy-labs/commons).
 
             Files listed under `pinned` in `.dev-config/sync.yaml` are excluded.
 
-            Triggered by the scheduled `Sync dev-config` workflow. Review the diff and merge when appropriate.
+            Triggered by the scheduled `Sync commons` workflow. Review the diff and merge when appropriate.
           labels: chore
           delete-branch: true

@@ -42,7 +42,7 @@ Supersedes: ADR-0002, ADR-0003
 
 ### メタデータの配置
 
-同期メタデータは `.dev-config/sync.yaml` に記録する（旧 `.claude/.dev-config-sync`）。dev-config の同期メタデータは Claude 固有の設定ではないため、独立したディレクトリに配置する。
+同期メタデータは `.dev-config/sync.yaml` に記録する（旧 `.claude/.dev-config-sync`）。commons の同期メタデータは Claude 固有の設定ではないため、独立したディレクトリに配置する（ディレクトリ名の `.dev-config` は後方互換のため当面維持、Phase 2 以降で再検討）。
 
 ```yaml
 commit: abc1234
