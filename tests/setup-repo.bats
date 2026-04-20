@@ -24,7 +24,7 @@ setup() {
 }
 
 @test "--dry-run shows all 5 sections without making changes" {
-  run "${SCRIPT}" --dry-run ozzy-labs/dev-config
+  run "${SCRIPT}" --dry-run ozzy-labs/commons
   [ "$status" -eq 0 ]
   [[ "$output" == *"1. Repository settings"* ]]
   [[ "$output" == *"2. Security settings"* ]]
@@ -35,14 +35,14 @@ setup() {
 }
 
 @test "--dry-run shows Actions permissions settings" {
-  run "${SCRIPT}" --dry-run ozzy-labs/dev-config
+  run "${SCRIPT}" --dry-run ozzy-labs/commons
   [ "$status" -eq 0 ]
   [[ "$output" == *"Workflow permissions: read-write"* ]]
   [[ "$output" == *"Allow creating and approving PRs: enabled"* ]]
 }
 
 @test "--dry-run shows [dry-run] markers for API calls" {
-  run "${SCRIPT}" --dry-run ozzy-labs/dev-config
+  run "${SCRIPT}" --dry-run ozzy-labs/commons
   [ "$status" -eq 0 ]
   [[ "$output" == *"[dry-run] PATCH"* ]]
   [[ "$output" == *"[dry-run] PUT"* ]] || [[ "$output" == *"[dry-run] POST"* ]]
@@ -51,19 +51,19 @@ setup() {
 }
 
 @test "--dry-run shows repository visibility" {
-  run "${SCRIPT}" --dry-run ozzy-labs/dev-config
+  run "${SCRIPT}" --dry-run ozzy-labs/commons
   [ "$status" -eq 0 ]
-  [[ "$output" == *"Repository: ozzy-labs/dev-config"* ]]
+  [[ "$output" == *"Repository: ozzy-labs/commons"* ]]
 }
 
 @test "--dry-run skips private vulnerability reporting for private repo" {
-  run "${SCRIPT}" --dry-run ozzy-labs/dev-config
+  run "${SCRIPT}" --dry-run ozzy-labs/commons
   [ "$status" -eq 0 ]
   [[ "$output" == *"skipped (private repo)"* ]]
 }
 
 @test "--dry-run shows all 10 Conventional Commits labels" {
-  run "${SCRIPT}" --dry-run ozzy-labs/dev-config
+  run "${SCRIPT}" --dry-run ozzy-labs/commons
   [ "$status" -eq 0 ]
   [[ "$output" == *"create label: feat"* ]]
   [[ "$output" == *"create label: fix"* ]]
@@ -78,7 +78,7 @@ setup() {
 }
 
 @test "--dry-run shows all 9 default labels to delete" {
-  run "${SCRIPT}" --dry-run ozzy-labs/dev-config
+  run "${SCRIPT}" --dry-run ozzy-labs/commons
   [ "$status" -eq 0 ]
   [[ "$output" == *"delete label: bug"* ]]
   [[ "$output" == *"delete label: documentation"* ]]

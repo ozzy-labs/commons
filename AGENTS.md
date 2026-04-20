@@ -11,7 +11,7 @@
 
 ## プロジェクト概要
 
-`dev-config`: OzzyLabs リポジトリ共通の開発設定を管理・配布するリポジトリ。
+`commons`: OzzyLabs リポジトリ共通の開発設定を管理・配布するリポジトリ。
 
 ## Tech Stack
 

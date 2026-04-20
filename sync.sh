@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# dev-config sync script
+# commons sync script
 # Usage:
 #   sync.sh [options] <target-repo-path>
 # Options:
@@ -107,14 +107,14 @@ write_metadata() {
   mkdir -p "${METADATA_DIR}"
 
   if ! COMMIT_HASH="$(git -C "${SCRIPT_DIR}" rev-parse --short HEAD 2>/dev/null)"; then
-    echo "Warning: dev-config is not a git repository. Skipping metadata." >&2
+    echo "Warning: commons is not a git repository. Skipping metadata." >&2
     return
   fi
   SYNCED_AT="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
 
   local tmp_file="${METADATA_FILE}.tmp.$$"
   {
-    echo "# Auto-updated by dev-config sync.sh"
+    echo "# Auto-updated by commons sync.sh"
     echo "# 'pinned' is user-editable — add or remove paths freely"
     echo "commit: ${COMMIT_HASH}"
     echo "synced_at: ${SYNCED_AT}"

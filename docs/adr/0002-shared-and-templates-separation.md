@@ -6,7 +6,7 @@ Superseded by [ADR-0005](0005-unified-dist-with-pin.md) (2026-04-05)
 
 ## Context
 
-dev-config が配布するファイルには2種類ある:
+commons が配布するファイルには2種類ある:
 
 - **共有ファイル**: 全リポジトリで同一であるべき（ワークフロースキル、ルール）
 - **テンプレート**: 初期セットアップ用の雛形（CLAUDE.md、settings.json、lint-rules）
