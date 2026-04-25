@@ -5,14 +5,14 @@ set -euo pipefail
 #
 # Sync @ozzylabs/skills adapter outputs (dist/{adapter-id}/) from a local
 # clone of the skills repo into a consumer repo. Consumer opts in by listing
-# adapter ids in `.dev-config/sync.yaml`:
+# adapter ids in `.commons/sync.yaml`:
 #
 #   skills_adapters:
 #     - claude-code
 #     - codex-cli
 #
 # Caller (typically a workflow) is responsible for cloning ozzy-labs/skills
-# at the SHA recorded in `.dev-config/sync.yaml`'s `skills_commit:` field
+# at the SHA recorded in `.commons/sync.yaml`'s `skills_commit:` field
 # and pointing this script at its `dist/` directory.
 #
 # Usage:
@@ -70,18 +70,8 @@ if [[ ! -d "${TARGET_DIR}/.git" ]]; then
   exit 1
 fi
 
-# Dual-path support (migration period — see ADR-0014 / handbook#79):
-#   canonical: <target>/.commons/sync.yaml
-#   fallback : <target>/.dev-config/sync.yaml
-# Prefer canonical; fall back to legacy if only that path exists.
-# TODO(handbook#79): drop the .dev-config/ fallback once all consumers migrate.
-if [[ -f "${TARGET_DIR}/.commons/sync.yaml" ]]; then
-  METADATA_FILE="${TARGET_DIR}/.commons/sync.yaml"
-elif [[ -f "${TARGET_DIR}/.dev-config/sync.yaml" ]]; then
-  METADATA_FILE="${TARGET_DIR}/.dev-config/sync.yaml"
-else
-  METADATA_FILE="${TARGET_DIR}/.commons/sync.yaml"
-fi
+# Sync metadata lives at <target>/.commons/sync.yaml (see ADR-0014).
+METADATA_FILE="${TARGET_DIR}/.commons/sync.yaml"
 
 # --- YAML helpers ---
 

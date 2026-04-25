@@ -56,30 +56,11 @@ fi
 
 # --- Metadata helpers ---
 #
-# Dual-path support (migration period — see ADR-0014 / handbook#79):
-#   canonical: <target>/.commons/sync.yaml      (preferred for new consumers)
-#   fallback : <target>/.dev-config/sync.yaml   (legacy; kept until all
-#                                                consumers rename)
-#
-# Read: prefer .commons/, fall back to .dev-config/ if only the legacy path
-# exists. Write: respect whichever path was found so we never auto-migrate
-# a consumer (rename is a consumer-driven, deliberate step). Brand-new
-# consumers (neither path present) are bootstrapped at the canonical path.
-#
-# TODO(handbook#79): remove the .dev-config/ fallback once all consumers
-# have migrated to .commons/. Track via the parent issue's sub-issues.
+# Sync metadata lives at <target>/.commons/sync.yaml. The legacy
+# <target>/.dev-config/ path was supported during the migration documented
+# in ADR-0014 and was removed once all consumers completed the rename.
 
-CANONICAL_METADATA_DIR="${TARGET_DIR}/.commons"
-FALLBACK_METADATA_DIR="${TARGET_DIR}/.dev-config"
-
-if [[ -f "${CANONICAL_METADATA_DIR}/sync.yaml" ]]; then
-  METADATA_DIR="${CANONICAL_METADATA_DIR}"
-elif [[ -f "${FALLBACK_METADATA_DIR}/sync.yaml" ]]; then
-  METADATA_DIR="${FALLBACK_METADATA_DIR}"
-else
-  # Brand-new consumer: bootstrap at the canonical path.
-  METADATA_DIR="${CANONICAL_METADATA_DIR}"
-fi
+METADATA_DIR="${TARGET_DIR}/.commons"
 METADATA_FILE="${METADATA_DIR}/sync.yaml"
 METADATA_REL="${METADATA_DIR#"${TARGET_DIR}/"}/sync.yaml"
 

@@ -9,7 +9,7 @@
 - **配布ファイル（`dist/`）**: 全リポジトリに配布する設定ファイル群。ターゲットリポジトリのルートにミラーされる
 - **scaffold テンプレート（`templates/`）**: 新規リポ作成時に手動コピーする雛形（AGENTS.md / CLAUDE.md）。`sync.sh` の対象外
 - **同期スクリプト（`sync.sh`）**: 配布ファイルを対象リポジトリにコピー
-- **skills 同期スクリプト（`sync-skills.sh`）**: `@ozzylabs/skills` の adapter 出力（`dist/{adapter-id}/`）を consumer の opt-in 設定（`.dev-config/sync.yaml` の `skills_adapters:`）に従って反映。SSOT は別リポなので呼び出し側がクローンを用意する。詳細は [ADR-0008](adr/0008-sync-skills-adapter.md)
+- **skills 同期スクリプト（`sync-skills.sh`）**: `@ozzylabs/skills` の adapter 出力（`dist/{adapter-id}/`）を consumer の opt-in 設定（`.commons/sync.yaml` の `skills_adapters:`）に従って反映。SSOT は別リポなので呼び出し側がクローンを用意する。詳細は [ADR-0008](adr/0008-sync-skills-adapter.md)
 - **リポジトリ初期設定スクリプト（`setup-repo.sh`）**: GitHub リポジトリの設定（マージルール、ブランチ保護、セキュリティ等）を `gh` CLI で自動化
 
 ### 含まないもの
@@ -104,12 +104,12 @@ dist/.devcontainer/Dockerfile        → <repo>/.devcontainer/Dockerfile
 
 - 対話モードで差分のあるファイルについて選択: `[y/N/pin/all]`（y=更新, N=スキップ, pin=永続スキップ, all=残り全て更新）
 - pinned ファイルは全モードでスキップ（意図的な乖離を尊重）
-- 設定: 対話モードで `pin` を選択、または `.dev-config/sync.yaml` を手動編集
-- 解除: `.dev-config/sync.yaml` から該当行を削除
+- 設定: 対話モードで `pin` を選択、または `.commons/sync.yaml` を手動編集
+- 解除: `.commons/sync.yaml` から該当行を削除
 
 ### 同期メタデータ
 
-`sync.sh` は同期完了後、対象リポジトリの `.dev-config/sync.yaml` にメタデータを書き込む:
+`sync.sh` は同期完了後、対象リポジトリの `.commons/sync.yaml` にメタデータを書き込む:
 
 ```yaml
 # Auto-updated by commons sync.sh

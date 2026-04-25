@@ -83,8 +83,8 @@ teardown() {
 }
 
 write_metadata() {
-  mkdir -p "${TARGET_DIR}/.dev-config"
-  printf '%s\n' "$1" >"${TARGET_DIR}/.dev-config/sync.yaml"
+  mkdir -p "${TARGET_DIR}/.commons"
+  printf '%s\n' "$1" >"${TARGET_DIR}/.commons/sync.yaml"
 }
 
 @test "exits 1 with usage when no arguments given" {

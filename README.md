@@ -56,26 +56,21 @@ Shared skills (`.agents/skills/`, `.claude/skills/`) are no longer distributed f
 /path/to/commons/sync.sh --check /path/to/target-repo
 ```
 
-All files use the same sync policy. In interactive mode, changed files show a diff and prompt for action: update, skip, pin (skip permanently), or update all remaining. Pinned files are skipped in all modes including `-y`. After sync, metadata is written to `.commons/sync.yaml` in the target repo (or `.dev-config/sync.yaml` if that legacy path already exists — see [Metadata path](#metadata-path-commons--dev-config-fallback) below).
+All files use the same sync policy. In interactive mode, changed files show a diff and prompt for action: update, skip, pin (skip permanently), or update all remaining. Pinned files are skipped in all modes including `-y`. After sync, metadata is written to `.commons/sync.yaml` in the target repo (see [Metadata path](#metadata-path) below).
 
 ### Pin
 
 When a file is intentionally customized in a target repo, it can be **pinned** to prevent future syncs from overwriting it. Pin during interactive sync by choosing `pin` at the prompt, or edit `.commons/sync.yaml` directly.
 
-### Metadata path (`.commons/` + `.dev-config/` fallback)
+### Metadata path
 
-Sync metadata lives in the consumer repo at one of two paths:
+Sync metadata lives in the consumer repo at `.commons/sync.yaml`. `sync.sh` reads and writes this single canonical path, and the Renovate preset (`commons-sync.json`'s `managerFilePatterns`) tracks it for `commit:` field bumps.
 
-- **canonical**: `.commons/sync.yaml` — preferred, used for all new consumers
-- **fallback**: `.dev-config/sync.yaml` — legacy, kept readable during the migration period documented in [ADR-0014](https://github.com/ozzy-labs/handbook/blob/main/adr/0014-rename-dev-config-to-commons.md)
-
-`sync.sh` reads `.commons/sync.yaml` first; if absent, it falls back to `.dev-config/sync.yaml`. Writes go back to whichever path was found, so existing consumers are **not** auto-migrated — the rename is a deliberate, consumer-driven step (tracked by handbook#79 sub-issues). Brand-new consumers (neither path present) are bootstrapped at the canonical `.commons/` path on first run.
-
-The `.dev-config/` fallback is **time-bound**: it will be removed once all consumers have completed the rename. Until then, both paths are equally supported by the Renovate preset (`commons-sync.json`'s `managerFilePatterns` matches both).
+The earlier `.dev-config/sync.yaml` path was supported as a temporary fallback during the migration documented in [ADR-0014](https://github.com/ozzy-labs/handbook/blob/main/adr/0014-rename-dev-config-to-commons.md). All consumers have now completed the rename and the fallback has been removed.
 
 ### Skills sync (opt-in per consumer)
 
-Shared skills live in [`ozzy-labs/skills`](https://github.com/ozzy-labs/skills) and are produced as per-agent adapter outputs under `dist/{adapter-id}/`. Consumers opt in by listing adapter ids in `.commons/sync.yaml` (or `.dev-config/sync.yaml` on legacy consumers):
+Shared skills live in [`ozzy-labs/skills`](https://github.com/ozzy-labs/skills) and are produced as per-agent adapter outputs under `dist/{adapter-id}/`. Consumers opt in by listing adapter ids in `.commons/sync.yaml`:
 
 ```yaml
 # Tracked by Renovate via the @ozzylabs/skills preset
@@ -128,7 +123,7 @@ First-time setup for a consumer repo:
 
 ### Automated sync via Renovate (opt-in)
 
-As a lower-latency alternative to the weekly schedule, consumer repos can opt into the `commons-sync` Renovate preset. Renovate watches the commons `main` branch and opens a PR bumping the `commit:` field in `.commons/sync.yaml` (or `.dev-config/sync.yaml` for legacy consumers) whenever a new commit lands. Actual file materialisation remains the consumer workflow's job (it runs `sync.sh --yes` on the Renovate PR branch).
+As a lower-latency alternative to the weekly schedule, consumer repos can opt into the `commons-sync` Renovate preset. Renovate watches the commons `main` branch and opens a PR bumping the `commit:` field in `.commons/sync.yaml` whenever a new commit lands. Actual file materialisation remains the consumer workflow's job (it runs `sync.sh --yes` on the Renovate PR branch).
 
 Consumer `renovate.json`:
 
