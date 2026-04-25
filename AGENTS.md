@@ -68,4 +68,9 @@ setup-repo.sh owner/repo                          # GitHub リポジトリ設定
 
 ## Adapter Files
 
-| Agent | Configuration | |-------|---------------| | Claude Code | `CLAUDE.md`, `.claude/` | | Gemini CLI | `.gemini/settings.json` → `AGENTS.md` | | Codex CLI | `AGENTS.md` + `.agents/skills/` | | GitHub Copilot | `AGENTS.md` + `.agents/skills/` |
+| Agent | Configuration |
+|-------|---------------|
+| Claude Code | `CLAUDE.md`, `.claude/` |
+| Gemini CLI | `.gemini/settings.json` → `AGENTS.md` |
+| Codex CLI | `AGENTS.md` + `.agents/skills/` |
+| GitHub Copilot | `AGENTS.md` + `.agents/skills/` |

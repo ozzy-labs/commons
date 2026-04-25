@@ -112,8 +112,8 @@ Consumer repos get a workflow distributed at `.github/workflows/sync-commons.yam
 First-time setup for a consumer repo:
 
 1. Run `sync.sh` manually once to pick up `sync-commons.yaml` into `.github/workflows/`
-1. The repo settings must allow creating PRs (already the case if `setup-repo.sh` was run)
-1. The weekly schedule takes over from the next Monday; `workflow_dispatch` lets you trigger it on demand
+2. The repo settings must allow creating PRs (already the case if `setup-repo.sh` was run)
+3. The weekly schedule takes over from the next Monday; `workflow_dispatch` lets you trigger it on demand
 
 ### Automated sync via Renovate (opt-in)
 

@@ -22,8 +22,8 @@ Related: [handbook ADR-0018](https://github.com/ozzy-labs/handbook/blob/main/adr
 検討した選択肢:
 
 1. **commons の `sync.sh` を拡張する** — adapter id ごとの分岐を `sync.sh` に追加
-1. **専用スクリプト `sync-skills.sh` を新設する** — adapter sync 専用
-1. **各 consumer の workflow に bash を直書きしたまま** — 共通化しない
+2. **専用スクリプト `sync-skills.sh` を新設する** — adapter sync 専用
+3. **各 consumer の workflow に bash を直書きしたまま** — 共通化しない
 
 ## Decision
 
@@ -31,7 +31,13 @@ Related: [handbook ADR-0018](https://github.com/ozzy-labs/handbook/blob/main/adr
 
 `sync.sh` と `sync-skills.sh` は責務とデータソースが異なるため、別スクリプトに分ける。
 
-| 観点 | sync.sh | sync-skills.sh | |------|---------|----------------| | ソース | ローカルの `dist/`（commons リポ自身） | 別リポ（`ozzy-labs/skills`）の dist | | 同期モデル | ディレクトリミラー（[ADR-0001](0001-directory-mirror-structure.md)） | per-adapter の細かい変換（per-skill-dir copy + snippet 置換） | | 呼び出し元 | consumer の `sync-commons.yaml` workflow | consumer の `sync-skills.yaml` workflow | | 引数 | target repo path | skills dist root path + target repo path | | Renovate 連携 | `commit:` を bump（[ADR-0006](0006-renovate-auto-sync-preset.md)） | `skills_commit:` を bump（skills repo 側 [skills#23](https://github.com/ozzy-labs/skills/issues/23) で実装） |
+| 観点 | sync.sh | sync-skills.sh |
+|------|---------|----------------|
+| ソース | ローカルの `dist/`（commons リポ自身） | 別リポ（`ozzy-labs/skills`）の dist |
+| 同期モデル | ディレクトリミラー（[ADR-0001](0001-directory-mirror-structure.md)） | per-adapter の細かい変換（per-skill-dir copy + snippet 置換） |
+| 呼び出し元 | consumer の `sync-commons.yaml` workflow | consumer の `sync-skills.yaml` workflow |
+| 引数 | target repo path | skills dist root path + target repo path |
+| Renovate 連携 | `commit:` を bump（[ADR-0006](0006-renovate-auto-sync-preset.md)） | `skills_commit:` を bump（skills repo 側 [skills#23](https://github.com/ozzy-labs/skills/issues/23) で実装） |
 
 これらを 1 スクリプトに統合すると、引数仕様・モード・ファイルレイアウトが二重化して読みづらくなる。分離した方がそれぞれの責務が明確になる。
 
