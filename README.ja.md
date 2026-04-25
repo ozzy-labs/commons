@@ -30,12 +30,15 @@ dist/                -> 全リポジトリに配布
   .mdformat.toml     -> Markdown フォーマッター設定
   .mise.toml         -> ツールバージョン管理
   trivy.yaml         -> Trivy セキュリティスキャナー設定
+  ...
+templates/           -> scaffold 専用ファイル（新規リポ作成時に手動でコピー、sync の対象外）
   AGENTS.md          -> AI エージェント共通 instructions の雛形
   CLAUDE.md          -> Claude Code 固有設定
-  ...
 sync.sh              -> 同期スクリプト
 setup-repo.sh        -> GitHub リポジトリ初期設定スクリプト
 ```
+
+`templates/` には各リポでカスタマイズ前提の雛形（プロジェクト概要・tech stack・利用スキル等）を置く。`sync.sh` の対象外なので、新規リポ初期化時に一度だけ手動コピーしてその後はリポ側で編集する。
 
 ## 使い方
 
