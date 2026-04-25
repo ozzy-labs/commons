@@ -17,7 +17,7 @@ PRESET_FILE="${BATS_TEST_DIRNAME}/../commons-sync.json"
   jq -e '."$schema" | test("renovate-schema")' "${PRESET_FILE}" >/dev/null
 }
 
-@test "preset defines a customManager targeting .dev-config/sync.yaml" {
+@test "preset defines a customManager targeting sync.yaml" {
   jq -e '.customManagers[0].managerFilePatterns | map(test("sync\\.yaml")) | any' \
     "${PRESET_FILE}" >/dev/null
 }
@@ -27,11 +27,12 @@ PRESET_FILE="${BATS_TEST_DIRNAME}/../commons-sync.json"
     "${PRESET_FILE}" >/dev/null
 }
 
-@test "preset customManager still matches the legacy .dev-config/sync.yaml path" {
-  # Migration period: fallback must remain matched until all consumers rename.
-  # See ADR-0014 / handbook#79.
-  jq -e '.customManagers[0].managerFilePatterns | map(test("\\.dev-config/sync\\.yaml")) | any' \
-    "${PRESET_FILE}" >/dev/null
+@test "preset customManager does NOT match the removed .dev-config/sync.yaml fallback" {
+  # ADR-0014 / handbook#79: the legacy fallback was removed once all
+  # consumers completed the rename to .commons/.
+  run jq -e '.customManagers[0].managerFilePatterns | map(test("\\.dev-config/sync\\.yaml")) | any' \
+    "${PRESET_FILE}"
+  [ "$status" -ne 0 ]
 }
 
 @test "preset customManager captures currentDigest via regex" {

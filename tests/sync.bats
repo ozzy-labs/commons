@@ -122,9 +122,8 @@ teardown() {
   # Files should NOT exist in target
   [ ! -f "${TARGET_DIR}/.claude/skills/commit/SKILL.md" ]
   [ ! -f "${TARGET_DIR}/CLAUDE.md" ]
-  # Metadata should NOT exist (neither canonical nor fallback)
+  # Metadata should NOT exist
   [ ! -f "${TARGET_DIR}/.commons/sync.yaml" ]
-  [ ! -f "${TARGET_DIR}/.dev-config/sync.yaml" ]
 }
 
 @test "writes metadata file with commit hash and timestamp" {
@@ -189,9 +188,8 @@ teardown() {
   [ "$status" -eq 1 ]
   # Files should NOT exist in target
   [ ! -f "${TARGET_DIR}/.claude/skills/commit/SKILL.md" ]
-  # Metadata should NOT exist (neither canonical nor fallback)
+  # Metadata should NOT exist
   [ ! -f "${TARGET_DIR}/.commons/sync.yaml" ]
-  [ ! -f "${TARGET_DIR}/.dev-config/sync.yaml" ]
 }
 
 @test "errors when target is not a git repository" {
