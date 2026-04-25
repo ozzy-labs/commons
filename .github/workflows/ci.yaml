@@ -46,4 +46,7 @@ jobs:
         run: ./sync.sh --check .
 
       - name: Test
+        env:
+          # gh CLI tests in tests/setup-repo.bats (11-18) require auth.
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: pnpm run test
