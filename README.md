@@ -32,6 +32,7 @@ templates/           -> Scaffold-only files (copied manually for new repos, neve
   AGENTS.md          -> Shared AI agent instructions template
   CLAUDE.md          -> Claude Code specific config
 sync.sh              -> Sync script
+sync-skills.sh       -> @ozzylabs/skills adapter sync script (opt-in per consumer)
 setup-repo.sh        -> GitHub repository setup script
 ```
 
@@ -61,6 +62,37 @@ All files use the same sync policy. In interactive mode, changed files show a di
 
 When a file is intentionally customized in a target repo, it can be **pinned** to prevent future syncs from overwriting it. Pin during interactive sync by choosing `pin` at the prompt, or edit `.dev-config/sync.yaml` directly.
 
+### Skills sync (opt-in per consumer)
+
+Shared skills live in [`ozzy-labs/skills`](https://github.com/ozzy-labs/skills) and are produced as per-agent adapter outputs under `dist/{adapter-id}/`. Consumers opt in by listing adapter ids in `.dev-config/sync.yaml`:
+
+```yaml
+# Tracked by Renovate via the @ozzylabs/skills preset
+skills_commit: <40-char-sha>
+
+# Opt-in per consumer (manual)
+skills_adapters:
+  - claude-code   # → .claude/skills/{name}/
+  - codex-cli     # → .agents/skills/{name}/ + AGENTS.md snippet
+  - gemini-cli    # → .gemini/settings.json + AGENTS.md snippet
+  - copilot       # → .github/copilot-instructions.md snippet
+```
+
+The consumer's sync workflow clones `ozzy-labs/skills` at `skills_commit:` and runs `sync-skills.sh` to apply the opted-in adapter outputs:
+
+```bash
+# Sync without confirmation (workflow use)
+/path/to/commons/sync-skills.sh -y /path/to/skills/dist /path/to/target-repo
+
+# Preview only
+/path/to/commons/sync-skills.sh --dry-run /path/to/skills/dist /path/to/target-repo
+
+# Check if files are in sync (CI, exits 1 if out of sync)
+/path/to/commons/sync-skills.sh --check /path/to/skills/dist /path/to/target-repo
+```
+
+Snippet targets (`AGENTS.md`, `.github/copilot-instructions.md`) must already contain the marker block — only the content between `<!-- begin: @ozzylabs/skills -->` and `<!-- end: @ozzylabs/skills -->` is replaced. Pinning a path in `.dev-config/sync.yaml`'s `pinned:` list (with a trailing `/` for whole directories) skips it across all adapters. Consumer-only skill directories under `.claude/skills/` or `.agents/skills/` are preserved.
+
 ### Repository setup
 
 ```bash
@@ -80,8 +112,8 @@ Consumer repos get a workflow distributed at `.github/workflows/sync-commons.yam
 First-time setup for a consumer repo:
 
 1. Run `sync.sh` manually once to pick up `sync-commons.yaml` into `.github/workflows/`
-2. The repo settings must allow creating PRs (already the case if `setup-repo.sh` was run)
-3. The weekly schedule takes over from the next Monday; `workflow_dispatch` lets you trigger it on demand
+1. The repo settings must allow creating PRs (already the case if `setup-repo.sh` was run)
+1. The weekly schedule takes over from the next Monday; `workflow_dispatch` lets you trigger it on demand
 
 ### Automated sync via Renovate (opt-in)
 

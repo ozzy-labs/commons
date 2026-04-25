@@ -24,21 +24,23 @@
 ## プロジェクト構成
 
 - `dist/` — 全リポジトリに配布するファイル群
-- `dist/.agents/skills/` — 共有スキル（agentskills.io 準拠、SSOT）
-- `dist/.claude/skills/` — Claude Code スキルオーバーレイ
+- `templates/` — scaffold 専用ファイル（`sync.sh` の対象外）
 - `tests/` — bats テスト
 - `sync.sh` — 配布ファイルの同期スクリプト
+- `sync-skills.sh` — `@ozzylabs/skills` adapter 出力を consumer の opt-in 設定に従って同期するスクリプト
 - `setup-repo.sh` — GitHub リポジトリ初期設定スクリプト
 - `docs/adr/` — Architecture Decision Records
 
 ## 主要コマンド
 
 ```bash
-bats tests/               # 全テスト実行
-sync.sh <target-repo>     # ファイル同期（対話モード）
-sync.sh -y <target-repo>  # ファイル同期（自動モード）
-sync.sh --check <target>  # 同期状態チェック（CI 用）
-setup-repo.sh owner/repo  # GitHub リポジトリ設定
+bats tests/                                       # 全テスト実行
+sync.sh <target-repo>                             # ファイル同期（対話モード）
+sync.sh -y <target-repo>                          # ファイル同期（自動モード）
+sync.sh --check <target>                          # 同期状態チェック（CI 用）
+sync-skills.sh -y <skills-dist> <target>          # skills adapter 同期（自動モード）
+sync-skills.sh --check <skills-dist> <target>     # skills adapter 同期状態チェック
+setup-repo.sh owner/repo                          # GitHub リポジトリ設定
 ```
 
 ## 検証（必須）
@@ -66,9 +68,4 @@ setup-repo.sh owner/repo  # GitHub リポジトリ設定
 
 ## Adapter Files
 
-| Agent | Configuration |
-|-------|---------------|
-| Claude Code | `CLAUDE.md`, `.claude/` |
-| Gemini CLI | `.gemini/settings.json` → `AGENTS.md` |
-| Codex CLI | `AGENTS.md` + `.agents/skills/` |
-| GitHub Copilot | `AGENTS.md` + `.agents/skills/` |
+| Agent | Configuration | |-------|---------------| | Claude Code | `CLAUDE.md`, `.claude/` | | Gemini CLI | `.gemini/settings.json` → `AGENTS.md` | | Codex CLI | `AGENTS.md` + `.agents/skills/` | | GitHub Copilot | `AGENTS.md` + `.agents/skills/` |
