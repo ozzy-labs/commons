@@ -9,6 +9,7 @@
 - **配布ファイル（`dist/`）**: 全リポジトリに配布する設定ファイル群。ターゲットリポジトリのルートにミラーされる
 - **scaffold テンプレート（`templates/`）**: 新規リポ作成時に手動コピーする雛形（AGENTS.md / CLAUDE.md）。`sync.sh` の対象外
 - **同期スクリプト（`sync.sh`）**: 配布ファイルを対象リポジトリにコピー
+- **skills 同期スクリプト（`sync-skills.sh`）**: `@ozzylabs/skills` の adapter 出力（`dist/{adapter-id}/`）を consumer の opt-in 設定（`.dev-config/sync.yaml` の `skills_adapters:`）に従って反映。SSOT は別リポなので呼び出し側がクローンを用意する。詳細は [ADR-0008](adr/0008-sync-skills-adapter.md)
 - **リポジトリ初期設定スクリプト（`setup-repo.sh`）**: GitHub リポジトリの設定（マージルール、ブランチ保護、セキュリティ等）を `gh` CLI で自動化
 
 ### 含まないもの
