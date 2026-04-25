@@ -8,9 +8,9 @@ Accepted (2026-04-25)
 
 [ADR-0005](0005-unified-dist-with-pin.md) の統合 dist/ 方針のもと、AGENTS.md と CLAUDE.md も `dist/` に含めて配布していた。pin 機構によって consumer 側のカスタマイズを尊重する想定だったが、運用してみると次の問題が顕在化した:
 
-1. **100% pin される配布物になっている**
+1. **配布する意味がない**
 
-   #42 で集計した結果、AGENTS.md（マルチエージェント対応 #43 後に追加）と CLAUDE.md は全 9 consumer リポで例外なく pin されていた。プロジェクト概要・tech stack・主要コマンド・利用 skill 一覧などリポ固有の内容を必ず書き換える性質上、`dist/` 経由で配布する意味がない。
+   #59 ロールアウト直後に 10 consumer リポを集計した結果、CLAUDE.md は 8/10、AGENTS.md は 6/10 のリポで template から書き換えられている（残りは starter / docs リポで完全一致のまま）。pin の有無は揺れるが、customize 済みリポは漏れなく pin している。プロジェクト概要・tech stack・主要コマンド・利用 skill 一覧などリポ固有の内容を書き換える性質上、template 一致のリポでも書き換えが起きるのは時間の問題で、`dist/` 経由で配布する意味がない。
 
 2. **新規同期で markdownlint hook が落ちる**
 

@@ -96,7 +96,7 @@ dist/.devcontainer/Dockerfile        → <repo>/.devcontainer/Dockerfile
 | AGENTS.md | AI エージェント共通 instructions の雛形（プロジェクト概要・tech stack・主要コマンド） |
 | CLAUDE.md | Claude Code 固有の追加設定（基本ルール・利用 skill 一覧） |
 
-これらは各リポで必ずカスタマイズされる（過去 9 リポすべてで pin 済み）ため、`dist/` から外して同期対象にしない。背景は [ADR-0007](adr/0007-exclude-agent-templates-from-dist.md) を参照。
+これらはプロジェクト概要・tech stack・利用 skill 一覧などリポ固有の内容を含むため、`dist/` から外して同期対象にしない。背景は [ADR-0007](adr/0007-exclude-agent-templates-from-dist.md) を参照。
 
 ## 同期の仕組み
 
