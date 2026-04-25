@@ -15,6 +15,8 @@ setup() {
   echo "editor" > "${SRC_DIR}/dist/.editorconfig"
 
   git -C "${SRC_DIR}" init -q
+  git -C "${SRC_DIR}" config user.email "test@example.com"
+  git -C "${SRC_DIR}" config user.name "Test User"
   git -C "${SRC_DIR}" add .
   git -C "${SRC_DIR}" commit -q -m "init"
 
@@ -24,6 +26,8 @@ setup() {
   TARGET_DIR="${TEST_DIR}/target"
   mkdir -p "${TARGET_DIR}"
   git -C "${TARGET_DIR}" init -q
+  git -C "${TARGET_DIR}" config user.email "test@example.com"
+  git -C "${TARGET_DIR}" config user.name "Test User"
   git -C "${TARGET_DIR}" commit -q --allow-empty -m "init"
 }
 
