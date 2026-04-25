@@ -106,7 +106,7 @@ write_metadata() {
   local pinned_list=("$@")
   mkdir -p "${METADATA_DIR}"
 
-  if ! COMMIT_HASH="$(git -C "${SCRIPT_DIR}" rev-parse --short HEAD 2>/dev/null)"; then
+  if ! COMMIT_HASH="$(git -C "${SCRIPT_DIR}" rev-parse HEAD 2>/dev/null)"; then
     echo "Warning: commons is not a git repository. Skipping metadata." >&2
     return
   fi
