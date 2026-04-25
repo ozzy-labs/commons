@@ -52,3 +52,5 @@ pnpm run build             # プロダクションビルド
 | Gemini CLI | `.gemini/settings.json` → `AGENTS.md` |
 | Codex CLI | `AGENTS.md` + `.agents/skills/` |
 | GitHub Copilot | `AGENTS.md` + `.agents/skills/` |
+
+`.agents/skills/` and `.claude/skills/` are distributed from [`ozzy-labs/skills`](https://github.com/ozzy-labs/skills) via the `@ozzylabs/skills` Renovate preset, not from `commons` (see [ADR-0016](https://github.com/ozzy-labs/handbook/blob/main/adr/0016-create-skills-repo.md)).

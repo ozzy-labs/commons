@@ -22,7 +22,7 @@
 `dist/` は**対象リポジトリのルートをミラー**する。コピー先がディレクトリ構造から自明になる。
 
 ```text
-dist/.claude/skills/commit/SKILL.md  → <repo>/.claude/skills/commit/SKILL.md
+dist/.claude/rules/git-workflow.md   → <repo>/.claude/rules/git-workflow.md
 dist/.claude/settings.json           → <repo>/.claude/settings.json
 dist/.devcontainer/Dockerfile        → <repo>/.devcontainer/Dockerfile
 ```
@@ -31,20 +31,7 @@ dist/.devcontainer/Dockerfile        → <repo>/.devcontainer/Dockerfile
 
 ## 配布ファイル一覧
 
-### スキル（`dist/.claude/skills/`）
-
-| スキル | 役割 |
-|--------|------|
-| commit | ステージング＆コミット |
-| commit-conventions | コミットメッセージ生成ルール（参照用） |
-| drive | implement→ship→review 自律ループ |
-| implement | ブランチ作成・実装 |
-| lint | リンター実行（lint-rules を参照） |
-| lint-rules | リンターコマンド対応表（参照用） |
-| pr | プッシュ＆PR 作成 |
-| review | コードレビュー |
-| ship | lint→commit→pr パイプライン |
-| test | ビルド・テスト実行（CLAUDE.md の検証セクションを参照） |
+> スキル（`.agents/skills/`、`.claude/skills/`）は [`ozzy-labs/skills`](https://github.com/ozzy-labs/skills) を SSOT とし、`@ozzylabs/skills` の Renovate preset 経由で各 consumer リポに配布される。本リポの `dist/` 配下からは除外する（[ADR-0016](https://github.com/ozzy-labs/handbook/blob/main/adr/0016-create-skills-repo.md)）。
 
 ### ルール（`dist/.claude/rules/`）
 
@@ -62,7 +49,6 @@ dist/.devcontainer/Dockerfile        → <repo>/.devcontainer/Dockerfile
 | .gitattributes | 改行コード正規化、バイナリファイル判定 |
 | .github/workflows/pr-check.yaml | PR タイトル・ブランチ名の Conventional Commits 検証 |
 | .claude/settings.json | 許可コマンドのベースライン。リポ固有のツールは各リポで追加する |
-| .claude/skills/lint-rules/SKILL.md | リンターコマンド対応表。リポの技術スタックに合わせてカスタマイズする |
 | SECURITY.md | 脆弱性報告ポリシー（Private Vulnerability Reporting 誘導） |
 | .mcp.json | MCP サーバー設定の雛形（Context7） |
 | .yamlfmt.yaml | YAML フォーマッター設定 |

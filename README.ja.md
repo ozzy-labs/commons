@@ -8,10 +8,7 @@ OzzyLabs リポジトリ共通の開発設定。
 
 ```text
 dist/                -> 全リポジトリに配布
-  .agents/
-    skills/          -> 共有スキル（agentskills.io 準拠、SSOT）
   .claude/
-    skills/          -> Claude Code スキルオーバーレイ
     rules/           -> ルール
     settings.json    -> 許可ツール・権限設定
   .devcontainer/     -> devcontainer 設定
@@ -39,6 +36,8 @@ setup-repo.sh        -> GitHub リポジトリ初期設定スクリプト
 ```
 
 `templates/` には各リポでカスタマイズ前提の雛形（プロジェクト概要・tech stack・利用スキル等）を置く。`sync.sh` の対象外なので、新規リポ初期化時に一度だけ手動コピーしてその後はリポ側で編集する。
+
+共有スキル（`.agents/skills/`、`.claude/skills/`）は本リポからの配布対象外。SSOT は [`ozzy-labs/skills`](https://github.com/ozzy-labs/skills) に置き、各 consumer リポは `@ozzylabs/skills` の Renovate preset 経由で取り込む（[ADR-0016](https://github.com/ozzy-labs/handbook/blob/main/adr/0016-create-skills-repo.md)）。
 
 ## 使い方
 
