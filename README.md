@@ -8,10 +8,7 @@ Shared configurations for OzzyLabs repositories.
 
 ```text
 dist/                -> Distributed to every repo
-  .agents/
-    skills/          -> Shared skills (agentskills.io, SSOT)
   .claude/
-    skills/          -> Claude Code skill overlays
     rules/           -> Rules
     settings.json    -> Allowed tools and permissions
   .devcontainer/     -> Devcontainer config
@@ -39,6 +36,8 @@ setup-repo.sh        -> GitHub repository setup script
 ```
 
 `templates/` ships starter content that every repo customizes (project name, tech stack, available skills). It is intentionally outside `dist/` so `sync.sh` never touches it — copy these files once when bootstrapping a new repo and edit in place.
+
+Shared skills (`.agents/skills/`, `.claude/skills/`) are no longer distributed from this repo. They live in [`ozzy-labs/skills`](https://github.com/ozzy-labs/skills) and are pulled into consumer repos via the `@ozzylabs/skills` Renovate preset (see [ADR-0016](https://github.com/ozzy-labs/handbook/blob/main/adr/0016-create-skills-repo.md)).
 
 ## Usage
 

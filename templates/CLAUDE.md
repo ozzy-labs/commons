@@ -8,6 +8,8 @@
 
 ## Available Skills
 
+スキル本体は [`ozzy-labs/skills`](https://github.com/ozzy-labs/skills) に置き、`@ozzylabs/skills` の Renovate preset 経由で `.claude/skills/` に配布される（[ADR-0016](https://github.com/ozzy-labs/handbook/blob/main/adr/0016-create-skills-repo.md)）。
+
 - `/implement` — Issue または指示をもとに、ブランチ作成・実装
 - `/lint` — 全リンターを自動修正付きで実行
 - `/test` — ビルド・テスト・型チェックを実行
