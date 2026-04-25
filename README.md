@@ -75,13 +75,26 @@ Sets merge rules (squash only), branch protection (Rulesets), security settings,
 
 Consumer repos get a workflow distributed at `.github/workflows/sync-commons.yaml`. It runs weekly (Monday 00:00 UTC) and on manual dispatch, checks the repo against the latest `commons`, and — if any non-pinned file diverges — runs `sync.sh --yes` and opens a pull request. Review and merge manually; the workflow never auto-merges.
 
-Why a scheduled workflow and not Renovate: Renovate's built-in managers don't cover the "copy files from a sibling repo via a custom script" model. Custom `regexManagers` could track the commit SHA but can't execute `sync.sh`, and `postUpgradeTasks` is unavailable on the Mend Renovate GitHub App (self-hosted only). A scheduled GitHub Actions workflow fits the existing `sync.sh` / `.dev-config/sync.yaml` design without adding a second source of truth.
-
 First-time setup for a consumer repo:
 
 1. Run `sync.sh` manually once to pick up `sync-commons.yaml` into `.github/workflows/`
 2. The repo settings must allow creating PRs (already the case if `setup-repo.sh` was run)
 3. The weekly schedule takes over from the next Monday; `workflow_dispatch` lets you trigger it on demand
+
+### Automated sync via Renovate (opt-in)
+
+As a lower-latency alternative to the weekly schedule, consumer repos can opt into the `commons-sync` Renovate preset. Renovate watches the commons `main` branch and opens a PR bumping `.dev-config/sync.yaml`'s `commit:` field whenever a new commit lands. Actual file materialisation remains the consumer workflow's job (it runs `sync.sh --yes` on the Renovate PR branch).
+
+Consumer `renovate.json`:
+
+```json
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["github>ozzy-labs/commons:commons-sync"]
+}
+```
+
+Design details are in [ADR-0006](docs/adr/0006-renovate-auto-sync-preset.md). Consumer-side workflow integration is tracked by the Renovate PoC rollout (handbook#18 / handbook#42); until that lands, the scheduled workflow above is the supported path.
 
 ## What stays in each repo
 

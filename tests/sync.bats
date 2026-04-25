@@ -135,10 +135,10 @@ teardown() {
   meta="$(cat "${TARGET_DIR}/.dev-config/sync.yaml")"
   [[ "$meta" == *"commit: "* ]]
   [[ "$meta" == *"synced_at: "* ]]
-  # Verify commit hash is a valid short hash (hex chars)
+  # Verify commit hash is a full 40-char hex SHA (Renovate git-refs compatible)
   local hash
   hash="$(grep '^commit:' "${TARGET_DIR}/.dev-config/sync.yaml" | awk '{print $2}')"
-  [[ "$hash" =~ ^[0-9a-f]+$ ]]
+  [[ "$hash" =~ ^[0-9a-f]{40}$ ]]
 }
 
 @test "metadata includes user-editable comment" {

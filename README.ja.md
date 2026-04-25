@@ -75,13 +75,26 @@ setup-repo.sh        -> GitHub リポジトリ初期設定スクリプト
 
 各消費リポには `.github/workflows/sync-commons.yaml` が配布される。このワークフローは毎週（月曜 UTC 00:00）と手動起動で動作し、最新の `commons` と比較して差分があれば `sync.sh --yes` を実行し、プルリクエストを作成する。自動マージはせず、必ずレビューしてマージする。
 
-Renovate ではなく scheduled workflow にした理由: Renovate の組込 manager は「独自スクリプトで sibling repo からファイルをコピーする」モデルをサポートしない。Custom `regexManagers` で commit SHA は追跡できるが `sync.sh` 自体の実行は別手段が必要で、`postUpgradeTasks` は Mend Renovate GitHub App では使えない（self-hosted 限定）。Scheduled GitHub Actions なら既存の `sync.sh` / `.dev-config/sync.yaml` の設計を生かしたまま自動化できる。
-
 消費リポ側の初回セットアップ手順:
 
 1. 手動で一度 `sync.sh` を実行し、`sync-commons.yaml` を `.github/workflows/` に取り込む
 2. リポ設定で PR 作成が許可されていること（`setup-repo.sh` 実行済みなら OK）
 3. 翌週から scheduled で自動起動。`workflow_dispatch` で即時実行も可能
+
+### Renovate 経由の自動同期（opt-in）
+
+週次 schedule の代替として、consumer リポは `commons-sync` Renovate preset を `extends` することで低レイテンシな更新検知に切り替えられる。Renovate は commons の `main` ブランチ HEAD を追跡し、新しい commit が来ると `.dev-config/sync.yaml` の `commit:` フィールドを書き換える PR を consumer に送る。実ファイルの反映は consumer 側の workflow が `sync.sh --yes` を Renovate PR ブランチ上で実行する役割。
+
+Consumer の `renovate.json`:
+
+```json
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["github>ozzy-labs/commons:commons-sync"]
+}
+```
+
+設計の詳細は [ADR-0006](docs/adr/0006-renovate-auto-sync-preset.md) を参照。consumer 側の workflow 整備は Renovate PoC の roll-out（handbook#18 / handbook#42）で対応予定。それまでは scheduled workflow が推奨パス。
 
 ## リポジトリ固有のまま残すもの
 
