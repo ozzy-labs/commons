@@ -122,22 +122,24 @@ teardown() {
   # Files should NOT exist in target
   [ ! -f "${TARGET_DIR}/.claude/skills/commit/SKILL.md" ]
   [ ! -f "${TARGET_DIR}/CLAUDE.md" ]
-  # Metadata should NOT exist
+  # Metadata should NOT exist (neither canonical nor fallback)
+  [ ! -f "${TARGET_DIR}/.commons/sync.yaml" ]
   [ ! -f "${TARGET_DIR}/.dev-config/sync.yaml" ]
 }
 
 @test "writes metadata file with commit hash and timestamp" {
   run "${SRC_DIR}/sync.sh" -y "${TARGET_DIR}"
   [ "$status" -eq 0 ]
-  [ -f "${TARGET_DIR}/.dev-config/sync.yaml" ]
+  # New consumer (no metadata dir): created at canonical .commons/
+  [ -f "${TARGET_DIR}/.commons/sync.yaml" ]
 
   local meta
-  meta="$(cat "${TARGET_DIR}/.dev-config/sync.yaml")"
+  meta="$(cat "${TARGET_DIR}/.commons/sync.yaml")"
   [[ "$meta" == *"commit: "* ]]
   [[ "$meta" == *"synced_at: "* ]]
   # Verify commit hash is a full 40-char hex SHA (Renovate git-refs compatible)
   local hash
-  hash="$(grep '^commit:' "${TARGET_DIR}/.dev-config/sync.yaml" | awk '{print $2}')"
+  hash="$(grep '^commit:' "${TARGET_DIR}/.commons/sync.yaml" | awk '{print $2}')"
   [[ "$hash" =~ ^[0-9a-f]{40}$ ]]
 }
 
@@ -145,7 +147,7 @@ teardown() {
   "${SRC_DIR}/sync.sh" -y "${TARGET_DIR}"
 
   local meta
-  meta="$(cat "${TARGET_DIR}/.dev-config/sync.yaml")"
+  meta="$(cat "${TARGET_DIR}/.commons/sync.yaml")"
   [[ "$meta" == *"user-editable"* ]]
 }
 
@@ -187,7 +189,8 @@ teardown() {
   [ "$status" -eq 1 ]
   # Files should NOT exist in target
   [ ! -f "${TARGET_DIR}/.claude/skills/commit/SKILL.md" ]
-  # Metadata should NOT exist
+  # Metadata should NOT exist (neither canonical nor fallback)
+  [ ! -f "${TARGET_DIR}/.commons/sync.yaml" ]
   [ ! -f "${TARGET_DIR}/.dev-config/sync.yaml" ]
 }
 
@@ -204,8 +207,8 @@ teardown() {
   "${SRC_DIR}/sync.sh" -y "${TARGET_DIR}"
 
   # Pin CLAUDE.md
-  mkdir -p "${TARGET_DIR}/.dev-config"
-  cat > "${TARGET_DIR}/.dev-config/sync.yaml" <<'EOF'
+  mkdir -p "${TARGET_DIR}/.commons"
+  cat > "${TARGET_DIR}/.commons/sync.yaml" <<'EOF'
 # Auto-updated by commons sync.sh
 # 'pinned' is user-editable — add or remove paths freely
 commit: abc1234
@@ -231,8 +234,8 @@ EOF
   "${SRC_DIR}/sync.sh" -y "${TARGET_DIR}"
 
   # Pin and customize CLAUDE.md
-  mkdir -p "${TARGET_DIR}/.dev-config"
-  cat > "${TARGET_DIR}/.dev-config/sync.yaml" <<'EOF'
+  mkdir -p "${TARGET_DIR}/.commons"
+  cat > "${TARGET_DIR}/.commons/sync.yaml" <<'EOF'
 # Auto-updated by commons sync.sh
 # 'pinned' is user-editable — add or remove paths freely
 commit: abc1234
@@ -254,8 +257,8 @@ EOF
   "${SRC_DIR}/sync.sh" -y "${TARGET_DIR}"
 
   # Pin a file
-  mkdir -p "${TARGET_DIR}/.dev-config"
-  cat > "${TARGET_DIR}/.dev-config/sync.yaml" <<'EOF'
+  mkdir -p "${TARGET_DIR}/.commons"
+  cat > "${TARGET_DIR}/.commons/sync.yaml" <<'EOF'
 # Auto-updated by commons sync.sh
 # 'pinned' is user-editable — add or remove paths freely
 commit: abc1234
@@ -272,7 +275,7 @@ EOF
 
   # Pin should still be in metadata
   local meta
-  meta="$(cat "${TARGET_DIR}/.dev-config/sync.yaml")"
+  meta="$(cat "${TARGET_DIR}/.commons/sync.yaml")"
   [[ "$meta" == *"pinned:"* ]]
   [[ "$meta" == *"CLAUDE.md"* ]]
 }
@@ -281,8 +284,8 @@ EOF
   "${SRC_DIR}/sync.sh" -y "${TARGET_DIR}"
 
   # Pin CLAUDE.md with YAML double quotes
-  mkdir -p "${TARGET_DIR}/.dev-config"
-  cat > "${TARGET_DIR}/.dev-config/sync.yaml" <<'EOF'
+  mkdir -p "${TARGET_DIR}/.commons"
+  cat > "${TARGET_DIR}/.commons/sync.yaml" <<'EOF'
 commit: abc1234
 synced_at: 2026-04-05T00:00:00Z
 pinned:
@@ -301,9 +304,9 @@ EOF
   "${SRC_DIR}/sync.sh" -y "${TARGET_DIR}"
 
   # Pin CLAUDE.md with trailing spaces
-  mkdir -p "${TARGET_DIR}/.dev-config"
+  mkdir -p "${TARGET_DIR}/.commons"
   printf 'commit: abc1234\nsynced_at: 2026-04-05T00:00:00Z\npinned:\n  - CLAUDE.md   \n' \
-    > "${TARGET_DIR}/.dev-config/sync.yaml"
+    > "${TARGET_DIR}/.commons/sync.yaml"
 
   echo "my custom claude" > "${TARGET_DIR}/CLAUDE.md"
   echo "updated claude md" > "${SRC_DIR}/dist/CLAUDE.md"
@@ -316,8 +319,8 @@ EOF
 @test "multiple pinned files are all skipped" {
   "${SRC_DIR}/sync.sh" -y "${TARGET_DIR}"
 
-  mkdir -p "${TARGET_DIR}/.dev-config"
-  cat > "${TARGET_DIR}/.dev-config/sync.yaml" <<'EOF'
+  mkdir -p "${TARGET_DIR}/.commons"
+  cat > "${TARGET_DIR}/.commons/sync.yaml" <<'EOF'
 commit: abc1234
 synced_at: 2026-04-05T00:00:00Z
 pinned:
@@ -346,8 +349,8 @@ EOF
 @test "pinned parser skips interleaved comments and blank lines" {
   "${SRC_DIR}/sync.sh" -y "${TARGET_DIR}"
 
-  mkdir -p "${TARGET_DIR}/.dev-config"
-  cat > "${TARGET_DIR}/.dev-config/sync.yaml" <<'EOF'
+  mkdir -p "${TARGET_DIR}/.commons"
+  cat > "${TARGET_DIR}/.commons/sync.yaml" <<'EOF'
 commit: abc1234
 synced_at: 2026-04-05T00:00:00Z
 pinned:
@@ -384,10 +387,11 @@ EOF
 @test "metadata is written atomically via temp file" {
   run "${SRC_DIR}/sync.sh" -y "${TARGET_DIR}"
   [ "$status" -eq 0 ]
-  [ -f "${TARGET_DIR}/.dev-config/sync.yaml" ]
+  # New consumer: written at canonical .commons/
+  [ -f "${TARGET_DIR}/.commons/sync.yaml" ]
   # No leftover temp files
   local tmp_count
-  tmp_count="$(find "${TARGET_DIR}/.dev-config" -name 'sync.yaml.tmp.*' | wc -l)"
+  tmp_count="$(find "${TARGET_DIR}/.commons" -name 'sync.yaml.tmp.*' | wc -l)"
   [ "$tmp_count" -eq 0 ]
 }
 
@@ -438,9 +442,9 @@ EOF
   # File should NOT be overwritten
   [ "$(cat "${TARGET_DIR}/CLAUDE.md")" = "claude md" ]
 
-  # File should be in pinned list
+  # File should be in pinned list (new consumer wrote to canonical .commons/)
   local meta
-  meta="$(cat "${TARGET_DIR}/.dev-config/sync.yaml")"
+  meta="$(cat "${TARGET_DIR}/.commons/sync.yaml")"
   [[ "$meta" == *"pinned:"* ]]
   [[ "$meta" == *"CLAUDE.md"* ]]
 }

@@ -22,6 +22,18 @@ PRESET_FILE="${BATS_TEST_DIRNAME}/../commons-sync.json"
     "${PRESET_FILE}" >/dev/null
 }
 
+@test "preset customManager matches the canonical .commons/sync.yaml path" {
+  jq -e '.customManagers[0].managerFilePatterns | map(test("\\.commons/sync\\.yaml")) | any' \
+    "${PRESET_FILE}" >/dev/null
+}
+
+@test "preset customManager still matches the legacy .dev-config/sync.yaml path" {
+  # Migration period: fallback must remain matched until all consumers rename.
+  # See ADR-0014 / handbook#79.
+  jq -e '.customManagers[0].managerFilePatterns | map(test("\\.dev-config/sync\\.yaml")) | any' \
+    "${PRESET_FILE}" >/dev/null
+}
+
 @test "preset customManager captures currentDigest via regex" {
   jq -e '.customManagers[0].matchStrings | map(test("currentDigest")) | any' \
     "${PRESET_FILE}" >/dev/null
