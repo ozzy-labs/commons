@@ -70,7 +70,18 @@ if [[ ! -d "${TARGET_DIR}/.git" ]]; then
   exit 1
 fi
 
-METADATA_FILE="${TARGET_DIR}/.dev-config/sync.yaml"
+# Dual-path support (migration period — see ADR-0014 / handbook#79):
+#   canonical: <target>/.commons/sync.yaml
+#   fallback : <target>/.dev-config/sync.yaml
+# Prefer canonical; fall back to legacy if only that path exists.
+# TODO(handbook#79): drop the .dev-config/ fallback once all consumers migrate.
+if [[ -f "${TARGET_DIR}/.commons/sync.yaml" ]]; then
+  METADATA_FILE="${TARGET_DIR}/.commons/sync.yaml"
+elif [[ -f "${TARGET_DIR}/.dev-config/sync.yaml" ]]; then
+  METADATA_FILE="${TARGET_DIR}/.dev-config/sync.yaml"
+else
+  METADATA_FILE="${TARGET_DIR}/.commons/sync.yaml"
+fi
 
 # --- YAML helpers ---
 

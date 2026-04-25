@@ -55,9 +55,33 @@ if [[ ! -d "${TARGET_DIR}/.git" ]]; then
 fi
 
 # --- Metadata helpers ---
+#
+# Dual-path support (migration period — see ADR-0014 / handbook#79):
+#   canonical: <target>/.commons/sync.yaml      (preferred for new consumers)
+#   fallback : <target>/.dev-config/sync.yaml   (legacy; kept until all
+#                                                consumers rename)
+#
+# Read: prefer .commons/, fall back to .dev-config/ if only the legacy path
+# exists. Write: respect whichever path was found so we never auto-migrate
+# a consumer (rename is a consumer-driven, deliberate step). Brand-new
+# consumers (neither path present) are bootstrapped at the canonical path.
+#
+# TODO(handbook#79): remove the .dev-config/ fallback once all consumers
+# have migrated to .commons/. Track via the parent issue's sub-issues.
 
-METADATA_DIR="${TARGET_DIR}/.dev-config"
+CANONICAL_METADATA_DIR="${TARGET_DIR}/.commons"
+FALLBACK_METADATA_DIR="${TARGET_DIR}/.dev-config"
+
+if [[ -f "${CANONICAL_METADATA_DIR}/sync.yaml" ]]; then
+  METADATA_DIR="${CANONICAL_METADATA_DIR}"
+elif [[ -f "${FALLBACK_METADATA_DIR}/sync.yaml" ]]; then
+  METADATA_DIR="${FALLBACK_METADATA_DIR}"
+else
+  # Brand-new consumer: bootstrap at the canonical path.
+  METADATA_DIR="${CANONICAL_METADATA_DIR}"
+fi
 METADATA_FILE="${METADATA_DIR}/sync.yaml"
+METADATA_REL="${METADATA_DIR#"${TARGET_DIR}/"}/sync.yaml"
 
 # Read pinned list from metadata
 read_pinned() {
@@ -216,7 +240,7 @@ if [[ "${YES}" == true ]]; then
     echo "  copy: ${f}"
   done
   write_metadata "${current_pinned[@]+"${current_pinned[@]}"}"
-  echo "  write: .dev-config/sync.yaml"
+  echo "  write: ${METADATA_REL}"
   echo ""
   echo "Sync complete."
   exit 0
@@ -284,7 +308,7 @@ done
 # Write metadata if any files were copied or pinned list changed
 if [[ ${copied} -gt 0 ]] || [[ ${#current_pinned[@]} -gt 0 ]]; then
   write_metadata "${current_pinned[@]+"${current_pinned[@]}"}"
-  echo "  write: .dev-config/sync.yaml"
+  echo "  write: ${METADATA_REL}"
 fi
 
 echo ""
