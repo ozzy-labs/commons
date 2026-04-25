@@ -30,12 +30,15 @@ dist/                -> Distributed to every repo
   .mdformat.toml     -> Markdown formatter config
   .mise.toml         -> Tool version management
   trivy.yaml         -> Trivy security scanner config
+  ...
+templates/           -> Scaffold-only files (copied manually for new repos, never synced)
   AGENTS.md          -> Shared AI agent instructions template
   CLAUDE.md          -> Claude Code specific config
-  ...
 sync.sh              -> Sync script
 setup-repo.sh        -> GitHub repository setup script
 ```
+
+`templates/` ships starter content that every repo customizes (project name, tech stack, available skills). It is intentionally outside `dist/` so `sync.sh` never touches it — copy these files once when bootstrapping a new repo and edit in place.
 
 ## Usage
 

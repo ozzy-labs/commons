@@ -7,12 +7,13 @@
 ### 含むもの
 
 - **配布ファイル（`dist/`）**: 全リポジトリに配布する設定ファイル群。ターゲットリポジトリのルートにミラーされる
+- **scaffold テンプレート（`templates/`）**: 新規リポ作成時に手動コピーする雛形（AGENTS.md / CLAUDE.md）。`sync.sh` の対象外
 - **同期スクリプト（`sync.sh`）**: 配布ファイルを対象リポジトリにコピー
 - **リポジトリ初期設定スクリプト（`setup-repo.sh`）**: GitHub リポジトリの設定（マージルール、ブランチ保護、セキュリティ等）を `gh` CLI で自動化
 
 ### 含まないもの
 
-- リポジトリ固有の設定（CLAUDE.md のプロジェクト概要、settings.json の許可コマンド等）
+- リポジトリ固有の設定（settings.json の許可コマンド等）
 - CI/CD ワークフロー（ビルド・テスト・デプロイ等。`.github` リポジトリで管理。PR 検証ワークフロー `pr-check.yaml` は配布対象）
 - AI エージェントの実行環境やランタイム
 
@@ -22,9 +23,11 @@
 
 ```text
 dist/.claude/skills/commit/SKILL.md  → <repo>/.claude/skills/commit/SKILL.md
-dist/CLAUDE.md                       → <repo>/CLAUDE.md
+dist/.claude/settings.json           → <repo>/.claude/settings.json
 dist/.devcontainer/Dockerfile        → <repo>/.devcontainer/Dockerfile
 ```
+
+`templates/` 配下のファイル（`AGENTS.md`、`CLAUDE.md`）は scaffold 専用で、新規リポ作成時に手動コピーする。同期対象外なので `sync.sh` は読み書きしない（[ADR-0007](adr/0007-exclude-agent-templates-from-dist.md)）。
 
 ## 配布ファイル一覧
 
@@ -58,7 +61,6 @@ dist/.devcontainer/Dockerfile        → <repo>/.devcontainer/Dockerfile
 | .editorconfig | エディタ共通設定（文字コード、改行、インデント） |
 | .gitattributes | 改行コード正規化、バイナリファイル判定 |
 | .github/workflows/pr-check.yaml | PR タイトル・ブランチ名の Conventional Commits 検証 |
-| CLAUDE.md | プロジェクト概要、コマンド、検証手順の雛形 |
 | .claude/settings.json | 許可コマンドのベースライン。リポ固有のツールは各リポで追加する |
 | .claude/skills/lint-rules/SKILL.md | リンターコマンド対応表。リポの技術スタックに合わせてカスタマイズする |
 | SECURITY.md | 脆弱性報告ポリシー（Private Vulnerability Reporting 誘導） |
@@ -84,6 +86,17 @@ dist/.devcontainer/Dockerfile        → <repo>/.devcontainer/Dockerfile
 | .devcontainer/devcontainer.json | devcontainer 設定（features, mounts, extensions） |
 | .devcontainer/initialize.sh | devcontainer 初期化スクリプト（ホスト側のマウント準備） |
 | .devcontainer/post-create.sh | devcontainer 作成後スクリプト（セットアップ処理） |
+
+## scaffold テンプレート（`templates/`）
+
+新規リポ作成時に手動コピーする雛形を `templates/` に置く。`sync.sh` は読み書きしない。
+
+| ファイル | 役割 |
+|----------|------|
+| AGENTS.md | AI エージェント共通 instructions の雛形（プロジェクト概要・tech stack・主要コマンド） |
+| CLAUDE.md | Claude Code 固有の追加設定（基本ルール・利用 skill 一覧） |
+
+これらはプロジェクト概要・tech stack・利用 skill 一覧などリポ固有の内容を含むため、`dist/` から外して同期対象にしない。背景は [ADR-0007](adr/0007-exclude-agent-templates-from-dist.md) を参照。
 
 ## 同期の仕組み
 
