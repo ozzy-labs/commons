@@ -11,35 +11,35 @@ setup() {
   mkdir -p "${SRC_DIR}/dist/.github/workflows"
   mkdir -p "${SRC_DIR}/dist/.github/ISSUE_TEMPLATE"
   mkdir -p "${SRC_DIR}/dist/.vscode"
-  echo "skill content" > "${SRC_DIR}/dist/.claude/skills/commit/SKILL.md"
-  echo "lint-rules content" > "${SRC_DIR}/dist/.claude/skills/lint-rules/SKILL.md"
-  echo "rule content" > "${SRC_DIR}/dist/.claude/rules/git-workflow.md"
-  echo "settings content" > "${SRC_DIR}/dist/.claude/settings.json"
-  echo "lefthook-base" > "${SRC_DIR}/dist/lefthook-base.yaml"
-  echo "commitlint" > "${SRC_DIR}/dist/.commitlintrc.yaml"
-  echo "editorconfig" > "${SRC_DIR}/dist/.editorconfig"
-  echo "gitattributes" > "${SRC_DIR}/dist/.gitattributes"
-  echo "pr-check" > "${SRC_DIR}/dist/.github/workflows/pr-check.yaml"
-  echo "claude md" > "${SRC_DIR}/dist/CLAUDE.md"
-  echo "security" > "${SRC_DIR}/dist/SECURITY.md"
-  echo "mcp" > "${SRC_DIR}/dist/.mcp.json"
-  echo "yamlfmt" > "${SRC_DIR}/dist/.yamlfmt.yaml"
-  echo "yamllint" > "${SRC_DIR}/dist/.yamllint.yaml"
-  echo "markdownlint" > "${SRC_DIR}/dist/.markdownlint-cli2.yaml"
-  echo "mdformat" > "${SRC_DIR}/dist/.mdformat.toml"
-  echo "mise" > "${SRC_DIR}/dist/.mise.toml"
-  echo "gitignore" > "${SRC_DIR}/dist/.gitignore"
-  echo "renovate" > "${SRC_DIR}/dist/renovate.json"
-  echo "trivy" > "${SRC_DIR}/dist/trivy.yaml"
-  echo "biome" > "${SRC_DIR}/dist/biome.json"
-  echo "license" > "${SRC_DIR}/dist/LICENSE"
-  echo "contributing" > "${SRC_DIR}/dist/CONTRIBUTING.md"
-  echo "pr template" > "${SRC_DIR}/dist/.github/pull_request_template.md"
-  echo "bug report" > "${SRC_DIR}/dist/.github/ISSUE_TEMPLATE/bug_report.yaml"
-  echo "feature request" > "${SRC_DIR}/dist/.github/ISSUE_TEMPLATE/feature_request.yaml"
-  echo "vscode settings" > "${SRC_DIR}/dist/.vscode/settings.json"
-  echo "vscode extensions" > "${SRC_DIR}/dist/.vscode/extensions.json"
-  echo "lefthook" > "${SRC_DIR}/dist/lefthook.yaml"
+  echo "skill content" >"${SRC_DIR}/dist/.claude/skills/commit/SKILL.md"
+  echo "lint-rules content" >"${SRC_DIR}/dist/.claude/skills/lint-rules/SKILL.md"
+  echo "rule content" >"${SRC_DIR}/dist/.claude/rules/git-workflow.md"
+  echo "settings content" >"${SRC_DIR}/dist/.claude/settings.json"
+  echo "lefthook-base" >"${SRC_DIR}/dist/lefthook-base.yaml"
+  echo "commitlint" >"${SRC_DIR}/dist/.commitlintrc.yaml"
+  echo "editorconfig" >"${SRC_DIR}/dist/.editorconfig"
+  echo "gitattributes" >"${SRC_DIR}/dist/.gitattributes"
+  echo "pr-check" >"${SRC_DIR}/dist/.github/workflows/pr-check.yaml"
+  echo "claude md" >"${SRC_DIR}/dist/CLAUDE.md"
+  echo "security" >"${SRC_DIR}/dist/SECURITY.md"
+  echo "mcp" >"${SRC_DIR}/dist/.mcp.json"
+  echo "yamlfmt" >"${SRC_DIR}/dist/.yamlfmt.yaml"
+  echo "yamllint" >"${SRC_DIR}/dist/.yamllint.yaml"
+  echo "markdownlint" >"${SRC_DIR}/dist/.markdownlint-cli2.yaml"
+  echo "mdformat" >"${SRC_DIR}/dist/.mdformat.toml"
+  echo "mise" >"${SRC_DIR}/dist/.mise.toml"
+  echo "gitignore" >"${SRC_DIR}/dist/.gitignore"
+  echo "renovate" >"${SRC_DIR}/dist/renovate.json"
+  echo "trivy" >"${SRC_DIR}/dist/trivy.yaml"
+  echo "biome" >"${SRC_DIR}/dist/biome.json"
+  echo "license" >"${SRC_DIR}/dist/LICENSE"
+  echo "contributing" >"${SRC_DIR}/dist/CONTRIBUTING.md"
+  echo "pr template" >"${SRC_DIR}/dist/.github/pull_request_template.md"
+  echo "bug report" >"${SRC_DIR}/dist/.github/ISSUE_TEMPLATE/bug_report.yaml"
+  echo "feature request" >"${SRC_DIR}/dist/.github/ISSUE_TEMPLATE/feature_request.yaml"
+  echo "vscode settings" >"${SRC_DIR}/dist/.vscode/settings.json"
+  echo "vscode extensions" >"${SRC_DIR}/dist/.vscode/extensions.json"
+  echo "lefthook" >"${SRC_DIR}/dist/lefthook.yaml"
 
   # Init as git repo (needed for metadata commit hash)
   git -C "${SRC_DIR}" init -q
@@ -92,7 +92,7 @@ teardown() {
   "${SRC_DIR}/sync.sh" -y "${TARGET_DIR}"
 
   # Modify source
-  echo "updated skill" > "${SRC_DIR}/dist/.claude/skills/commit/SKILL.md"
+  echo "updated skill" >"${SRC_DIR}/dist/.claude/skills/commit/SKILL.md"
 
   run "${SRC_DIR}/sync.sh" -y "${TARGET_DIR}"
   [ "$status" -eq 0 ]
@@ -103,10 +103,10 @@ teardown() {
   "${SRC_DIR}/sync.sh" --yes "${TARGET_DIR}"
 
   # Customize target file
-  echo "custom content" > "${TARGET_DIR}/CLAUDE.md"
+  echo "custom content" >"${TARGET_DIR}/CLAUDE.md"
 
   # Modify source so there's a diff
-  echo "updated claude md" > "${SRC_DIR}/dist/CLAUDE.md"
+  echo "updated claude md" >"${SRC_DIR}/dist/CLAUDE.md"
 
   run "${SRC_DIR}/sync.sh" --yes "${TARGET_DIR}"
   [ "$status" -eq 0 ]
@@ -180,7 +180,7 @@ teardown() {
   "${SRC_DIR}/sync.sh" -y "${TARGET_DIR}"
 
   # Modify source
-  echo "updated skill" > "${SRC_DIR}/dist/.claude/skills/commit/SKILL.md"
+  echo "updated skill" >"${SRC_DIR}/dist/.claude/skills/commit/SKILL.md"
 
   run "${SRC_DIR}/sync.sh" --check "${TARGET_DIR}"
   [ "$status" -eq 1 ]
@@ -210,7 +210,7 @@ teardown() {
 
   # Pin CLAUDE.md
   mkdir -p "${TARGET_DIR}/.commons"
-  cat > "${TARGET_DIR}/.commons/sync.yaml" <<'EOF'
+  cat >"${TARGET_DIR}/.commons/sync.yaml" <<'EOF'
 # Auto-updated by commons sync.sh
 # 'pinned' is user-editable — add or remove paths freely
 commit: abc1234
@@ -220,10 +220,10 @@ pinned:
 EOF
 
   # Customize pinned file
-  echo "my custom claude" > "${TARGET_DIR}/CLAUDE.md"
+  echo "my custom claude" >"${TARGET_DIR}/CLAUDE.md"
 
   # Modify source
-  echo "updated claude md" > "${SRC_DIR}/dist/CLAUDE.md"
+  echo "updated claude md" >"${SRC_DIR}/dist/CLAUDE.md"
 
   run "${SRC_DIR}/sync.sh" -y "${TARGET_DIR}"
   [ "$status" -eq 0 ]
@@ -237,7 +237,7 @@ EOF
 
   # Pin and customize CLAUDE.md
   mkdir -p "${TARGET_DIR}/.commons"
-  cat > "${TARGET_DIR}/.commons/sync.yaml" <<'EOF'
+  cat >"${TARGET_DIR}/.commons/sync.yaml" <<'EOF'
 # Auto-updated by commons sync.sh
 # 'pinned' is user-editable — add or remove paths freely
 commit: abc1234
@@ -245,10 +245,10 @@ synced_at: 2026-04-05T00:00:00Z
 pinned:
   - CLAUDE.md
 EOF
-  echo "my custom claude" > "${TARGET_DIR}/CLAUDE.md"
+  echo "my custom claude" >"${TARGET_DIR}/CLAUDE.md"
 
   # Modify source
-  echo "updated claude md" > "${SRC_DIR}/dist/CLAUDE.md"
+  echo "updated claude md" >"${SRC_DIR}/dist/CLAUDE.md"
 
   run "${SRC_DIR}/sync.sh" --check "${TARGET_DIR}"
   # Should pass because CLAUDE.md is pinned (only non-pinned files checked)
@@ -260,7 +260,7 @@ EOF
 
   # Pin a file
   mkdir -p "${TARGET_DIR}/.commons"
-  cat > "${TARGET_DIR}/.commons/sync.yaml" <<'EOF'
+  cat >"${TARGET_DIR}/.commons/sync.yaml" <<'EOF'
 # Auto-updated by commons sync.sh
 # 'pinned' is user-editable — add or remove paths freely
 commit: abc1234
@@ -270,7 +270,7 @@ pinned:
 EOF
 
   # Modify a non-pinned file and sync
-  echo "updated skill" > "${SRC_DIR}/dist/.claude/skills/commit/SKILL.md"
+  echo "updated skill" >"${SRC_DIR}/dist/.claude/skills/commit/SKILL.md"
 
   run "${SRC_DIR}/sync.sh" -y "${TARGET_DIR}"
   [ "$status" -eq 0 ]
@@ -287,15 +287,15 @@ EOF
 
   # Pin CLAUDE.md with YAML double quotes
   mkdir -p "${TARGET_DIR}/.commons"
-  cat > "${TARGET_DIR}/.commons/sync.yaml" <<'EOF'
+  cat >"${TARGET_DIR}/.commons/sync.yaml" <<'EOF'
 commit: abc1234
 synced_at: 2026-04-05T00:00:00Z
 pinned:
   - "CLAUDE.md"
 EOF
 
-  echo "my custom claude" > "${TARGET_DIR}/CLAUDE.md"
-  echo "updated claude md" > "${SRC_DIR}/dist/CLAUDE.md"
+  echo "my custom claude" >"${TARGET_DIR}/CLAUDE.md"
+  echo "updated claude md" >"${SRC_DIR}/dist/CLAUDE.md"
 
   run "${SRC_DIR}/sync.sh" -y "${TARGET_DIR}"
   [ "$status" -eq 0 ]
@@ -308,10 +308,10 @@ EOF
   # Pin CLAUDE.md with trailing spaces
   mkdir -p "${TARGET_DIR}/.commons"
   printf 'commit: abc1234\nsynced_at: 2026-04-05T00:00:00Z\npinned:\n  - CLAUDE.md   \n' \
-    > "${TARGET_DIR}/.commons/sync.yaml"
+    >"${TARGET_DIR}/.commons/sync.yaml"
 
-  echo "my custom claude" > "${TARGET_DIR}/CLAUDE.md"
-  echo "updated claude md" > "${SRC_DIR}/dist/CLAUDE.md"
+  echo "my custom claude" >"${TARGET_DIR}/CLAUDE.md"
+  echo "updated claude md" >"${SRC_DIR}/dist/CLAUDE.md"
 
   run "${SRC_DIR}/sync.sh" -y "${TARGET_DIR}"
   [ "$status" -eq 0 ]
@@ -322,7 +322,7 @@ EOF
   "${SRC_DIR}/sync.sh" -y "${TARGET_DIR}"
 
   mkdir -p "${TARGET_DIR}/.commons"
-  cat > "${TARGET_DIR}/.commons/sync.yaml" <<'EOF'
+  cat >"${TARGET_DIR}/.commons/sync.yaml" <<'EOF'
 commit: abc1234
 synced_at: 2026-04-05T00:00:00Z
 pinned:
@@ -330,11 +330,11 @@ pinned:
   - .editorconfig
 EOF
 
-  echo "my claude" > "${TARGET_DIR}/CLAUDE.md"
-  echo "my editor" > "${TARGET_DIR}/.editorconfig"
+  echo "my claude" >"${TARGET_DIR}/CLAUDE.md"
+  echo "my editor" >"${TARGET_DIR}/.editorconfig"
 
-  echo "updated claude md" > "${SRC_DIR}/dist/CLAUDE.md"
-  echo "updated editorconfig" > "${SRC_DIR}/dist/.editorconfig"
+  echo "updated claude md" >"${SRC_DIR}/dist/CLAUDE.md"
+  echo "updated editorconfig" >"${SRC_DIR}/dist/.editorconfig"
 
   run "${SRC_DIR}/sync.sh" -y "${TARGET_DIR}"
   [ "$status" -eq 0 ]
@@ -352,7 +352,7 @@ EOF
   "${SRC_DIR}/sync.sh" -y "${TARGET_DIR}"
 
   mkdir -p "${TARGET_DIR}/.commons"
-  cat > "${TARGET_DIR}/.commons/sync.yaml" <<'EOF'
+  cat >"${TARGET_DIR}/.commons/sync.yaml" <<'EOF'
 commit: abc1234
 synced_at: 2026-04-05T00:00:00Z
 pinned:
@@ -364,13 +364,13 @@ pinned:
   - trivy.yaml
 EOF
 
-  echo "my claude" > "${TARGET_DIR}/CLAUDE.md"
-  echo "my editor" > "${TARGET_DIR}/.editorconfig"
-  echo "my trivy" > "${TARGET_DIR}/trivy.yaml"
+  echo "my claude" >"${TARGET_DIR}/CLAUDE.md"
+  echo "my editor" >"${TARGET_DIR}/.editorconfig"
+  echo "my trivy" >"${TARGET_DIR}/trivy.yaml"
 
-  echo "updated claude md" > "${SRC_DIR}/dist/CLAUDE.md"
-  echo "updated editorconfig" > "${SRC_DIR}/dist/.editorconfig"
-  echo "updated trivy" > "${SRC_DIR}/dist/trivy.yaml"
+  echo "updated claude md" >"${SRC_DIR}/dist/CLAUDE.md"
+  echo "updated editorconfig" >"${SRC_DIR}/dist/.editorconfig"
+  echo "updated trivy" >"${SRC_DIR}/dist/trivy.yaml"
 
   run "${SRC_DIR}/sync.sh" -y "${TARGET_DIR}"
   [ "$status" -eq 0 ]
@@ -402,11 +402,11 @@ EOF
   "${SRC_DIR}/sync.sh" -y "${TARGET_DIR}"
 
   # Add a new file to source
-  echo "new-file-content" > "${SRC_DIR}/dist/NEW_FILE.md"
+  echo "new-file-content" >"${SRC_DIR}/dist/NEW_FILE.md"
   git -C "${SRC_DIR}" add . && git -C "${SRC_DIR}" commit -q -m "add new file"
 
   # Also change an existing file so interactive prompt appears
-  echo "updated claude md" > "${SRC_DIR}/dist/CLAUDE.md"
+  echo "updated claude md" >"${SRC_DIR}/dist/CLAUDE.md"
 
   # Provide "n" to skip the changed file — new file should still be copied
   run bash -c 'printf "n\n" | "${1}" "${2}"' _ "${SRC_DIR}/sync.sh" "${TARGET_DIR}"
@@ -423,8 +423,8 @@ EOF
 @test "interactive mode: skip unchanged and respond to input" {
   "${SRC_DIR}/sync.sh" -y "${TARGET_DIR}"
 
-  echo "updated skill" > "${SRC_DIR}/dist/.claude/skills/commit/SKILL.md"
-  echo "updated claude md" > "${SRC_DIR}/dist/CLAUDE.md"
+  echo "updated skill" >"${SRC_DIR}/dist/.claude/skills/commit/SKILL.md"
+  echo "updated claude md" >"${SRC_DIR}/dist/CLAUDE.md"
 
   # Provide "n" to skip the first changed file, then "y" for the second
   run bash -c 'printf "n\ny\n" | "${1}" "${2}"' _ "${SRC_DIR}/sync.sh" "${TARGET_DIR}"
@@ -435,7 +435,7 @@ EOF
 @test "interactive mode: pin adds file to pinned list" {
   "${SRC_DIR}/sync.sh" -y "${TARGET_DIR}"
 
-  echo "updated claude md" > "${SRC_DIR}/dist/CLAUDE.md"
+  echo "updated claude md" >"${SRC_DIR}/dist/CLAUDE.md"
 
   # Choose "pin" for the changed file
   run bash -c 'printf "pin\n" | "${1}" "${2}"' _ "${SRC_DIR}/sync.sh" "${TARGET_DIR}"
@@ -454,9 +454,9 @@ EOF
 @test "interactive mode: all copies remaining changed files without prompting" {
   "${SRC_DIR}/sync.sh" -y "${TARGET_DIR}"
 
-  echo "updated skill" > "${SRC_DIR}/dist/.claude/skills/commit/SKILL.md"
-  echo "updated claude md" > "${SRC_DIR}/dist/CLAUDE.md"
-  echo "updated editorconfig" > "${SRC_DIR}/dist/.editorconfig"
+  echo "updated skill" >"${SRC_DIR}/dist/.claude/skills/commit/SKILL.md"
+  echo "updated claude md" >"${SRC_DIR}/dist/CLAUDE.md"
+  echo "updated editorconfig" >"${SRC_DIR}/dist/.editorconfig"
 
   # Choose "all" at the first prompt — remaining files should be copied
   run bash -c 'printf "all\n" | "${1}" "${2}"' _ "${SRC_DIR}/sync.sh" "${TARGET_DIR}"
@@ -467,4 +467,48 @@ EOF
   [ "$(cat "${TARGET_DIR}/.claude/skills/commit/SKILL.md")" = "updated skill" ]
   [ "$(cat "${TARGET_DIR}/CLAUDE.md")" = "updated claude md" ]
   [ "$(cat "${TARGET_DIR}/.editorconfig")" = "updated editorconfig" ]
+}
+
+@test "write_metadata preserves skills_commit from existing metadata" {
+  "${SRC_DIR}/sync.sh" -y "${TARGET_DIR}"
+
+  # Simulate sync-skills.sh writing skills_commit to the metadata
+  local meta_file="${TARGET_DIR}/.commons/sync.yaml"
+  echo "skills_commit: abc1234567890abc1234567890abc1234567890ab" >>"${meta_file}"
+
+  # Run sync again (nothing changed, but metadata is rewritten)
+  echo "updated skill" >"${SRC_DIR}/dist/.claude/skills/commit/SKILL.md"
+  "${SRC_DIR}/sync.sh" -y "${TARGET_DIR}"
+
+  local meta
+  meta="$(cat "${meta_file}")"
+  [[ "$meta" == *"skills_commit: abc1234567890abc1234567890abc1234567890ab"* ]]
+}
+
+@test "write_metadata preserves skills_adapters from existing metadata" {
+  "${SRC_DIR}/sync.sh" -y "${TARGET_DIR}"
+
+  # Simulate sync-skills.sh writing skills_adapters to the metadata
+  local meta_file="${TARGET_DIR}/.commons/sync.yaml"
+  printf "skills_adapters:\n  - claude-code\n  - codex-cli\n" >>"${meta_file}"
+
+  # Run sync again to trigger a metadata rewrite
+  echo "updated skill" >"${SRC_DIR}/dist/.claude/skills/commit/SKILL.md"
+  "${SRC_DIR}/sync.sh" -y "${TARGET_DIR}"
+
+  local meta
+  meta="$(cat "${meta_file}")"
+  [[ "$meta" == *"skills_adapters:"* ]]
+  [[ "$meta" == *"- claude-code"* ]]
+  [[ "$meta" == *"- codex-cli"* ]]
+}
+
+@test "write_metadata does not add skills fields when not present" {
+  run "${SRC_DIR}/sync.sh" -y "${TARGET_DIR}"
+  [ "$status" -eq 0 ]
+
+  local meta
+  meta="$(cat "${TARGET_DIR}/.commons/sync.yaml")"
+  [[ "$meta" != *"skills_commit"* ]]
+  [[ "$meta" != *"skills_adapters"* ]]
 }
