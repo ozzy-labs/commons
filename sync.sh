@@ -64,25 +64,45 @@ METADATA_DIR="${TARGET_DIR}/.commons"
 METADATA_FILE="${METADATA_DIR}/sync.yaml"
 METADATA_REL="${METADATA_DIR#"${TARGET_DIR}/"}/sync.yaml"
 
-# Read pinned list from metadata
-read_pinned() {
-  if [[ ! -f "${METADATA_FILE}" ]]; then
+# Read a flat list under `key` from a YAML file (block or flow style).
+read_yaml_list() {
+  local file="$1"
+  local key="$2"
+  if [[ ! -f "${file}" ]]; then
     return
   fi
-  local in_pinned=false
+  # Flow style: key: [item1, item2]
+  local flow_line
+  flow_line="$(grep -E "^${key}:[[:space:]]*\[" "${file}" || true)"
+  if [[ -n "${flow_line}" ]]; then
+    local body
+    body="$(echo "${flow_line}" | sed -E "s/^${key}:[[:space:]]*\[(.*)\].*/\1/")"
+    local IFS=','
+    local item
+    for item in ${body}; do
+      item="${item#"${item%%[![:space:]]*}"}"
+      item="${item%"${item##*[![:space:]]}"}"
+      item="${item#\"}"
+      item="${item%\"}"
+      item="${item#\'}"
+      item="${item%\'}"
+      [[ -n "${item}" ]] && echo "${item}"
+    done
+    return
+  fi
+  # Block style
+  local in_list=false
   while IFS= read -r line; do
-    if [[ "${line}" == "pinned:" ]]; then
-      in_pinned=true
+    if [[ "${line}" == "${key}:" ]]; then
+      in_list=true
       continue
     fi
-    if ${in_pinned}; then
-      # Skip blank lines and YAML comments interleaved within the pinned block
+    if ${in_list}; then
       if [[ -z "${line}" ]] || [[ "${line}" =~ ^[[:space:]]*# ]]; then
         continue
       fi
       if [[ "${line}" =~ ^[[:space:]]*-[[:space:]]+(.*) ]]; then
         local val="${BASH_REMATCH[1]}"
-        # Strip surrounding quotes and trailing whitespace
         val="${val#\"}"
         val="${val%\"}"
         val="${val#\'}"
@@ -93,8 +113,11 @@ read_pinned() {
         break
       fi
     fi
-  done <"${METADATA_FILE}"
+  done <"${file}"
 }
+
+# Read pinned list from metadata
+read_pinned() { read_yaml_list "${METADATA_FILE}" "pinned"; }
 
 is_pinned() {
   local file="$1"
@@ -117,12 +140,27 @@ write_metadata() {
   fi
   SYNCED_AT="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
 
+  # Preserve skills fields managed by sync-skills.sh
+  local existing_skills_commit=""
+  local existing_skills_adapters=()
+  if [[ -f "${METADATA_FILE}" ]]; then
+    existing_skills_commit="$(grep '^skills_commit:' "${METADATA_FILE}" | awk '{print $2}' || true)"
+    while IFS= read -r a; do existing_skills_adapters+=("${a}"); done < <(read_yaml_list "${METADATA_FILE}" "skills_adapters")
+  fi
+
   local tmp_file="${METADATA_FILE}.tmp.$$"
   {
     echo "# Auto-updated by commons sync.sh"
     echo "# 'pinned' is user-editable — add or remove paths freely"
     echo "commit: ${COMMIT_HASH}"
     echo "synced_at: ${SYNCED_AT}"
+    if [[ -n "${existing_skills_commit:-}" ]]; then
+      echo "skills_commit: ${existing_skills_commit}"
+    fi
+    if [[ ${#existing_skills_adapters[@]} -gt 0 ]]; then
+      echo "skills_adapters:"
+      for a in "${existing_skills_adapters[@]}"; do echo "  - ${a}"; done
+    fi
     if [[ ${#pinned_list[@]} -gt 0 ]]; then
       echo "pinned:"
       for p in "${pinned_list[@]}"; do
