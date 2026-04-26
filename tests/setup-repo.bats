@@ -56,10 +56,15 @@ setup() {
   [[ "$output" == *"Repository: ozzy-labs/commons"* ]]
 }
 
-@test "--dry-run skips private vulnerability reporting for private repo" {
+@test "--dry-run handles private vulnerability reporting based on visibility" {
+  VISIBILITY="$(gh repo view ozzy-labs/commons --json visibility --jq '.visibility')"
   run "${SCRIPT}" --dry-run ozzy-labs/commons
   [ "$status" -eq 0 ]
-  [[ "$output" == *"skipped (private repo)"* ]]
+  if [[ "${VISIBILITY}" == "PUBLIC" ]]; then
+    [[ "$output" == *"Private vulnerability reporting: enabled"* ]]
+  else
+    [[ "$output" == *"skipped (private repo)"* ]]
+  fi
 }
 
 @test "--dry-run shows all 10 Conventional Commits labels" {
