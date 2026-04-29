@@ -158,6 +158,86 @@ surgical_merge() {
   mv "${tmp}" "${dest}"
 }
 
+# Marker sections (part of a file managed by commons)
+get_markers() {
+  local file="$1"
+  case "${file}" in
+  *.md | *.html | *.xml)
+    echo "<!-- begin: ozzy-labs/commons -->|<!-- end: ozzy-labs/commons -->"
+    ;;
+  *)
+    echo "# begin: ozzy-labs/commons|# end: ozzy-labs/commons"
+    ;;
+  esac
+}
+
+has_markers() {
+  local file="$1"
+  [[ ! -f "${file}" ]] && return 1
+  IFS='|' read -r begin end < <(get_markers "${file}")
+  grep -q "${begin}" "${file}" && grep -q "${end}" "${file}"
+}
+
+compare_marked_sections() {
+  local src="$1"
+  local dest="$2"
+  IFS='|' read -r begin end < <(get_markers "${src}")
+  local src_section dest_section
+  src_section="$(awk -v begin="${begin}" -v end="${end}" 'index($0, begin) > 0 { in_block = 1 } in_block { print } index($0, end) > 0 { in_block = 0 }' "${src}")"
+  dest_section="$(awk -v begin="${begin}" -v end="${end}" 'index($0, begin) > 0 { in_block = 1 } in_block { print } index($0, end) > 0 { in_block = 0 }' "${dest}")"
+  [[ "${src_section}" == "${dest_section}" ]]
+}
+
+is_file_changed() {
+  local src="$1"
+  local dest="$2"
+  if has_markers "${src}" && has_markers "${dest}"; then
+    if compare_marked_sections "${src}" "${dest}"; then
+      return 1 # Not changed
+    else
+      return 0 # Changed
+    fi
+  else
+    if diff -q "${src}" "${dest}" >/dev/null 2>&1; then
+      return 1 # Not changed
+    else
+      return 0 # Changed
+    fi
+  fi
+}
+
+merge_marker_section() {
+  local src="$1"
+  local dest="$2"
+  local tmp
+  tmp="$(mktemp)"
+  IFS='|' read -r begin end < <(get_markers "${src}")
+  # Use awk to replace the section in dest with the section from src.
+  # The src file must contain the marker block.
+  awk -v src_file="${src}" -v begin="${begin}" -v end="${end}" '
+    BEGIN {
+      in_src = 0
+      while ((getline line < src_file) > 0) {
+        if (index(line, begin) > 0) in_src = 1
+        if (in_src) src_lines[++n] = line
+        if (index(line, end) > 0) in_src = 0
+      }
+      close(src_file)
+    }
+    index($0, begin) > 0 {
+      for (i=1; i<=n; i++) print src_lines[i]
+      in_block = 1
+      next
+    }
+    index($0, end) > 0 {
+      in_block = 0
+      next
+    }
+    !in_block { print }
+  ' "${dest}" >"${tmp}"
+  mv "${tmp}" "${dest}"
+}
+
 write_metadata() {
   local pinned_list=("$@")
   mkdir -p "${METADATA_DIR}"
@@ -214,7 +294,7 @@ if [[ -d "${DIST_DIR}" ]]; then
       files_pinned+=("${rel_path}")
     elif [[ ! -f "${dest_path}" ]]; then
       files_new+=("${rel_path}")
-    elif ! diff -q "${src_path}" "${dest_path}" >/dev/null 2>&1; then
+    elif is_file_changed "${src_path}" "${dest_path}"; then
       files_changed+=("${rel_path}")
     else
       files_unchanged+=("${rel_path}")
@@ -284,6 +364,12 @@ if [[ "${YES}" == true ]]; then
     dest="${TARGET_DIR}/${f}"
     mkdir -p "$(dirname "${dest}")"
 
+    if has_markers "${src}" && has_markers "${dest}"; then
+      merge_marker_section "${src}" "${dest}"
+      echo "  merge (section): ${f}"
+      continue
+    fi
+
     if [[ -f "${dest}" ]] && is_surgical "${f}"; then
       if surgical_merge "${src}" "${dest}"; then
         echo "  merge: ${f}"
@@ -339,7 +425,7 @@ for f in "${files_changed[@]+"${files_changed[@]}"}"; do
   echo ""
 
   prompt="  Update ${f}? [y/N/pin/all]"
-  if is_surgical "${f}"; then
+  if is_surgical "${f}" || (has_markers "${src}" && has_markers "${dest}"); then
     prompt="  Update ${f}? [y/N/m/pin/all]"
   fi
 
@@ -352,7 +438,11 @@ for f in "${files_changed[@]+"${files_changed[@]}"}"; do
     copied=$((copied + 1))
     ;;
   [mM] | merge)
-    if is_surgical "${f}"; then
+    if has_markers "${src}" && has_markers "${dest}"; then
+      merge_marker_section "${src}" "${dest}"
+      echo "  merge (section): ${f}"
+      copied=$((copied + 1))
+    elif is_surgical "${f}"; then
       if surgical_merge "${src}" "${dest}"; then
         echo "  merge: ${f}"
         copied=$((copied + 1))
@@ -360,7 +450,7 @@ for f in "${files_changed[@]+"${files_changed[@]}"}"; do
         echo "  error: surgical merge failed"
       fi
     else
-      echo "  error: ${f} is not a structured file (JSON/YAML)"
+      echo "  error: ${f} is not mergable (no markers or not structured)"
     fi
     ;;
   [pP] | pin)
