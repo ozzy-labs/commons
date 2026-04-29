@@ -1,3 +1,4 @@
+# begin: ozzy-labs/commons
 name: PR Check
 
 on:
@@ -57,3 +58,4 @@ jobs:
             } else {
               core.info('Branch name follows naming convention');
             }
+# end: ozzy-labs/commons
