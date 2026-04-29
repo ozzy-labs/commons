@@ -130,6 +130,34 @@ is_pinned() {
   return 1
 }
 
+# Surgical files (JSON/YAML that should be merged instead of overwritten)
+is_surgical() {
+  local file="$1"
+  case "${file}" in
+  *.json | *.yaml | *.yml)
+    # Exclude certain files that should be handled as a whole
+    [[ "${file}" == "lefthook.yaml" ]] && return 1
+    return 0
+    ;;
+  *)
+    return 1
+    ;;
+  esac
+}
+
+surgical_merge() {
+  local src="$1"
+  local dest="$2"
+  local tmp
+  tmp="$(mktemp)"
+  # Merge dist into target. dist (fileIndex 1) overrides target (fileIndex 0).
+  if ! yq eval-all 'select(fileIndex == 0) * select(fileIndex == 1)' "${dest}" "${src}" >"${tmp}" 2>/dev/null; then
+    rm -f "${tmp}"
+    return 1
+  fi
+  mv "${tmp}" "${dest}"
+}
+
 write_metadata() {
   local pinned_list=("$@")
   mkdir -p "${METADATA_DIR}"
@@ -255,6 +283,16 @@ if [[ "${YES}" == true ]]; then
     src="${DIST_DIR}/${f}"
     dest="${TARGET_DIR}/${f}"
     mkdir -p "$(dirname "${dest}")"
+
+    if [[ -f "${dest}" ]] && is_surgical "${f}"; then
+      if surgical_merge "${src}" "${dest}"; then
+        echo "  merge: ${f}"
+        continue
+      else
+        echo "  warning: surgical merge failed for ${f}, falling back to copy" >&2
+      fi
+    fi
+
     cp "${src}" "${dest}"
     echo "  copy: ${f}"
   done
@@ -299,13 +337,31 @@ for f in "${files_changed[@]+"${files_changed[@]}"}"; do
   echo "--- ${f} ---"
   diff -u "${dest}" "${src}" --label "target/${f}" --label "dist/${f}" || true
   echo ""
-  read -r -p "  Update ${f}? [y/N/pin/all] " answer
+
+  prompt="  Update ${f}? [y/N/pin/all]"
+  if is_surgical "${f}"; then
+    prompt="  Update ${f}? [y/N/m/pin/all]"
+  fi
+
+  read -r -p "${prompt} " answer
   case "${answer}" in
   [yY])
     mkdir -p "$(dirname "${dest}")"
     cp "${src}" "${dest}"
     echo "  copy: ${f}"
     copied=$((copied + 1))
+    ;;
+  [mM] | merge)
+    if is_surgical "${f}"; then
+      if surgical_merge "${src}" "${dest}"; then
+        echo "  merge: ${f}"
+        copied=$((copied + 1))
+      else
+        echo "  error: surgical merge failed"
+      fi
+    else
+      echo "  error: ${f} is not a structured file (JSON/YAML)"
+    fi
     ;;
   [pP] | pin)
     current_pinned+=("${f}")
