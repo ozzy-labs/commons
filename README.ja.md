@@ -43,20 +43,47 @@ setup-repo.sh        -> GitHub リポジトリ初期設定スクリプト
 ## 使い方
 
 ```bash
-# 対話的に同期（差分のあるファイルは確認あり）
-/path/to/commons/sync.sh /path/to/target-repo
+# OzzyLabs Commons CLI
+/path/to/commons/commons <command> [args]
 
-# 確認なしで同期（pinned 以外の差分ファイルを全て上書き）
-/path/to/commons/sync.sh -y /path/to/target-repo
-
-# コピーせず差分のみ表示
-/path/to/commons/sync.sh --dry-run /path/to/target-repo
-
-# 同期状態をチェック（CI 用、差分があれば exit 1）
-/path/to/commons/sync.sh --check /path/to/target-repo
+# コマンド一覧:
+#   sync      共有ファイルの同期
+#   check     規約適合度診断
+#   setup     リポジトリ初期設定
+#   skills    スキル・アダプター同期
 ```
 
-全ファイルに同一の同期ポリシーを適用する。対話モードでは差分のあるファイルについて更新・スキップ・pin（永続スキップ）・全て更新を選択できる。pinned ファイルは `-y` を含む全モードでスキップされる。同期後、対象リポジトリの `.commons/sync.yaml` にメタデータが記録される（後述の「メタデータパス」を参照）。
+### 同期 (Sync)
+
+```bash
+# 対話的に同期（差分のあるファイルは確認あり）
+commons sync /path/to/target-repo
+
+# 確認なしで同期（pinned 以外の差分ファイルを全て上書き）
+commons sync -y /path/to/target-repo
+
+# コピーせず差分のみ表示
+commons sync --dry-run /path/to/target-repo
+
+# 同期状態をチェック（CI 用、差分があれば exit 1）
+commons sync --check /path/to/target-repo
+```
+
+全ファイルに同一の同期ポリシーを適用する。対話モードでは差分のあるファイルについて更新 (`y`)、マージ (`m`)、スキップ (`N`)、pin（永続スキップ）、全て更新 (`all`) を選択できる。pinned ファイルは `-y` を含む全モードでスキップされる。同期後、対象リポジトリの `.commons/sync.yaml` にメタデータが記録される。
+
+### 規約適合度診断 (Check)
+
+```bash
+# リポジトリが OzzyLabs の規約に適合しているか総合的に診断
+commons check /path/to/target-repo
+```
+
+診断項目:
+
+- 全ての共有ファイルが同期（または pin）されているか
+- 必須ファイル（`LICENSE`, `AGENTS.md` 等）が存在するか
+- Markdown や YAML に必要なマーカーブロックが含まれているか
+- セキュリティ設定（Lefthook, Gitleaks）が有効か
 
 ### Pin
 

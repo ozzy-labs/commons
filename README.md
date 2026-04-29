@@ -43,20 +43,47 @@ Shared skills (`.agents/skills/`, `.claude/skills/`) are no longer distributed f
 ## Usage
 
 ```bash
-# Sync with interactive confirmation (shows diff for changed files)
-/path/to/commons/sync.sh /path/to/target-repo
+# OzzyLabs Commons CLI
+/path/to/commons/commons <command> [args]
 
-# Sync without confirmation (overwrite all non-pinned changed files)
-/path/to/commons/sync.sh -y /path/to/target-repo
-
-# Preview changes without copying
-/path/to/commons/sync.sh --dry-run /path/to/target-repo
-
-# Check if files are in sync (for CI, exits 1 if out of sync)
-/path/to/commons/sync.sh --check /path/to/target-repo
+# Commands:
+#   sync      Sync shared files
+#   check     Run health check
+#   setup     Initialize repository
+#   skills    Sync skills adapters
 ```
 
-All files use the same sync policy. In interactive mode, changed files show a diff and prompt for action: update, skip, pin (skip permanently), or update all remaining. Pinned files are skipped in all modes including `-y`. After sync, metadata is written to `.commons/sync.yaml` in the target repo (see [Metadata path](#metadata-path) below).
+### Sync
+
+```bash
+# Sync with interactive confirmation (shows diff for changed files)
+commons sync /path/to/target-repo
+
+# Sync without confirmation (overwrite all non-pinned changed files)
+commons sync -y /path/to/target-repo
+
+# Preview changes without copying
+commons sync --dry-run /path/to/target-repo
+
+# Check if files are in sync (for CI, exits 1 if out of sync)
+commons sync --check /path/to/target-repo
+```
+
+All files use the same sync policy. In interactive mode, changed files show a diff and prompt for action: update (`y`), merge (`m`), skip (`N`), pin (`pin`), or update all remaining (`all`). Pinned files are skipped in all modes including `-y`. After sync, metadata is written to `.commons/sync.yaml` in the target repo.
+
+### Check
+
+```bash
+# Run health check to verify compliance with OzzyLabs conventions
+commons check /path/to/target-repo
+```
+
+Verifies:
+
+- All shared files are in sync.
+- Presence of mandatory files (`LICENSE`, `AGENTS.md`, etc.).
+- Presence of required markers in Markdown and YAML files.
+- Security configurations (Lefthook, Gitleaks).
 
 ### Pin
 
