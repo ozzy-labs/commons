@@ -1,0 +1,51 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# OzzyLabs Commons CLI
+# Usage: commons <command> [args]
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+
+usage() {
+  echo "OzzyLabs Commons CLI"
+  echo "Usage:"
+  echo "  commons <command> [args]"
+  echo ""
+  echo "Commands:"
+  echo "  sync      Sync shared files (wrapper for sync.sh)"
+  echo "  check     Run health check (wrapper for check.sh)"
+  echo "  setup     Initialize repository (wrapper for setup-repo.sh)"
+  echo "  skills    Sync skills adapters (wrapper for sync-skills.sh)"
+}
+
+if [[ $# -lt 1 ]]; then
+  usage
+  exit 1
+fi
+
+COMMAND="$1"
+shift
+
+case "${COMMAND}" in
+  sync)
+    exec "${SCRIPT_DIR}/sync.sh" "$@"
+    ;;
+  check)
+    exec "${SCRIPT_DIR}/check.sh" "$@"
+    ;;
+  setup)
+    exec "${SCRIPT_DIR}/setup-repo.sh" "$@"
+    ;;
+  skills)
+    exec "${SCRIPT_DIR}/sync-skills.sh" "$@"
+    ;;
+  help | --help | -h)
+    usage
+    exit 0
+    ;;
+  *)
+    echo "Unknown command: ${COMMAND}" >&2
+    usage
+    exit 1
+    ;;
+esac

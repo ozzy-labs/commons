@@ -35,11 +35,8 @@
 
 ```bash
 bats tests/                                       # 全テスト実行
-sync.sh <target-repo>                             # ファイル同期（対話モード）
-sync.sh -y <target-repo>                          # ファイル同期（自動モード）
-sync.sh --check <target>                          # 同期状態チェック（CI 用）
-sync-skills.sh -y <skills-dist> <target>          # skills adapter 同期（自動モード）
-sync-skills.sh --check <skills-dist> <target>     # skills adapter 同期状態チェック
+commons sync <target-repo>                        # ファイル同期（sync.sh のラッパー）
+commons check <target-repo>                       # 規約適合度診断（check.sh のラッパー）
 setup-repo.sh owner/repo                          # GitHub リポジトリ設定
 ```
 
