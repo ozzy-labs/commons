@@ -1,22 +1,23 @@
-# 設計方針
+# 全体設計 (System Design)
 
-## リポジトリの責務
+OzzyLabs の共有設定基盤 `commons` の設計ドキュメントです。
+
+## ドキュメント構成
+
+- **[設計思想 (Rationale)](rationale.md)**: なぜこのツール、規約、構成を選んだのかの背景
+- **[同期フロー (Sync Flow)](sync-flow.md)**: `sync.sh` の詳細な動作アルゴリズムと図解
+- **[アーキテクチャ定義 (ADR)](../adr/)**: 個別の設計決定事項（Architecture Decision Records）
+
+## システム概要
 
 `commons` は、OzzyLabs の全リポジトリに共通する開発設定を一元管理し、同期する。
 
-### 含むもの
+### 構成要素
 
-- **配布ファイル（`dist/`）**: 全リポジトリに配布する設定ファイル群。ターゲットリポジトリのルートにミラーされる
-- **scaffold テンプレート（`templates/`）**: 新規リポ作成時に手動コピーする雛形（AGENTS.md / CLAUDE.md）。`sync.sh` の対象外
-- **同期スクリプト（`sync.sh`）**: 配布ファイルを対象リポジトリにコピー
-- **skills 同期スクリプト（`sync-skills.sh`）**: `@ozzylabs/skills` の adapter 出力（`dist/{adapter-id}/`）を consumer の opt-in 設定（`.commons/sync.yaml` の `skills_adapters:`）に従って反映。SSOT は別リポなので呼び出し側がクローンを用意する。詳細は [ADR-0008](adr/0008-sync-skills-adapter.md)
-- **リポジトリ初期設定スクリプト（`setup-repo.sh`）**: GitHub リポジトリの設定（マージルール、ブランチ保護、セキュリティ等）を `gh` CLI で自動化
-
-### 含まないもの
-
-- リポジトリ固有の設定（settings.json の許可コマンド等）
-- CI/CD ワークフロー（ビルド・テスト・デプロイ等。`.github` リポジトリで管理。PR 検証ワークフロー `pr-check.yaml` は配布対象）
-- AI エージェントの実行環境やランタイム
+- **配布ファイル (`dist/`)**: 全リポジトリに配布する設定ファイル群。
+- **scaffold テンプレート (`templates/`)**: 新規リポ作成時に一度だけ使用する雛形。
+- **同期エンジン (`sync.sh`, `sync-skills.sh`)**: ファイルの差分検知、マージ、更新を行うコアスクリプト。
+- **リポジトリ設定 (`setup-repo.sh`)**: GitHub リポジトリ側の設定（Rulesets 等）を自動化する。
 
 ## ディレクトリ構成の原則
 
