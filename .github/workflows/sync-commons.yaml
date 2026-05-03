@@ -1,3 +1,4 @@
+# begin: ozzy-labs/commons
 name: Sync commons
 
 # Automated sync of shared configuration from ozzy-labs/commons.
@@ -72,3 +73,4 @@ jobs:
             Triggered by the scheduled `Sync commons` workflow. Review the diff and merge when appropriate.
           labels: chore
           delete-branch: true
+# end: ozzy-labs/commons

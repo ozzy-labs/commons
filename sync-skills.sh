@@ -3,7 +3,7 @@ set -euo pipefail
 
 # commons sync-skills script
 #
-# Sync @ozzylabs/skills adapter outputs (dist/{adapter-id}/) from a local
+# Sync ${MARKER_TAG} adapter outputs (dist/{adapter-id}/) from a local
 # clone of the skills repo into a consumer repo. Consumer opts in by listing
 # adapter ids in `.commons/sync.yaml`:
 #
@@ -54,8 +54,15 @@ if [[ $# -lt 2 ]]; then
   echo "    -y, --yes   Sync without confirmation" >&2
   echo "    --dry-run   Show what would be synced without copying" >&2
   echo "    --check     Exit 1 if non-pinned files are out of sync (for CI)" >&2
+  echo "  Env:" >&2
+  echo "    MARKER_TAG  Marker block tag (default: @ozzylabs/skills)" >&2
   exit 1
 fi
+
+# Marker block tag used in `<!-- begin: ${MARKER_TAG} -->` / `<!-- end: ... -->`.
+# Defaults to @ozzylabs/skills for backward compatibility; override via env var
+# when reusing this script for other adapter bundles (e.g. @ozzylabs/gh-tasks).
+MARKER_TAG="${MARKER_TAG:-@ozzylabs/skills}"
 
 SKILLS_DIST="${1%/}"
 TARGET_DIR="${2%/}"
@@ -199,15 +206,18 @@ pending_unchanged=()
 # contains both begin and end markers); print result to stdout.
 replace_snippet_to_stdout() {
   local target="$1" snippet="$2"
-  awk -v snippet_file="${snippet}" '
+  awk \
+    -v snippet_file="${snippet}" \
+    -v begin_marker="<!-- begin: ${MARKER_TAG} -->" \
+    -v end_marker="<!-- end: ${MARKER_TAG} -->" '
     BEGIN { in_block = 0 }
-    /<!-- begin: @ozzylabs\/skills -->/ && !in_block {
+    index($0, begin_marker) && !in_block {
       while ((getline line < snippet_file) > 0) print line
       close(snippet_file)
       in_block = 1
       next
     }
-    /<!-- end: @ozzylabs\/skills -->/ && in_block {
+    index($0, end_marker) && in_block {
       in_block = 0
       next
     }
@@ -234,7 +244,7 @@ add_snippet_op() {
     pending_pinned+=("${rel}")
     return
   fi
-  if [[ -f "${target}" ]] && grep -q '<!-- begin: @ozzylabs/skills -->' "${target}"; then
+  if [[ -f "${target}" ]] && grep -qF "<!-- begin: ${MARKER_TAG} -->" "${target}"; then
     local new_content current
     new_content="$(replace_snippet_to_stdout "${target}" "${snippet}")"
     current="$(cat "${target}")"
@@ -374,11 +384,11 @@ for entry in "${pending_ops[@]}"; do
   mkdir -p "$(dirname "${dest}")"
   if [[ "${kind}" == "snippet" ]]; then
     if [[ ! -f "${dest}" ]]; then
-      echo "Error: ${dest} does not exist (expected to contain @ozzylabs/skills marker block)" >&2
+      echo "Error: ${dest} does not exist (expected to contain ${MARKER_TAG} marker block)" >&2
       exit 1
     fi
-    if ! grep -q '<!-- begin: @ozzylabs/skills -->' "${dest}"; then
-      echo "Error: ${dest} is missing the '<!-- begin: @ozzylabs/skills -->' marker" >&2
+    if ! grep -qF "<!-- begin: ${MARKER_TAG} -->" "${dest}"; then
+      echo "Error: ${dest} is missing the '<!-- begin: ${MARKER_TAG} -->' marker" >&2
       exit 1
     fi
     tmp="${dest}.tmp.$$"

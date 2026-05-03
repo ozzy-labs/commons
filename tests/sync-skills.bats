@@ -383,3 +383,76 @@ pinned:
   [ "$(cat "${TARGET_DIR}/.claude/skills/commit/SKILL.md")" = "my commit" ]
   [ "$(cat "${TARGET_DIR}/.claude/skills/lint/SKILL.md")" = "my lint" ]
 }
+
+@test "MARKER_TAG override replaces a custom marker block" {
+  # Snippet uses the custom marker tag
+  cat >"${SKILLS_DIST}/codex-cli/AGENTS.md.snippet" <<'EOF'
+<!-- begin: @ozzylabs/test-marker -->
+## Available Skills
+
+- `commit` — codex (custom)
+<!-- end: @ozzylabs/test-marker -->
+EOF
+
+  # Target AGENTS.md uses the custom marker tag
+  cat >"${TARGET_DIR}/AGENTS.md" <<'EOF'
+# AGENTS.md
+
+intro text
+
+<!-- begin: @ozzylabs/test-marker -->
+old custom content
+<!-- end: @ozzylabs/test-marker -->
+
+footer text
+EOF
+
+  write_metadata "skills_adapters:
+  - codex-cli"
+
+  MARKER_TAG="@ozzylabs/test-marker" run "${SCRIPT}" -y "${SKILLS_DIST}" "${TARGET_DIR}"
+  [ "$status" -eq 0 ]
+
+  # New custom-marker block present, old gone
+  grep -q "<!-- begin: @ozzylabs/test-marker -->" "${TARGET_DIR}/AGENTS.md"
+  grep -q "<!-- end: @ozzylabs/test-marker -->" "${TARGET_DIR}/AGENTS.md"
+  grep -q "commit. — codex .custom." "${TARGET_DIR}/AGENTS.md"
+  run ! grep -q "old custom content" "${TARGET_DIR}/AGENTS.md"
+
+  # Surrounding text preserved
+  grep -q "intro text" "${TARGET_DIR}/AGENTS.md"
+  grep -q "footer text" "${TARGET_DIR}/AGENTS.md"
+
+  # Default marker tag must NOT appear
+  run ! grep -q "@ozzylabs/skills" "${TARGET_DIR}/AGENTS.md"
+}
+
+@test "MARKER_TAG override errors when target has only the default marker" {
+  # Snippet uses custom marker
+  cat >"${SKILLS_DIST}/codex-cli/AGENTS.md.snippet" <<'EOF'
+<!-- begin: @ozzylabs/test-marker -->
+custom skills
+<!-- end: @ozzylabs/test-marker -->
+EOF
+
+  # Target only has default marker (no custom marker block)
+  # (default setup() already wrote AGENTS.md with @ozzylabs/skills marker)
+
+  write_metadata "skills_adapters:
+  - codex-cli"
+
+  MARKER_TAG="@ozzylabs/test-marker" run "${SCRIPT}" -y "${SKILLS_DIST}" "${TARGET_DIR}"
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"missing the"*"@ozzylabs/test-marker"*"marker"* ]]
+}
+
+@test "MARKER_TAG unset preserves default @ozzylabs/skills behaviour" {
+  write_metadata "skills_adapters:
+  - codex-cli"
+
+  # Run without setting MARKER_TAG; ensure env is clean
+  run env -u MARKER_TAG "${SCRIPT}" -y "${SKILLS_DIST}" "${TARGET_DIR}"
+  [ "$status" -eq 0 ]
+  grep -q "<!-- begin: @ozzylabs/skills -->" "${TARGET_DIR}/AGENTS.md"
+  grep -q "commit. — codex" "${TARGET_DIR}/AGENTS.md"
+}
