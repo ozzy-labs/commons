@@ -13,6 +13,12 @@ name: Sync commons
 #   - Workflow permissions must allow creating PRs (usually set by
 #     commons/setup-repo.sh)
 #   - `.commons/sync.yaml` exists (created on first manual sync.sh run).
+#   - Org-level secrets `SYNC_APP_ID` and `SYNC_APP_PRIVATE_KEY` must be
+#     available. These belong to a GitHub App with `contents: write`,
+#     `pull-requests: write`, and `workflows: write` permissions. The
+#     default `GITHUB_TOKEN` cannot push changes to `.github/workflows/*`
+#     because it lacks the `workflows` scope, so an App token is required
+#     whenever sync-commons distributes workflow files.
 on:
   schedule:
     # Every Monday 00:00 UTC
@@ -28,8 +34,17 @@ jobs:
     name: Sync commons defaults
     runs-on: ubuntu-latest
     steps:
+      - name: Generate App token
+        id: app-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.SYNC_APP_ID }}
+          private-key: ${{ secrets.SYNC_APP_PRIVATE_KEY }}
+
       - name: Checkout this repo
         uses: actions/checkout@v4
+        with:
+          token: ${{ steps.app-token.outputs.token }}
 
       - name: Clone commons
         uses: actions/checkout@v4
@@ -58,6 +73,7 @@ jobs:
         if: steps.sync.outputs.changed == 'true'
         uses: peter-evans/create-pull-request@v7
         with:
+          token: ${{ steps.app-token.outputs.token }}
           branch: chore/sync-commons
           base: main
           commit-message: |
