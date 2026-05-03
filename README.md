@@ -146,8 +146,7 @@ First-time setup for a consumer repo:
 
 1. Run `sync.sh` manually once to pick up `sync-commons.yaml` into `.github/workflows/`
 2. The repo settings must allow creating PRs (already the case if `setup-repo.sh` was run)
-3. Make the org-level secrets `SYNC_APP_ID` and `SYNC_APP_PRIVATE_KEY` available to the repo. They belong to a GitHub App with `contents: write`, `pull-requests: write`, and `workflows: write` permissions installed on the org. The default `GITHUB_TOKEN` cannot push changes that touch `.github/workflows/*`, so the workflow uses an App token instead.
-4. The weekly schedule takes over from the next Monday; `workflow_dispatch` lets you trigger it on demand
+3. The weekly schedule takes over from the next Monday; `workflow_dispatch` lets you trigger it on demand
 
 ### Automated sync via Renovate (opt-in)
 
