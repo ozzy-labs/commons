@@ -117,12 +117,12 @@ EOF
   [ "$(yq '.rules.indentation.spaces' "${TARGET_DIR}/.yamllint.yaml")" = "4" ]
 }
 
-@test "_template/ YAML files are full-copied (not surgical-merged) to preserve comments" {
-  # _template/ files are scaffolds with educational comments.
-  # Surgical merge with yq strips comments and reorders keys, which would
-  # cumulatively damage the scaffold across syncs. They must be full-copied.
-  mkdir -p "${SRC_DIR}/dist/.claude/routines/_template"
-  cat <<'EOF' > "${SRC_DIR}/dist/.claude/routines/_template/routine.yaml"
+@test "_template.yaml scaffolds are full-copied (not surgical-merged) to preserve comments" {
+  # _template scaffolds carry educational comments and multi-line literal
+  # blocks. Surgical merge with yq strips comments and reorders keys, which
+  # would cumulatively damage the scaffold across syncs. They must be full-copied.
+  mkdir -p "${SRC_DIR}/dist/.claude/routines"
+  cat <<'EOF' > "${SRC_DIR}/dist/.claude/routines/_template.yaml"
 # Comment that must survive the sync
 name: <routine-name>
 
@@ -133,8 +133,8 @@ EOF
   git -C "${SRC_DIR}" commit -q -m "add routines template"
 
   # Create existing target with different content (to trigger 'changed' path)
-  mkdir -p "${TARGET_DIR}/.claude/routines/_template"
-  cat <<'EOF' > "${TARGET_DIR}/.claude/routines/_template/routine.yaml"
+  mkdir -p "${TARGET_DIR}/.claude/routines"
+  cat <<'EOF' > "${TARGET_DIR}/.claude/routines/_template.yaml"
 name: <old-name>
 status: active
 EOF
@@ -145,12 +145,12 @@ EOF
   [ "$status" -eq 0 ]
 
   # Should be reported as copy, not merge
-  [[ "$output" == *"copy: .claude/routines/_template/routine.yaml"* ]]
-  [[ "$output" != *"merge: .claude/routines/_template/routine.yaml"* ]]
+  [[ "$output" == *"copy: .claude/routines/_template.yaml"* ]]
+  [[ "$output" != *"merge: .claude/routines/_template.yaml"* ]]
 
   # Comments must be preserved (yq surgical merge would have stripped them)
-  grep -q "Comment that must survive the sync" "${TARGET_DIR}/.claude/routines/_template/routine.yaml"
-  grep -q "Section header comment" "${TARGET_DIR}/.claude/routines/_template/routine.yaml"
+  grep -q "Comment that must survive the sync" "${TARGET_DIR}/.claude/routines/_template.yaml"
+  grep -q "Section header comment" "${TARGET_DIR}/.claude/routines/_template.yaml"
 }
 
 @test "interactive mode offers 'm' for surgical files and performs merge" {
