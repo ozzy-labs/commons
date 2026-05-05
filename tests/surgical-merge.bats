@@ -117,6 +117,42 @@ EOF
   [ "$(yq '.rules.indentation.spaces' "${TARGET_DIR}/.yamllint.yaml")" = "4" ]
 }
 
+@test "_template/ YAML files are full-copied (not surgical-merged) to preserve comments" {
+  # _template/ files are scaffolds with educational comments.
+  # Surgical merge with yq strips comments and reorders keys, which would
+  # cumulatively damage the scaffold across syncs. They must be full-copied.
+  mkdir -p "${SRC_DIR}/dist/.claude/routines/_template"
+  cat <<'EOF' > "${SRC_DIR}/dist/.claude/routines/_template/routine.yaml"
+# Comment that must survive the sync
+name: <routine-name>
+
+# Section header comment
+status: draft
+EOF
+  git -C "${SRC_DIR}" add .
+  git -C "${SRC_DIR}" commit -q -m "add routines template"
+
+  # Create existing target with different content (to trigger 'changed' path)
+  mkdir -p "${TARGET_DIR}/.claude/routines/_template"
+  cat <<'EOF' > "${TARGET_DIR}/.claude/routines/_template/routine.yaml"
+name: <old-name>
+status: active
+EOF
+  git -C "${TARGET_DIR}" add .
+  git -C "${TARGET_DIR}" commit -q -m "old template"
+
+  run "${SRC_DIR}/sync.sh" -y "${TARGET_DIR}"
+  [ "$status" -eq 0 ]
+
+  # Should be reported as copy, not merge
+  [[ "$output" == *"copy: .claude/routines/_template/routine.yaml"* ]]
+  [[ "$output" != *"merge: .claude/routines/_template/routine.yaml"* ]]
+
+  # Comments must be preserved (yq surgical merge would have stripped them)
+  grep -q "Comment that must survive the sync" "${TARGET_DIR}/.claude/routines/_template/routine.yaml"
+  grep -q "Section header comment" "${TARGET_DIR}/.claude/routines/_template/routine.yaml"
+}
+
 @test "interactive mode offers 'm' for surgical files and performs merge" {
   # Create a surgical file in dist
   cat <<EOF > "${SRC_DIR}/dist/biome.json"

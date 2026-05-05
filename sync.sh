@@ -137,6 +137,8 @@ is_surgical() {
   *.json | *.yaml | *.yml)
     # Exclude certain files that should be handled as a whole
     [[ "${file}" == "lefthook.yaml" ]] && return 1
+    # _template/ files are scaffolds — full copy preserves comments and layout
+    [[ "${file}" == */_template/* ]] && return 1
     return 0
     ;;
   *)
