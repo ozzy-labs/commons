@@ -1,0 +1,44 @@
+# Claude Code Routine のメタデータ。
+# このファイルは正本（source of truth）。Web UI で直接編集せず、変更は必ずここから行う。
+
+name: <routine-name>
+description: <一行サマリ>
+
+# active = Web UI に登録済みで稼働中
+# draft  = Web UI 未登録（PR レビュー段階など）
+status: draft
+
+# Web UI 登録後に発行される ID（trig_xxxx）。draft の間は空でよい。
+routine_id: ""
+
+repositories:
+  - <owner>/<repo>
+
+model: claude-sonnet-4-6
+
+# トリガーは配列。schedule / api / github を将来併用可能。
+triggers:
+  - type: scheduled
+    # 5 フィールドの cron 式（最小実行間隔は 1 時間）
+    cron: "0 23 * * *"
+    # Web UI ではローカル TZ 入力 → 内部で UTC 変換される。記録は UTC 統一。
+    timezone: UTC
+
+permissions:
+  # claude/* ブランチ以外への push を許可するか。デフォルト false。
+  unrestricted_branch_pushes: false
+
+# Web UI の Connectors で included にする MCP サーバー名のリスト。
+# ローカル stdio MCP（knowledge / context7 等）はクラウドに届かないため空のままが基本。
+connectors: []
+
+environment:
+  # 環境変数の名前のみ列挙する。値は絶対に書かない（Web UI 側の secret として登録）。
+  variables: []
+
+# 同ディレクトリ内のファイル参照。固定で OK。
+prompt_file: prompt.md
+setup_script: setup.sh
+
+notes: |
+  運用上のメモ・既知の注意点があればここに書く。
