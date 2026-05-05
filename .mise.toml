@@ -1,7 +1,7 @@
 [tools]
 # Runtime & package managers
 node = "24"
-pnpm = "10"
+"npm:pnpm" = "10"  # aqua backend fails: registry expects v11 .tar.gz format (see #100)
 uv = "0.11.8"  # Pin: 0.11.9 fails attestation verification (see #98)
 
 # Linters & formatters
