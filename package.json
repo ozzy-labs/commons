@@ -8,7 +8,12 @@
     "lint:yaml": "yamlfmt -lint . && yamllint -c .yamllint.yaml .",
     "lint:shell": "find . -name '*.sh' -not -path './node_modules/*' -exec shellcheck {} + && find . -name '*.sh' -not -path './node_modules/*' -exec shfmt -d {} +",
     "lint:secrets": "gitleaks detect --no-banner",
-    "lint:all": "pnpm run lint:md && pnpm run lint:yaml && pnpm run lint:shell && pnpm run lint:secrets",
+    "lint:format": "prettier --check --ignore-path=.prettierignore '**/*.{md,json,yaml,yml}'",
+    "lint:format:fix": "prettier --write --ignore-path=.prettierignore '**/*.{md,json,yaml,yml}'",
+    "lint:all": "pnpm run lint:md && pnpm run lint:yaml && pnpm run lint:format && pnpm run lint:shell && pnpm run lint:secrets",
     "test": "bats tests/"
+  },
+  "devDependencies": {
+    "prettier": "^3.0.0"
   }
 }

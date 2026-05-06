@@ -37,52 +37,52 @@ dist/.devcontainer/Dockerfile        → <repo>/.devcontainer/Dockerfile
 
 ### ルール（`dist/.claude/rules/`）
 
-| ルール | 役割 |
-|--------|------|
+| ルール          | 役割                                  |
+| --------------- | ------------------------------------- |
 | git-workflow.md | ブランチ・コミット・PR 規約、禁止事項 |
 
 ### 設定ファイル（`dist/`）
 
-| ファイル | 役割 |
-|----------|------|
-| lefthook-base.yaml | lefthook の共通ベース設定（commit-msg + 共通リンター）。各リポの lefthook.yaml から `extends` で参照 |
-| .commitlintrc.yaml | Conventional Commits の検証設定 |
-| .editorconfig | エディタ共通設定（文字コード、改行、インデント） |
-| .gitattributes | 改行コード正規化、バイナリファイル判定 |
-| .github/workflows/pr-check.yaml | PR タイトル・ブランチ名の Conventional Commits 検証 |
-| .claude/settings.json | 許可コマンドのベースライン。リポ固有のツールは各リポで追加する |
-| SECURITY.md | 脆弱性報告ポリシー（Private Vulnerability Reporting 誘導） |
-| .mcp.json | MCP サーバー設定の雛形（Context7） |
-| .yamlfmt.yaml | YAML フォーマッター設定 |
-| .yamllint.yaml | YAML リンター設定 |
-| .markdownlint-cli2.yaml | Markdown リンター設定 |
-| .mdformat.toml | Markdown フォーマッター設定（折り返しなし、LF 改行） |
-| .mise.toml | ツールバージョン管理のベースライン。リポの技術スタックに合わせてツールを追加する |
-| .gitignore | 共通の無視パターン。フレームワーク固有のパターンは各リポで追加する |
-| renovate.json | Renovate 依存関係自動更新設定（org shared preset `github>ozzy-labs/.github` を参照） |
-| trivy.yaml | Trivy セキュリティスキャナー設定（vuln + secret のみ。IaC/コンテナは各リポでカスタマイズ） |
-| biome.json | Biome リンター・フォーマッター設定 |
-| lefthook.yaml | 共通ベース（`lefthook-base.yaml`）を `extends` で参照。リポ固有のフック（biome, ruff 等）は各リポで追記する |
-| LICENSE | MIT ライセンス |
-| CONTRIBUTING.md | コントリビューションポリシー |
-| .github/pull_request_template.md | PR テンプレート（Summary, Type of Change, Checklist） |
-| .github/ISSUE_TEMPLATE/bug_report.yaml | バグ報告テンプレート |
-| .github/ISSUE_TEMPLATE/feature_request.yaml | 機能リクエストテンプレート |
-| .vscode/settings.json | VS Code エディタ設定のベースライン |
-| .vscode/extensions.json | VS Code 推奨拡張のベースライン |
-| .devcontainer/Dockerfile | devcontainer ベースイメージ（Ubuntu 24.04 + Claude Code + mise + zsh） |
-| .devcontainer/devcontainer.json | devcontainer 設定（features, mounts, extensions） |
-| .devcontainer/initialize.sh | devcontainer 初期化スクリプト（ホスト側のマウント準備） |
-| .devcontainer/post-create.sh | devcontainer 作成後スクリプト（セットアップ処理） |
+| ファイル                                    | 役割                                                                                                        |
+| ------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| lefthook-base.yaml                          | lefthook の共通ベース設定（commit-msg + 共通リンター）。各リポの lefthook.yaml から `extends` で参照        |
+| .commitlintrc.yaml                          | Conventional Commits の検証設定                                                                             |
+| .editorconfig                               | エディタ共通設定（文字コード、改行、インデント）                                                            |
+| .gitattributes                              | 改行コード正規化、バイナリファイル判定                                                                      |
+| .github/workflows/pr-check.yaml             | PR タイトル・ブランチ名の Conventional Commits 検証                                                         |
+| .claude/settings.json                       | 許可コマンドのベースライン。リポ固有のツールは各リポで追加する                                              |
+| SECURITY.md                                 | 脆弱性報告ポリシー（Private Vulnerability Reporting 誘導）                                                  |
+| .mcp.json                                   | MCP サーバー設定の雛形（Context7）                                                                          |
+| .yamlfmt.yaml                               | YAML フォーマッター設定                                                                                     |
+| .yamllint.yaml                              | YAML リンター設定                                                                                           |
+| .markdownlint-cli2.yaml                     | Markdown リンター設定                                                                                       |
+| .mdformat.toml                              | Markdown フォーマッター設定（折り返しなし、LF 改行）                                                        |
+| .mise.toml                                  | ツールバージョン管理のベースライン。リポの技術スタックに合わせてツールを追加する                            |
+| .gitignore                                  | 共通の無視パターン。フレームワーク固有のパターンは各リポで追加する                                          |
+| renovate.json                               | Renovate 依存関係自動更新設定（org shared preset `github>ozzy-labs/.github` を参照）                        |
+| trivy.yaml                                  | Trivy セキュリティスキャナー設定（vuln + secret のみ。IaC/コンテナは各リポでカスタマイズ）                  |
+| biome.json                                  | Biome リンター・フォーマッター設定                                                                          |
+| lefthook.yaml                               | 共通ベース（`lefthook-base.yaml`）を `extends` で参照。リポ固有のフック（biome, ruff 等）は各リポで追記する |
+| LICENSE                                     | MIT ライセンス                                                                                              |
+| CONTRIBUTING.md                             | コントリビューションポリシー                                                                                |
+| .github/pull_request_template.md            | PR テンプレート（Summary, Type of Change, Checklist）                                                       |
+| .github/ISSUE_TEMPLATE/bug_report.yaml      | バグ報告テンプレート                                                                                        |
+| .github/ISSUE_TEMPLATE/feature_request.yaml | 機能リクエストテンプレート                                                                                  |
+| .vscode/settings.json                       | VS Code エディタ設定のベースライン                                                                          |
+| .vscode/extensions.json                     | VS Code 推奨拡張のベースライン                                                                              |
+| .devcontainer/Dockerfile                    | devcontainer ベースイメージ（Ubuntu 24.04 + Claude Code + mise + zsh）                                      |
+| .devcontainer/devcontainer.json             | devcontainer 設定（features, mounts, extensions）                                                           |
+| .devcontainer/initialize.sh                 | devcontainer 初期化スクリプト（ホスト側のマウント準備）                                                     |
+| .devcontainer/post-create.sh                | devcontainer 作成後スクリプト（セットアップ処理）                                                           |
 
 ## scaffold テンプレート（`templates/`）
 
 新規リポ作成時に手動コピーする雛形を `templates/` に置く。`sync.sh` は読み書きしない。
 
-| ファイル | 役割 |
-|----------|------|
+| ファイル  | 役割                                                                                  |
+| --------- | ------------------------------------------------------------------------------------- |
 | AGENTS.md | AI エージェント共通 instructions の雛形（プロジェクト概要・tech stack・主要コマンド） |
-| CLAUDE.md | Claude Code 固有の追加設定（基本ルール・利用 skill 一覧） |
+| CLAUDE.md | Claude Code 固有の追加設定（基本ルール・利用 skill 一覧）                             |
 
 これらはプロジェクト概要・tech stack・利用 skill 一覧などリポ固有の内容を含むため、`dist/` から外して同期対象にしない。背景は [ADR-0007](adr/0007-exclude-agent-templates-from-dist.md) を参照。
 
@@ -92,12 +92,12 @@ dist/.devcontainer/Dockerfile        → <repo>/.devcontainer/Dockerfile
 
 全ファイルに同一のポリシーを適用する（[ADR-0005](adr/0005-unified-dist-with-pin.md)）。
 
-| ファイル状態 | 対話モード | `-y` / `--yes` | `--check`（CI） | `--dry-run` |
-|---|---|---|---|---|
-| 未存在 | コピー | コピー | exit 1 | 表示 |
-| 同一 | スキップ | スキップ | OK | 表示 |
-| 差分あり | 差分表示→選択 | 上書き | exit 1 | 表示 |
-| 差分あり (pinned) | スキップ | スキップ | OK | 表示 |
+| ファイル状態      | 対話モード    | `-y` / `--yes` | `--check`（CI） | `--dry-run` |
+| ----------------- | ------------- | -------------- | --------------- | ----------- |
+| 未存在            | コピー        | コピー         | exit 1          | 表示        |
+| 同一              | スキップ      | スキップ       | OK              | 表示        |
+| 差分あり          | 差分表示→選択 | 上書き         | exit 1          | 表示        |
+| 差分あり (pinned) | スキップ      | スキップ       | OK              | 表示        |
 
 ### pin 機構
 
@@ -135,48 +135,48 @@ pinned:
 
 #### マージ設定
 
-| 設定 | デフォルト | 変更後 | 理由 |
-|------|-----------|--------|------|
-| Merge commit | 許可 | 禁止 | squash merge のみの運用 |
-| Rebase merge | 許可 | 禁止 | 同上 |
-| ブランチ自動削除 | 無効 | 有効 | マージ後のブランチ削除を自動化 |
-| Auto merge | 無効 | 有効 | CI 通過後の自動マージを許可（PR ごとに opt-in） |
+| 設定             | デフォルト | 変更後 | 理由                                            |
+| ---------------- | ---------- | ------ | ----------------------------------------------- |
+| Merge commit     | 許可       | 禁止   | squash merge のみの運用                         |
+| Rebase merge     | 許可       | 禁止   | 同上                                            |
+| ブランチ自動削除 | 無効       | 有効   | マージ後のブランチ削除を自動化                  |
+| Auto merge       | 無効       | 有効   | CI 通過後の自動マージを許可（PR ごとに opt-in） |
 
 #### ブランチ保護（Rulesets）
 
-| ルール | 理由 |
-|--------|------|
-| main への直接 push 禁止 | git-workflow ルール |
-| force push 禁止 | git-workflow ルール |
-| main の削除禁止 | デフォルトブランチの保護 |
-| PR 必須（承認数 0） | PR 作成を強制しつつソロ開発に対応 |
-| linear history 必須 | squash merge と整合 |
+| ルール                  | 理由                              |
+| ----------------------- | --------------------------------- |
+| main への直接 push 禁止 | git-workflow ルール               |
+| force push 禁止         | git-workflow ルール               |
+| main の削除禁止         | デフォルトブランチの保護          |
+| PR 必須（承認数 0）     | PR 作成を強制しつつソロ開発に対応 |
+| linear history 必須     | squash merge と整合               |
 
 - bypass は禁止（admin 含む）
 - CI ステータスチェックは含めない（リポごとに手動設定）
 
 #### セキュリティ
 
-| 設定 | 理由 |
-|------|------|
-| Secret scanning | gitleaks と二重防御 |
-| Push protection | シークレット漏洩防止 |
-| Dependabot alerts | 依存関係の脆弱性検知 |
-| Dependabot security updates | 脆弱性の自動修正 PR |
+| 設定                            | 理由                                    |
+| ------------------------------- | --------------------------------------- |
+| Secret scanning                 | gitleaks と二重防御                     |
+| Push protection                 | シークレット漏洩防止                    |
+| Dependabot alerts               | 依存関係の脆弱性検知                    |
+| Dependabot security updates     | 脆弱性の自動修正 PR                     |
 | Private Vulnerability Reporting | SECURITY.md との整合（public リポのみ） |
 
 #### リポジトリ設定
 
-| 設定 | デフォルト | 変更後 | 理由 |
-|------|-----------|--------|------|
-| Wiki | 有効 | 無効 | ドキュメントはリポ内で管理 |
+| 設定 | デフォルト | 変更後 | 理由                       |
+| ---- | ---------- | ------ | -------------------------- |
+| Wiki | 有効       | 無効   | ドキュメントはリポ内で管理 |
 
 #### Actions permissions
 
-| 設定 | デフォルト | 変更後 | 理由 |
-|------|-----------|--------|------|
-| Workflow permissions | read | read-write | PR 作成等のワークフローに write 権限が必要 |
-| Allow creating and approving PRs | 無効 | 有効 | ワークフローからの PR 操作を許可 |
+| 設定                             | デフォルト | 変更後     | 理由                                       |
+| -------------------------------- | ---------- | ---------- | ------------------------------------------ |
+| Workflow permissions             | read       | read-write | PR 作成等のワークフローに write 権限が必要 |
+| Allow creating and approving PRs | 無効       | 有効       | ワークフローからの PR 操作を許可           |
 
 #### ラベル
 
@@ -186,12 +186,12 @@ GitHub デフォルトラベル（9 個）を削除し、Conventional Commits �
 
 ### sync.sh との棲み分け
 
-| 観点 | sync.sh | setup-repo.sh |
-|------|---------|---------------|
-| 対象 | ファイル（スキル、ルール、設定ファイル） | GitHub リポジトリ設定（API） |
-| 実行頻度 | commons 更新時に毎回 | リポジトリ作成時に 1 回 |
-| 冪等性 | あり（差分検出） | あり（Rulesets は既存チェックで create/update を切り替え） |
-| 依存 | git | gh CLI（認証済み） |
+| 観点     | sync.sh                                  | setup-repo.sh                                              |
+| -------- | ---------------------------------------- | ---------------------------------------------------------- |
+| 対象     | ファイル（スキル、ルール、設定ファイル） | GitHub リポジトリ設定（API）                               |
+| 実行頻度 | commons 更新時に毎回                     | リポジトリ作成時に 1 回                                    |
+| 冪等性   | あり（差分検出）                         | あり（Rulesets は既存チェックで create/update を切り替え） |
+| 依存     | git                                      | gh CLI（認証済み）                                         |
 
 ## 既知の制限事項
 

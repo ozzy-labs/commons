@@ -69,4 +69,5 @@ jobs:
             } else {
               core.info('Branch name follows naming convention');
             }
+
 # end: ozzy-labs/commons
