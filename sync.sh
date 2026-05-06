@@ -137,6 +137,10 @@ is_surgical() {
   *.json | *.yaml | *.yml)
     # Exclude certain files that should be handled as a whole
     [[ "${file}" == "lefthook.yaml" ]] && return 1
+    # lefthook-base.yaml is a shared base; consumers extend it via lefthook.yaml
+    # and never add keys to it. yq surgical merge would compound free-floating
+    # header comments and reorder appended commands across syncs.
+    [[ "${file}" == "lefthook-base.yaml" ]] && return 1
     # _template scaffolds — full copy preserves comments and layout.
     # Matches both legacy directory form (`_template/<file>`) and current
     # single-file form (`_template.yaml`).
