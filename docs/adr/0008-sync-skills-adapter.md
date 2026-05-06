@@ -31,26 +31,26 @@ Related: [handbook ADR-0018](https://github.com/ozzy-labs/handbook/blob/main/adr
 
 `sync.sh` と `sync-skills.sh` は責務とデータソースが異なるため、別スクリプトに分ける。
 
-| 観点 | sync.sh | sync-skills.sh |
-|------|---------|----------------|
-| ソース | ローカルの `dist/`（commons リポ自身） | 別リポ（`ozzy-labs/skills`）の dist |
-| 同期モデル | ディレクトリミラー（[ADR-0001](0001-directory-mirror-structure.md)） | per-adapter の細かい変換（per-skill-dir copy + snippet 置換） |
-| 呼び出し元 | consumer の `sync-commons.yaml` workflow | consumer の `sync-skills.yaml` workflow |
-| 引数 | target repo path | skills dist root path + target repo path |
-| Renovate 連携 | `commit:` を bump（[ADR-0006](0006-renovate-auto-sync-preset.md)） | `skills_commit:` を bump（skills repo 側 [skills#23](https://github.com/ozzy-labs/skills/issues/23) で実装） |
+| 観点          | sync.sh                                                              | sync-skills.sh                                                                                               |
+| ------------- | -------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| ソース        | ローカルの `dist/`（commons リポ自身）                               | 別リポ（`ozzy-labs/skills`）の dist                                                                          |
+| 同期モデル    | ディレクトリミラー（[ADR-0001](0001-directory-mirror-structure.md)） | per-adapter の細かい変換（per-skill-dir copy + snippet 置換）                                                |
+| 呼び出し元    | consumer の `sync-commons.yaml` workflow                             | consumer の `sync-skills.yaml` workflow                                                                      |
+| 引数          | target repo path                                                     | skills dist root path + target repo path                                                                     |
+| Renovate 連携 | `commit:` を bump（[ADR-0006](0006-renovate-auto-sync-preset.md)）   | `skills_commit:` を bump（skills repo 側 [skills#23](https://github.com/ozzy-labs/skills/issues/23) で実装） |
 
 これらを 1 スクリプトに統合すると、引数仕様・モード・ファイルレイアウトが二重化して読みづらくなる。分離した方がそれぞれの責務が明確になる。
 
 ### opt-in は `.dev-config/sync.yaml` の `skills_adapters:` リストで宣言する
 
 ```yaml
-commit: <commons SHA>          # sync.sh が管理（ADR-0006）
-synced_at: <timestamp>          # sync.sh が管理
-skills_commit: <skills SHA>     # Renovate（@ozzylabs/skills preset）が管理
-skills_adapters:                # consumer が手動で opt-in
+commit: <commons SHA> # sync.sh が管理（ADR-0006）
+synced_at: <timestamp> # sync.sh が管理
+skills_commit: <skills SHA> # Renovate（@ozzylabs/skills preset）が管理
+skills_adapters: # consumer が手動で opt-in
   - claude-code
   - codex-cli
-pinned:                         # consumer が手動で管理
+pinned: # consumer が手動で管理
   - AGENTS.md
 ```
 

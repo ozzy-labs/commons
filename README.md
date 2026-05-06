@@ -105,10 +105,10 @@ skills_commit: <40-char-sha>
 
 # Opt-in per consumer (manual)
 skills_adapters:
-  - claude-code   # → .claude/skills/{name}/
-  - codex-cli     # → .agents/skills/{name}/ + AGENTS.md snippet
-  - gemini-cli    # → .gemini/settings.json + AGENTS.md snippet
-  - copilot       # → .github/copilot-instructions.md snippet
+  - claude-code # → .claude/skills/{name}/
+  - codex-cli # → .agents/skills/{name}/ + AGENTS.md snippet
+  - gemini-cli # → .gemini/settings.json + AGENTS.md snippet
+  - copilot # → .github/copilot-instructions.md snippet
 ```
 
 The consumer's sync workflow clones `ozzy-labs/skills` at `skills_commit:` and runs `sync-skills.sh` to apply the opted-in adapter outputs:

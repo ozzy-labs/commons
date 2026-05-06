@@ -15,14 +15,14 @@ Accepted (2026-04-29)
 ### 仕様
 
 1. **`commons` スクリプト**:
-    - サブコマンド（`sync`, `check`, `setup`, `skills`）を受け取り、対応する既存スクリプトを実行する。
-    - 将来的な拡張のベースラインとする。
+   - サブコマンド（`sync`, `check`, `setup`, `skills`）を受け取り、対応する既存スクリプトを実行する。
+   - 将来的な拡張のベースラインとする。
 2. **`check` コマンド (`check.sh`)**:
-    - ターゲットリポジトリに対して以下の診断を行う:
-        - **Sync Status**: `sync.sh --check` を実行し、共有ファイルが最新か確認する。
-        - **Mandatory Files**: `LICENSE`, `AGENTS.md`, `README.md` 等の必須ファイルの存在を確認する。
-        - **Markers**: Markdown や YAML において、部分同期に必要なマーカーブロックが存在するか確認する。
-        - **Security**: Lefthook および Gitleaks が正しく構成されているか確認する。
+   - ターゲットリポジトリに対して以下の診断を行う:
+     - **Sync Status**: `sync.sh --check` を実行し、共有ファイルが最新か確認する。
+     - **Mandatory Files**: `LICENSE`, `AGENTS.md`, `README.md` 等の必須ファイルの存在を確認する。
+     - **Markers**: Markdown や YAML において、部分同期に必要なマーカーブロックが存在するか確認する。
+     - **Security**: Lefthook および Gitleaks が正しく構成されているか確認する。
 
 ## Consequences
 

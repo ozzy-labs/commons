@@ -105,10 +105,10 @@ skills_commit: <40-char-sha>
 
 # Consumer が手動で opt-in 設定
 skills_adapters:
-  - claude-code   # → .claude/skills/{name}/
-  - codex-cli     # → .agents/skills/{name}/ + AGENTS.md snippet
-  - gemini-cli    # → .gemini/settings.json + AGENTS.md snippet
-  - copilot       # → .github/copilot-instructions.md snippet
+  - claude-code # → .claude/skills/{name}/
+  - codex-cli # → .agents/skills/{name}/ + AGENTS.md snippet
+  - gemini-cli # → .gemini/settings.json + AGENTS.md snippet
+  - copilot # → .github/copilot-instructions.md snippet
 ```
 
 Consumer の sync workflow が `skills_commit:` の SHA で `ozzy-labs/skills` をクローンし、`sync-skills.sh` で opt-in した adapter 出力を反映する:

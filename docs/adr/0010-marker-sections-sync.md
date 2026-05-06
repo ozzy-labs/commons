@@ -17,17 +17,17 @@ ADR-0009 で導入した「外科的マージ」は JSON/YAML には有効だが
 ### 仕様
 
 1. **マーカーの形式**:
-    - Markdown, HTML, XML 等:
-        - `<!-- begin: ozzy-labs/commons -->`
-        - `<!-- end: ozzy-labs/commons -->`
-    - YAML, Shell, Justfile, その他（デフォルト）:
-        - `# begin: ozzy-labs/commons`
-        - `# end: ozzy-labs/commons`
+   - Markdown, HTML, XML 等:
+     - `<!-- begin: ozzy-labs/commons -->`
+     - `<!-- end: ozzy-labs/commons -->`
+   - YAML, Shell, Justfile, その他（デフォルト）:
+     - `# begin: ozzy-labs/commons`
+     - `# end: ozzy-labs/commons`
 2. **動作**:
-    - `dist/` 側のファイルとターゲット側のファイルの両方にマーカーが存在する場合、ターゲット側のマーカー内のコンテンツのみを `dist/` 側の内容で置き換える。
-    - マーカーの外側のコンテンツは維持される。
-    - `sync.sh --check` においても、マーカー内のコンテンツのみを比較対象とし、外側の変更は無視する。
-    - 片方にしかマーカーがない場合は、従来の「全上書き」挙動にフォールバックする。
+   - `dist/` 側のファイルとターゲット側のファイルの両方にマーカーが存在する場合、ターゲット側のマーカー内のコンテンツのみを `dist/` 側の内容で置き換える。
+   - マーカーの外側のコンテンツは維持される。
+   - `sync.sh --check` においても、マーカー内のコンテンツのみを比較対象とし、外側の変更は無視する。
+   - 片方にしかマーカーがない場合は、従来の「全上書き」挙動にフォールバックする。
 
 ## Consequences
 

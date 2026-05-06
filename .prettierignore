@@ -1,0 +1,6 @@
+# Used with `prettier --ignore-path=.prettierignore` so .gitignore is NOT
+# auto-applied. We need Prettier to format files under dist/ (which is in
+# .gitignore but is the canonical published artifact).
+
+node_modules/
+pnpm-lock.yaml
