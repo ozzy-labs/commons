@@ -153,6 +153,61 @@ EOF
   grep -q "Section header comment" "${TARGET_DIR}/.claude/routines/_template.yaml"
 }
 
+@test "lefthook-base.yaml is full-copied (not surgical-merged) to avoid header/key drift" {
+  # lefthook-base.yaml is a shared base — consumers extend via lefthook.yaml and
+  # never add keys to it. yq surgical merge would compound free-floating header
+  # comments across syncs and append new keys at the bottom, drifting from dist.
+  cat <<'EOF' > "${SRC_DIR}/dist/lefthook-base.yaml"
+# Header comment v2
+commit-msg:
+  commands:
+    commitlint:
+      run: new-commitlint --edit {1}
+pre-commit:
+  commands:
+    shell:
+      run: new-shfmt
+    taplo:
+      run: new-taplo
+EOF
+  git -C "${SRC_DIR}" add .
+  git -C "${SRC_DIR}" commit -q -m "update lefthook-base"
+
+  # Existing target with old header and only `shell` (no taplo)
+  cat <<'EOF' > "${TARGET_DIR}/lefthook-base.yaml"
+# Header comment v1
+commit-msg:
+  commands:
+    commitlint:
+      run: old-commitlint --edit {1}
+pre-commit:
+  commands:
+    shell:
+      run: old-shfmt
+EOF
+  git -C "${TARGET_DIR}" add lefthook-base.yaml
+  git -C "${TARGET_DIR}" commit -q -m "old lefthook-base"
+
+  run "${SRC_DIR}/sync.sh" -y "${TARGET_DIR}"
+  [ "$status" -eq 0 ]
+
+  # Should be reported as copy, not merge
+  [[ "$output" == *"copy: lefthook-base.yaml"* ]]
+  [[ "$output" != *"merge: lefthook-base.yaml"* ]]
+
+  # Old header must NOT remain (full copy replaces it)
+  ! grep -q "Header comment v1" "${TARGET_DIR}/lefthook-base.yaml"
+  grep -q "Header comment v2" "${TARGET_DIR}/lefthook-base.yaml"
+
+  # Header must appear exactly once (no compounding)
+  [ "$(grep -c "^# Header comment" "${TARGET_DIR}/lefthook-base.yaml")" = "1" ]
+
+  # New content from dist must win
+  [ "$(yq '.commit-msg.commands.commitlint.run' "${TARGET_DIR}/lefthook-base.yaml")" = "new-commitlint --edit {1}" ]
+  [ "$(yq '.pre-commit.commands.shell.run' "${TARGET_DIR}/lefthook-base.yaml")" = "new-shfmt" ]
+  [ "$(yq '.pre-commit.commands.taplo.run' "${TARGET_DIR}/lefthook-base.yaml")" = "new-taplo" ]
+}
+
 @test "interactive mode offers 'm' for surgical files and performs merge" {
   # Create a surgical file in dist
   cat <<EOF > "${SRC_DIR}/dist/biome.json"
