@@ -59,6 +59,15 @@ jobs:
               return;
             }
 
+            // Claude Code's GitHub app creates PRs from branches like
+            // `claude/<slug>-<id>`. The naming is bot-controlled and does
+            // not match the type/description convention; skip the check
+            // for those PRs the same way Dependabot is exempted.
+            if (branch.startsWith('claude/')) {
+              core.info(`Branch is managed by Claude Code (${branch}), skipping check`);
+              return;
+            }
+
             if (!pattern.test(branch)) {
               core.setFailed(
                 `Branch name does not follow naming convention.\n\n` +
