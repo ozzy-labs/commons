@@ -456,3 +456,96 @@ EOF
   grep -q "<!-- begin: @ozzylabs/skills -->" "${TARGET_DIR}/AGENTS.md"
   grep -q "commit. — codex" "${TARGET_DIR}/AGENTS.md"
 }
+
+# --- ADR-0026: agents distribution (.claude/agents/) ---
+
+@test "claude-code adapter copies .claude/agents/ when present in skills dist" {
+  mkdir -p "${SKILLS_DIST}/claude-code/.claude/agents"
+  echo "code-reviewer agent" >"${SKILLS_DIST}/claude-code/.claude/agents/code-reviewer.md"
+
+  write_metadata "skills_adapters:
+  - claude-code"
+  run "${SCRIPT}" -y "${SKILLS_DIST}" "${TARGET_DIR}"
+  [ "$status" -eq 0 ]
+  [ -f "${TARGET_DIR}/.claude/agents/code-reviewer.md" ]
+  [ "$(cat "${TARGET_DIR}/.claude/agents/code-reviewer.md")" = "code-reviewer agent" ]
+  # Skills still copied (regression check)
+  [ -f "${TARGET_DIR}/.claude/skills/commit/SKILL.md" ]
+}
+
+@test "claude-code adapter is no-op for agents when .claude/agents/ absent in dist" {
+  # Default fixture has no .claude/agents/ directory in dist
+  write_metadata "skills_adapters:
+  - claude-code"
+  run "${SCRIPT}" -y "${SKILLS_DIST}" "${TARGET_DIR}"
+  [ "$status" -eq 0 ]
+  [ ! -d "${TARGET_DIR}/.claude/agents" ]
+  # Skills baseline still works
+  [ -f "${TARGET_DIR}/.claude/skills/commit/SKILL.md" ]
+}
+
+@test "agent file pin (file path) preserves consumer's local agent" {
+  mkdir -p "${SKILLS_DIST}/claude-code/.claude/agents"
+  echo "upstream agent" >"${SKILLS_DIST}/claude-code/.claude/agents/code-reviewer.md"
+
+  write_metadata "skills_adapters:
+  - claude-code
+pinned:
+  - .claude/agents/code-reviewer.md"
+
+  mkdir -p "${TARGET_DIR}/.claude/agents"
+  echo "my custom agent" >"${TARGET_DIR}/.claude/agents/code-reviewer.md"
+
+  run "${SCRIPT}" -y "${SKILLS_DIST}" "${TARGET_DIR}"
+  [ "$status" -eq 0 ]
+  [ "$(cat "${TARGET_DIR}/.claude/agents/code-reviewer.md")" = "my custom agent" ]
+  [[ "$output" == *"pinned:"*".claude/agents/code-reviewer.md"* ]]
+}
+
+@test "agent directory pin (trailing slash) skips every agent" {
+  mkdir -p "${SKILLS_DIST}/claude-code/.claude/agents"
+  echo "upstream A" >"${SKILLS_DIST}/claude-code/.claude/agents/agent-a.md"
+  echo "upstream B" >"${SKILLS_DIST}/claude-code/.claude/agents/agent-b.md"
+
+  write_metadata "skills_adapters:
+  - claude-code
+pinned:
+  - .claude/agents/"
+
+  mkdir -p "${TARGET_DIR}/.claude/agents"
+  echo "my A" >"${TARGET_DIR}/.claude/agents/agent-a.md"
+
+  run "${SCRIPT}" -y "${SKILLS_DIST}" "${TARGET_DIR}"
+  [ "$status" -eq 0 ]
+  [ "$(cat "${TARGET_DIR}/.claude/agents/agent-a.md")" = "my A" ]
+  [ ! -f "${TARGET_DIR}/.claude/agents/agent-b.md" ]
+  # Skills are unaffected by agent dir pin
+  [ -f "${TARGET_DIR}/.claude/skills/commit/SKILL.md" ]
+}
+
+@test "--check detects out-of-sync agent files" {
+  mkdir -p "${SKILLS_DIST}/claude-code/.claude/agents"
+  echo "code-reviewer agent" >"${SKILLS_DIST}/claude-code/.claude/agents/code-reviewer.md"
+
+  write_metadata "skills_adapters:
+  - claude-code"
+  run "${SCRIPT}" --check "${SKILLS_DIST}" "${TARGET_DIR}"
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"out of sync"* ]]
+  [[ "$output" == *".claude/agents/code-reviewer.md"* ]]
+}
+
+@test "non-md files under .claude/agents/ are not copied" {
+  mkdir -p "${SKILLS_DIST}/claude-code/.claude/agents"
+  echo "agent" >"${SKILLS_DIST}/claude-code/.claude/agents/code-reviewer.md"
+  echo "ignore" >"${SKILLS_DIST}/claude-code/.claude/agents/README"
+  echo "{}" >"${SKILLS_DIST}/claude-code/.claude/agents/config.json"
+
+  write_metadata "skills_adapters:
+  - claude-code"
+  run "${SCRIPT}" -y "${SKILLS_DIST}" "${TARGET_DIR}"
+  [ "$status" -eq 0 ]
+  [ -f "${TARGET_DIR}/.claude/agents/code-reviewer.md" ]
+  [ ! -f "${TARGET_DIR}/.claude/agents/README" ]
+  [ ! -f "${TARGET_DIR}/.claude/agents/config.json" ]
+}

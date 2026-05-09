@@ -272,6 +272,19 @@ collect_skill_dir_ops() {
   done
 }
 
+# Flat copy: iterate *.md files directly under src_dir (no recursion).
+# Used for .claude/agents/, where each file is a standalone agent definition.
+collect_flat_dir_ops() {
+  local src_dir="$1" dst_dir="$2"
+  local file rel_in_dir dst_file rel
+  while IFS= read -r file; do
+    rel_in_dir="${file#"${src_dir}/"}"
+    dst_file="${dst_dir}/${rel_in_dir}"
+    rel="${dst_file#"${TARGET_DIR}/"}"
+    add_file_op "${file}" "${dst_file}" "${rel}"
+  done < <(find "${src_dir}" -maxdepth 1 -type f -name '*.md' | sort)
+}
+
 # --- Plan operations per adapter ---
 
 for a in "${ADAPTERS[@]}"; do
@@ -283,6 +296,14 @@ for a in "${ADAPTERS[@]}"; do
       exit 1
     fi
     collect_skill_dir_ops "${src_root}" "${TARGET_DIR}/.claude/skills"
+
+    # Optional agent distribution (ADR-0026). No-op if skills dist
+    # predates the convention. perspectives/ files live under skill dirs
+    # and are already carried by collect_skill_dir_ops above.
+    src_agents="${SKILLS_DIST}/claude-code/.claude/agents"
+    if [[ -d "${src_agents}" ]]; then
+      collect_flat_dir_ops "${src_agents}" "${TARGET_DIR}/.claude/agents"
+    fi
     ;;
   codex-cli)
     src_root="${SKILLS_DIST}/codex-cli/.agents/skills"
