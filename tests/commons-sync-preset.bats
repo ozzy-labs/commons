@@ -40,6 +40,15 @@ PRESET_FILE="${BATS_TEST_DIRNAME}/../commons-sync.json"
     "${PRESET_FILE}" >/dev/null
 }
 
+@test "preset regex anchors commit: to the start of a line (avoid skills_commit collision)" {
+  # Without an anchor, the regex would also match `skills_commit: <sha>` and
+  # cause Renovate to bump that field as if it were the commons SHA. The
+  # multiline-mode `^` anchor scopes matching to lines that begin with
+  # `commit:` only.
+  jq -e '.customManagers[0].matchStrings | map(test("\\(\\?m\\)\\^commit:")) | any' \
+    "${PRESET_FILE}" >/dev/null
+}
+
 @test "preset uses git-refs datasource pointing at ozzy-labs/commons main" {
   [ "$(jq -r '.customManagers[0].datasourceTemplate' "${PRESET_FILE}")" = "git-refs" ]
   jq -e '.customManagers[0].packageNameTemplate | test("ozzy-labs/commons")' \

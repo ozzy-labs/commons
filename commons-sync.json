@@ -5,7 +5,7 @@
     {
       "customType": "regex",
       "managerFilePatterns": ["**/.commons/sync.yaml"],
-      "matchStrings": ["commit:\\s*(?<currentDigest>[a-f0-9]{7,40})"],
+      "matchStrings": ["(?m)^commit:\\s*(?<currentDigest>[a-f0-9]{7,40})"],
       "currentValueTemplate": "main",
       "depNameTemplate": "ozzy-labs/commons",
       "packageNameTemplate": "https://github.com/ozzy-labs/commons",

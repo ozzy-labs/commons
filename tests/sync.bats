@@ -472,9 +472,10 @@ EOF
 @test "write_metadata preserves skills_commit from existing metadata" {
   "${SRC_DIR}/sync.sh" -y "${TARGET_DIR}"
 
-  # Simulate sync-skills.sh writing skills_commit to the metadata
+  # Simulate a consumer (or downstream tool) replacing the seeded empty
+  # skills_commit with a real SHA.
   local meta_file="${TARGET_DIR}/.commons/sync.yaml"
-  echo "skills_commit: abc1234567890abc1234567890abc1234567890ab" >>"${meta_file}"
+  sed -i 's|^skills_commit:.*|skills_commit: abc1234567890abc1234567890abc1234567890ab|' "${meta_file}"
 
   # Run sync again (nothing changed, but metadata is rewritten)
   echo "updated skill" >"${SRC_DIR}/dist/.claude/skills/commit/SKILL.md"
@@ -488,9 +489,10 @@ EOF
 @test "write_metadata preserves skills_adapters from existing metadata" {
   "${SRC_DIR}/sync.sh" -y "${TARGET_DIR}"
 
-  # Simulate sync-skills.sh writing skills_adapters to the metadata
+  # Simulate a consumer replacing the seeded empty skills_adapters with a
+  # populated block-style list.
   local meta_file="${TARGET_DIR}/.commons/sync.yaml"
-  printf "skills_adapters:\n  - claude-code\n  - codex-cli\n" >>"${meta_file}"
+  sed -i 's|^skills_adapters:.*|skills_adapters:\n  - claude-code\n  - codex-cli|' "${meta_file}"
 
   # Run sync again to trigger a metadata rewrite
   echo "updated skill" >"${SRC_DIR}/dist/.claude/skills/commit/SKILL.md"
@@ -503,12 +505,22 @@ EOF
   [[ "$meta" == *"- codex-cli"* ]]
 }
 
-@test "write_metadata does not add skills fields when not present" {
+@test "write_metadata seeds skills fields with empty values when not present" {
   run "${SRC_DIR}/sync.sh" -y "${TARGET_DIR}"
   [ "$status" -eq 0 ]
 
   local meta
   meta="$(cat "${TARGET_DIR}/.commons/sync.yaml")"
-  [[ "$meta" != *"skills_commit"* ]]
-  [[ "$meta" != *"skills_adapters"* ]]
+  [[ "$meta" == *"skills_commit: \"\""* ]]
+  [[ "$meta" == *"skills_adapters: []"* ]]
+}
+
+@test "write_metadata includes skills opt-in guidance comment" {
+  run "${SRC_DIR}/sync.sh" -y "${TARGET_DIR}"
+  [ "$status" -eq 0 ]
+
+  local meta
+  meta="$(cat "${TARGET_DIR}/.commons/sync.yaml")"
+  [[ "$meta" == *"# Skills sync (opt-in)"* ]]
+  [[ "$meta" == *"gh api repos/ozzy-labs/skills/commits/main --jq .sha"* ]]
 }

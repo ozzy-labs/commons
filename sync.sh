@@ -257,11 +257,15 @@ write_metadata() {
   fi
   SYNCED_AT="$(date -u +"%Y-%m-%dT%H:%M:%SZ")"
 
-  # Preserve skills fields managed by sync-skills.sh
+  # Preserve skills fields managed by sync-skills.sh. We always emit the
+  # skills_commit / skills_adapters keys (with empty defaults if unset) so
+  # consumers can opt in by editing the metadata file directly without
+  # consulting external docs — the explanatory comment below names the
+  # exact gh command to fetch the SHA.
   local existing_skills_commit=""
   local existing_skills_adapters=()
   if [[ -f "${METADATA_FILE}" ]]; then
-    existing_skills_commit="$(grep '^skills_commit:' "${METADATA_FILE}" | awk '{print $2}' || true)"
+    existing_skills_commit="$(grep '^skills_commit:' "${METADATA_FILE}" | awk '{print $2}' | tr -d '"' || true)"
     while IFS= read -r a; do existing_skills_adapters+=("${a}"); done < <(read_yaml_list "${METADATA_FILE}" "skills_adapters")
   fi
 
@@ -271,12 +275,20 @@ write_metadata() {
     echo "# 'pinned' is user-editable — add or remove paths freely"
     echo "commit: ${COMMIT_HASH}"
     echo "synced_at: ${SYNCED_AT}"
+    echo ""
+    echo "# Skills sync (opt-in). Add adapter ids to skills_adapters and a SHA"
+    echo "# to skills_commit. The skills repo's main HEAD SHA can be obtained via:"
+    echo "#   gh api repos/ozzy-labs/skills/commits/main --jq .sha"
     if [[ -n "${existing_skills_commit:-}" ]]; then
       echo "skills_commit: ${existing_skills_commit}"
+    else
+      echo "skills_commit: \"\""
     fi
     if [[ ${#existing_skills_adapters[@]} -gt 0 ]]; then
       echo "skills_adapters:"
       for a in "${existing_skills_adapters[@]}"; do echo "  - ${a}"; done
+    else
+      echo "skills_adapters: []"
     fi
     if [[ ${#pinned_list[@]} -gt 0 ]]; then
       echo "pinned:"

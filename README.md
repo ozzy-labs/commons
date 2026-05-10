@@ -97,7 +97,17 @@ The earlier `.dev-config/sync.yaml` path was supported as a temporary fallback d
 
 ### Skills sync (opt-in per consumer)
 
-Shared skills live in [`ozzy-labs/skills`](https://github.com/ozzy-labs/skills) and are produced as per-agent adapter outputs under `dist/{adapter-id}/`. Consumers opt in by listing adapter ids in `.commons/sync.yaml`:
+Shared skills live in [`ozzy-labs/skills`](https://github.com/ozzy-labs/skills) and are produced as per-agent adapter outputs under `dist/{adapter-id}/`. The first run of `commons sync` seeds `.commons/sync.yaml` with empty `skills_commit:` and `skills_adapters:` keys plus a comment naming the exact `gh` command for fetching the SHA — opt-in is then a matter of editing those keys in place. The seeded shape:
+
+```yaml
+# Skills sync (opt-in). Add adapter ids to skills_adapters and a SHA
+# to skills_commit. The skills repo's main HEAD SHA can be obtained via:
+#   gh api repos/ozzy-labs/skills/commits/main --jq .sha
+skills_commit: ""
+skills_adapters: []
+```
+
+Once filled in, the metadata looks like:
 
 ```yaml
 # Tracked by Renovate via the @ozzylabs/skills preset
@@ -110,6 +120,8 @@ skills_adapters:
   - gemini-cli # → .gemini/settings.json + AGENTS.md snippet
   - copilot # → .github/copilot-instructions.md snippet
 ```
+
+Running `sync-skills.sh` against a repo with empty `skills_adapters` is non-fatal: it prints opt-in guidance (including the SHA fetch command) and exits 0, so the consumer's sync workflow keeps succeeding while the repo is still in opt-out state.
 
 The consumer's sync workflow clones `ozzy-labs/skills` at `skills_commit:` and runs `sync-skills.sh` to apply the opted-in adapter outputs:
 
