@@ -124,7 +124,7 @@ The consumer's sync workflow clones `ozzy-labs/skills` at `skills_commit:` and r
 /path/to/commons/sync-skills.sh --check /path/to/skills/dist /path/to/target-repo
 ```
 
-Snippet targets (`AGENTS.md`, `.github/copilot-instructions.md`) must already contain the marker block — only the content between `<!-- begin: @ozzylabs/skills -->` and `<!-- end: @ozzylabs/skills -->` is replaced. Pinning a path in the metadata file's `pinned:` list (with a trailing `/` for whole directories) skips it across all adapters. Consumer-only skill directories under `.claude/skills/` or `.agents/skills/` are preserved.
+Snippet targets (`AGENTS.md`, `.github/copilot-instructions.md`) must already contain the marker block — only the content between `<!-- begin: @ozzylabs/skills -->` and `<!-- end: @ozzylabs/skills -->` is replaced. `templates/AGENTS.md` ships with the marker block pre-installed, so new repos scaffolded from the template are ready for codex-cli / gemini-cli adapter opt-in without manual edits. `commons check` warns when the marker is missing from `AGENTS.md` so existing repos can be retrofitted before opt-in. Pinning a path in the metadata file's `pinned:` list (with a trailing `/` for whole directories) skips it across all adapters. Consumer-only skill directories under `.claude/skills/` or `.agents/skills/` are preserved.
 
 ### Repository setup
 
