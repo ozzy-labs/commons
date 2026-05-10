@@ -11,7 +11,7 @@
 
 ## プロジェクト概要
 
-`<project-name>`: <description>
+`{{project_name}}`: {{description}}
 
 ## Tech Stack
 

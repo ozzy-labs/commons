@@ -16,6 +16,7 @@ usage() {
   echo "  check     Run health check (wrapper for check.sh)"
   echo "  setup     Initialize repository (wrapper for setup-repo.sh)"
   echo "  skills    Sync skills adapters (wrapper for sync-skills.sh)"
+  echo "  init      Bootstrap templates and metadata (wrapper for init-templates.sh)"
 }
 
 if [[ $# -lt 1 ]]; then
@@ -38,6 +39,9 @@ case "${COMMAND}" in
     ;;
   skills)
     exec "${SCRIPT_DIR}/sync-skills.sh" "$@"
+    ;;
+  init)
+    exec "${SCRIPT_DIR}/init-templates.sh" "$@"
     ;;
   help | --help | -h)
     usage

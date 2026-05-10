@@ -34,6 +34,7 @@ templates/           -> Scaffold-only files (copied manually for new repos, neve
 sync.sh              -> Sync script
 sync-skills.sh       -> @ozzylabs/skills adapter sync script (opt-in per consumer)
 setup-repo.sh        -> GitHub repository setup script
+init-templates.sh    -> Bootstrap templates with placeholder substitution + repo metadata
 ```
 
 `templates/` ships starter content that every repo customizes (project name, tech stack, available skills). It is intentionally outside `dist/` so `sync.sh` never touches it — copy these files once when bootstrapping a new repo and edit in place.
@@ -51,6 +52,7 @@ Shared skills (`.agents/skills/`, `.claude/skills/`) are no longer distributed f
 #   check     Run health check
 #   setup     Initialize repository
 #   skills    Sync skills adapters
+#   init      Bootstrap templates and metadata
 ```
 
 ### Sync
@@ -149,6 +151,27 @@ Snippet targets (`AGENTS.md`, `.github/copilot-instructions.md`) must already co
 ```
 
 Sets merge rules (squash only), branch protection (Rulesets), security settings, and Conventional Commits labels. See [ADR-0004](docs/adr/0004-repo-setup-with-rulesets.md) for design decisions.
+
+### Bootstrap templates (`commons init`)
+
+`init-templates.sh` copies `templates/AGENTS.md` and `templates/CLAUDE.md` into a target repo, substitutes `{{project_name}}` and `{{description}}` placeholders, and (when invoked with `--description` or `--topics`) applies the GitHub repo description and topics in one shot. It complements `setup-repo.sh`: that script handles ozzy-labs-wide GitHub settings, while this one handles per-repo bootstrap content.
+
+```bash
+# Full bootstrap (file ops + GitHub metadata)
+/path/to/commons/init-templates.sh \
+  --name agentic-watch \
+  --description "Multi-agent CLI that watches blogs..." \
+  --topics ai,cli,multi-agent,claude-code,codex,gemini \
+  /path/to/agentic-watch
+
+# Files only (no gh API calls)
+/path/to/commons/init-templates.sh --name <name> --skip-gh-edit /path/to/repo
+
+# Preview changes
+/path/to/commons/init-templates.sh --name <name> --dry-run /path/to/repo
+```
+
+`--name` is required. Existing `AGENTS.md` / `CLAUDE.md` files in the target are protected: the script aborts with a diff summary unless `--force` is passed. The repo for `gh api` is auto-detected from the target's `origin` remote, or pass `--repo owner/repo` to override.
 
 ### Automated sync (scheduled PR)
 

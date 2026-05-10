@@ -34,6 +34,7 @@ templates/           -> scaffold 専用ファイル（新規リポ作成時に�
 sync.sh              -> 同期スクリプト
 sync-skills.sh       -> @ozzylabs/skills adapter 同期スクリプト（consumer ごとに opt-in）
 setup-repo.sh        -> GitHub リポジトリ初期設定スクリプト
+init-templates.sh    -> templates のプレースホルダ置換とリポメタデータ反映
 ```
 
 `templates/` には各リポでカスタマイズ前提の雛形（プロジェクト概要・tech stack・利用スキル等）を置く。`sync.sh` の対象外なので、新規リポ初期化時に一度だけ手動コピーしてその後はリポ側で編集する。
@@ -51,6 +52,7 @@ setup-repo.sh        -> GitHub リポジトリ初期設定スクリプト
 #   check     規約適合度診断
 #   setup     リポジトリ初期設定
 #   skills    スキル・アダプター同期
+#   init      templates のブートストラップとメタデータ反映
 ```
 
 ### 同期 (Sync)
@@ -149,6 +151,27 @@ Snippet 対象（`AGENTS.md` / `.github/copilot-instructions.md`）は対象フ�
 ```
 
 マージルール（squash のみ）、ブランチ保護（Rulesets）、セキュリティ設定、Conventional Commits ラベルを設定する。設計方針は [ADR-0004](docs/adr/0004-repo-setup-with-rulesets.md) を参照。
+
+### Templates のブートストラップ（`commons init`）
+
+`init-templates.sh` は `templates/AGENTS.md` `templates/CLAUDE.md` を target リポにコピーし、`{{project_name}}` `{{description}}` プレースホルダを置換、加えて `--description` `--topics` 指定時には GitHub リポの description / topics を一括反映する。`setup-repo.sh` が ozzy-labs 共通の GitHub 設定を担当するのに対し、本スクリプトはリポ固有のブートストラップ内容を担当する補完関係。
+
+```bash
+# フル ブートストラップ（ファイル + GitHub メタデータ）
+/path/to/commons/init-templates.sh \
+  --name agentic-watch \
+  --description "ブログを監視するマルチエージェント CLI..." \
+  --topics ai,cli,multi-agent,claude-code,codex,gemini \
+  /path/to/agentic-watch
+
+# ファイルのみ（gh API 呼び出しをスキップ）
+/path/to/commons/init-templates.sh --name <name> --skip-gh-edit /path/to/repo
+
+# 変更内容をプレビュー
+/path/to/commons/init-templates.sh --name <name> --dry-run /path/to/repo
+```
+
+`--name` は必須。target に既存の `AGENTS.md` / `CLAUDE.md` がある場合は diff を表示してアボートする（`--force` で上書き）。`gh api` 用のリポは target の `origin` remote から自動検出するが、`--repo owner/repo` で明示指定も可能。
 
 ### 自動同期（定期 PR）
 
