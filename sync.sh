@@ -16,6 +16,7 @@ DIST_DIR="${SCRIPT_DIR}/dist"
 YES=false
 DRY_RUN=false
 CHECK=false
+QUIET=false
 while [[ "${1:-}" == -* ]]; do
   case "$1" in
   -y | --yes)
@@ -28,6 +29,10 @@ while [[ "${1:-}" == -* ]]; do
     ;;
   --check)
     CHECK=true
+    shift
+    ;;
+  --quiet)
+    QUIET=true
     shift
     ;;
   *)
@@ -44,6 +49,7 @@ if [[ $# -lt 1 ]]; then
   echo "    -y, --yes   Sync without confirmation" >&2
   echo "    --dry-run   Show what would be synced without copying" >&2
   echo "    --check     Exit 1 if non-pinned files are out of sync (for CI)" >&2
+  echo "    --quiet     Suppress next-step hints (CI use)" >&2
   exit 1
 fi
 
@@ -53,6 +59,21 @@ if [[ ! -d "${TARGET_DIR}/.git" ]]; then
   echo "Error: ${TARGET_DIR} is not a git repository" >&2
   exit 1
 fi
+
+# Print bootstrap-oriented next-step hints. Suppressed by --quiet so the
+# scheduled sync-commons workflow doesn't clutter CI logs on every run.
+print_next_steps() {
+  ${QUIET} && return 0
+  echo ""
+  echo "Next steps:"
+  echo "  1. Bootstrap templates (if a fresh repo):"
+  echo "       ${SCRIPT_DIR}/init-templates.sh --name <name> ${TARGET_DIR}"
+  echo "  2. (Optional) Opt in to @ozzylabs/skills:"
+  echo "       Edit .commons/sync.yaml — set skills_commit and skills_adapters"
+  echo "       Run:  ${SCRIPT_DIR}/sync-skills.sh -y <skills-repo>/dist ${TARGET_DIR}"
+  echo "  3. Add project-specific files (package.json, src/, etc.)"
+  echo "  4. Open a PR (chore/bootstrap → main)"
+}
 
 # --- Metadata helpers ---
 #
@@ -407,6 +428,7 @@ if [[ "${YES}" == true ]]; then
   echo "  write: ${METADATA_REL}"
   echo ""
   echo "Sync complete."
+  print_next_steps
   exit 0
 fi
 
@@ -499,3 +521,4 @@ fi
 
 echo ""
 echo "Sync complete."
+print_next_steps

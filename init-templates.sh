@@ -41,6 +41,7 @@ REPO=""
 SKIP_GH_EDIT=false
 FORCE=false
 DRY_RUN=false
+QUIET=false
 
 while [[ "${1:-}" == --* ]]; do
   case "$1" in
@@ -72,6 +73,10 @@ while [[ "${1:-}" == --* ]]; do
     DRY_RUN=true
     shift
     ;;
+  --quiet)
+    QUIET=true
+    shift
+    ;;
   *)
     echo "Unknown option: $1" >&2
     exit 1
@@ -91,6 +96,7 @@ usage() {
   echo "    --skip-gh-edit          Skip gh metadata update" >&2
   echo "    --force                 Overwrite existing files without prompting" >&2
   echo "    --dry-run               Show what would happen without changing anything" >&2
+  echo "    --quiet                 Suppress next-step hints (CI use)" >&2
 }
 
 if [[ $# -lt 1 ]]; then
@@ -274,3 +280,11 @@ fi
 
 echo ""
 echo "Templates init complete."
+
+if ! ${QUIET}; then
+  echo ""
+  echo "Next steps:"
+  echo "  1. Edit AGENTS.md / CLAUDE.md to fill in tech stack and project specifics"
+  echo "  2. Add project-specific files (package.json, src/, etc.)"
+  echo "  3. Commit and open a PR (chore/bootstrap → main)"
+fi

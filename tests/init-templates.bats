@@ -183,6 +183,21 @@ teardown() {
   run ! grep -q "GitHub metadata" <<<"$output"
 }
 
+@test "prints next-step hints by default" {
+  run "${SCRIPT}" --name foo --skip-gh-edit "${TARGET_DIR}"
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"Templates init complete."* ]]
+  [[ "$output" == *"Next steps:"* ]]
+  [[ "$output" == *"chore/bootstrap"* ]]
+}
+
+@test "--quiet suppresses next-step hints" {
+  run "${SCRIPT}" --name foo --skip-gh-edit --quiet "${TARGET_DIR}"
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"Templates init complete."* ]]
+  run ! grep -q "Next steps:" <<<"$output"
+}
+
 @test "templates with substitution are valid markdown (no broken placeholders)" {
   "${SCRIPT}" \
     --name "my-project" \
