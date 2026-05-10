@@ -41,6 +41,53 @@ init-templates.sh    -> templates のプレースホルダ置換とリポメタ�
 
 共有スキル（`.agents/skills/`、`.claude/skills/`）は本リポからの配布対象外。SSOT は [`ozzy-labs/skills`](https://github.com/ozzy-labs/skills) に置き、各 consumer リポは `@ozzylabs/skills` の Renovate preset 経由で取り込む（[ADR-0016](https://github.com/ozzy-labs/handbook/blob/main/adr/0016-create-skills-repo.md)）。
 
+## Quick start: 新規リポのブートストラップ
+
+新規 ozzy-labs リポを最初から立ち上げる際のエンドツーエンドの手順。各スクリプトは完了時に "Next steps" ヒントを出力するため、本セクションは主に**順序**を示すもの。各コマンドの詳細フラグは下の各セクションを参照。
+
+1. **GitHub リポを作成してローカルに clone する。**
+
+   ```bash
+   gh repo create ozzy-labs/<name> --public --description "..."
+   gh repo clone ozzy-labs/<name>
+   cd <name>
+   ```
+
+2. **ozzy-labs 共通の GitHub 設定を適用する** — マージルール（squash のみ）、ブランチ保護、セキュリティ、Conventional Commits ラベル。
+
+   ```bash
+   /path/to/commons/setup-repo.sh ozzy-labs/<name>
+   ```
+
+3. **共通設定を同期する** — lefthook / mise / editorconfig / workflows などを配布し、`.commons/sync.yaml` を seed（`skills_commit:` / `skills_adapters:` の opt-in 用空キーも含む）。
+
+   ```bash
+   /path/to/commons/sync.sh -y .
+   ```
+
+4. **テンプレートをブートストラップする** — `AGENTS.md` / `CLAUDE.md` をコピーし、`{{project_name}}` / `{{description}}` プレースホルダを置換、加えて GitHub API でリポ description / topics を一括反映。
+
+   ```bash
+   /path/to/commons/init-templates.sh \
+     --name <name> \
+     --description "..." \
+     --topics ai,cli,multi-agent,... \
+     .
+   ```
+
+5. **（任意）`@ozzylabs/skills` に opt-in する** — `.commons/sync.yaml` の `skills_commit:` `skills_adapters:` を埋める。SHA 取得方法は seed されているコメント内に記載済み。続いて `sync-skills.sh` をローカルにクローンした `ozzy-labs/skills` に対して実行する。
+
+6. **プロジェクト固有ファイルを追加** — `package.json`, `tsconfig.json`, `src/` 等。`AGENTS.md` / `CLAUDE.md` の tech stack やプロジェクト概要も埋める。
+
+7. **ブートストラップ PR を作成する。** ステップ 2 で設置した ruleset により `main` への直接 push はブロックされている:
+
+   ```bash
+   git checkout -b chore/bootstrap
+   git add . && git commit -m "chore: bootstrap repo"
+   git push -u origin chore/bootstrap
+   gh pr create --fill && gh pr merge --squash --delete-branch
+   ```
+
 ## 使い方
 
 ```bash
