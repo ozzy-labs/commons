@@ -124,7 +124,7 @@ Consumer の sync workflow が `skills_commit:` の SHA で `ozzy-labs/skills` �
 /path/to/commons/sync-skills.sh --check /path/to/skills/dist /path/to/target-repo
 ```
 
-Snippet 対象（`AGENTS.md` / `.github/copilot-instructions.md`）は対象ファイルにマーカーブロックが既に存在している必要がある。`<!-- begin: @ozzylabs/skills -->` と `<!-- end: @ozzylabs/skills -->` の間だけが置換され、その他のセクションは保持される。メタデータファイルの `pinned:` リストにパスを追加する（ディレクトリ全体は末尾に `/` を付ける）と、全 adapter で当該パスをスキップする。`.claude/skills/` や `.agents/skills/` 配下に consumer 固有のスキルディレクトリを置いても削除されない。
+Snippet 対象（`AGENTS.md` / `.github/copilot-instructions.md`）は対象ファイルにマーカーブロックが既に存在している必要がある。`<!-- begin: @ozzylabs/skills -->` と `<!-- end: @ozzylabs/skills -->` の間だけが置換され、その他のセクションは保持される。`templates/AGENTS.md` には marker block が事前に組み込まれており、template から scaffold した新規リポは codex-cli / gemini-cli adapter の opt-in 時に手作業の編集なしで対応できる。既存リポについては `commons check` が AGENTS.md の marker 不在を warning で報告するため、opt-in 前に retrofit できる。メタデータファイルの `pinned:` リストにパスを追加する（ディレクトリ全体は末尾に `/` を付ける）と、全 adapter で当該パスをスキップする。`.claude/skills/` や `.agents/skills/` 配下に consumer 固有のスキルディレクトリを置いても削除されない。
 
 ### リポジトリ初期設定
 

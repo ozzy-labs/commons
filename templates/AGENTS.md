@@ -44,6 +44,12 @@ pnpm run build             # プロダクションビルド
 
 言語・コミット・ブランチ・PR のルールは README.md を参照すること。
 
+## Available Skills
+
+<!-- begin: @ozzylabs/skills -->
+<!-- このブロックは sync-skills.sh が opt-in 後に自動管理する。opt-in していない場合は空のままで問題ない。 -->
+<!-- end: @ozzylabs/skills -->
+
 ## Adapter Files
 
 | Agent          | Configuration                         |
