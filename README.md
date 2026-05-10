@@ -41,6 +41,53 @@ init-templates.sh    -> Bootstrap templates with placeholder substitution + repo
 
 Shared skills (`.agents/skills/`, `.claude/skills/`) are no longer distributed from this repo. They live in [`ozzy-labs/skills`](https://github.com/ozzy-labs/skills) and are pulled into consumer repos via the `@ozzylabs/skills` Renovate preset (see [ADR-0016](https://github.com/ozzy-labs/handbook/blob/main/adr/0016-create-skills-repo.md)).
 
+## Quick start: bootstrap a new repo
+
+End-to-end flow for a brand-new ozzy-labs repo. Each script ends with its own "Next steps" hint, so this list is mainly about the order. Detailed flags for each command live in the sections below.
+
+1. **Create the GitHub repo and clone it locally.**
+
+   ```bash
+   gh repo create ozzy-labs/<name> --public --description "..."
+   gh repo clone ozzy-labs/<name>
+   cd <name>
+   ```
+
+2. **Apply ozzy-labs GitHub settings** — merge rules (squash only), branch protection, security, Conventional Commits labels.
+
+   ```bash
+   /path/to/commons/setup-repo.sh ozzy-labs/<name>
+   ```
+
+3. **Sync shared config** — distributes lefthook, mise, editorconfig, workflows, etc., and seeds `.commons/sync.yaml` (including the `skills_commit:` / `skills_adapters:` opt-in stubs).
+
+   ```bash
+   /path/to/commons/sync.sh -y .
+   ```
+
+4. **Bootstrap templates** — copies `AGENTS.md` / `CLAUDE.md`, substitutes `{{project_name}}` / `{{description}}` placeholders, and applies the repo description + topics via the GitHub API in one shot.
+
+   ```bash
+   /path/to/commons/init-templates.sh \
+     --name <name> \
+     --description "..." \
+     --topics ai,cli,multi-agent,... \
+     .
+   ```
+
+5. **(Optional) Opt in to `@ozzylabs/skills`** — edit `.commons/sync.yaml`'s `skills_commit:` and `skills_adapters:`. The seeded comment in the file names the exact `gh` command for fetching the SHA. Then run `sync-skills.sh` against a local clone of `ozzy-labs/skills`.
+
+6. **Add project-specific files** (`package.json`, `tsconfig.json`, `src/`, etc.) and edit `AGENTS.md` / `CLAUDE.md` to fill in tech stack and project specifics.
+
+7. **Open the bootstrap PR.** Direct push to `main` is blocked by the ruleset installed in step 2:
+
+   ```bash
+   git checkout -b chore/bootstrap
+   git add . && git commit -m "chore: bootstrap repo"
+   git push -u origin chore/bootstrap
+   gh pr create --fill && gh pr merge --squash --delete-branch
+   ```
+
 ## Usage
 
 ```bash
