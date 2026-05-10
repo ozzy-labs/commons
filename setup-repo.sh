@@ -9,10 +9,15 @@ set -euo pipefail
 
 # Parse arguments
 DRY_RUN=false
+QUIET=false
 while [[ "${1:-}" == --* ]]; do
   case "$1" in
   --dry-run)
     DRY_RUN=true
+    shift
+    ;;
+  --quiet)
+    QUIET=true
     shift
     ;;
   *)
@@ -27,6 +32,7 @@ if [[ $# -lt 1 ]]; then
   echo "  $0 [options] <owner/repo>" >&2
   echo "  Options:" >&2
   echo "    --dry-run   Show what would be configured without making changes" >&2
+  echo "    --quiet     Suppress next-step hints (CI use)" >&2
   exit 1
 fi
 
@@ -248,3 +254,13 @@ echo "  ✓ Conventional Commits labels: created"
 
 echo ""
 echo "Setup complete."
+
+if ! ${QUIET}; then
+  echo ""
+  echo "Next steps:"
+  echo "  1. Sync shared config:    <commons>/sync.sh /path/to/repo"
+  echo "  2. Bootstrap templates:   <commons>/init-templates.sh --name <name> /path/to/repo"
+  echo "  3. Add project-specific files and open a PR (chore/bootstrap → main)"
+  echo ""
+  echo "Direct push to main is now blocked by ruleset; subsequent changes go via PR."
+fi

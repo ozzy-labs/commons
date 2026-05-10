@@ -1,5 +1,7 @@
 #!/usr/bin/env bats
 
+bats_require_minimum_version 1.5.0
+
 setup() {
   TEST_DIR="$(mktemp -d)"
 
@@ -523,4 +525,28 @@ EOF
   meta="$(cat "${TARGET_DIR}/.commons/sync.yaml")"
   [[ "$meta" == *"# Skills sync (opt-in)"* ]]
   [[ "$meta" == *"gh api repos/ozzy-labs/skills/commits/main --jq .sha"* ]]
+}
+
+@test "prints next-step hints after Sync complete in -y mode" {
+  run "${SRC_DIR}/sync.sh" -y "${TARGET_DIR}"
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"Sync complete."* ]]
+  [[ "$output" == *"Next steps:"* ]]
+  [[ "$output" == *"init-templates.sh"* ]]
+  [[ "$output" == *"sync-skills.sh"* ]]
+}
+
+@test "--quiet suppresses next-step hints" {
+  run "${SRC_DIR}/sync.sh" -y --quiet "${TARGET_DIR}"
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"Sync complete."* ]]
+  run ! grep -q "Next steps:" <<<"$output"
+}
+
+@test "--check does not print next-step hints" {
+  # First sync to bring target up to date
+  "${SRC_DIR}/sync.sh" -y "${TARGET_DIR}"
+  run "${SRC_DIR}/sync.sh" --check "${TARGET_DIR}"
+  [ "$status" -eq 0 ]
+  run ! grep -q "Next steps:" <<<"$output"
 }

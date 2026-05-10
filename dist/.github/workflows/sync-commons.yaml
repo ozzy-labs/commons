@@ -47,7 +47,7 @@ jobs:
             echo "No changes to sync."
             exit 0
           fi
-          bash .sync-commons/sync.sh --yes "$GITHUB_WORKSPACE"
+          bash .sync-commons/sync.sh --yes --quiet "$GITHUB_WORKSPACE"
           echo "changed=true" >> "$GITHUB_OUTPUT"
 
       - name: Remove temporary clone

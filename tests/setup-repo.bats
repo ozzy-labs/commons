@@ -1,5 +1,7 @@
 #!/usr/bin/env bats
 
+bats_require_minimum_version 1.5.0
+
 setup() {
   SCRIPT="${BATS_TEST_DIRNAME}/../setup-repo.sh"
 }
@@ -100,4 +102,26 @@ setup() {
   run "${SCRIPT}"
   [ "$status" -eq 1 ]
   [[ "$output" == *"--dry-run"* ]]
+}
+
+@test "usage message includes --quiet option" {
+  run "${SCRIPT}"
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"--quiet"* ]]
+}
+
+@test "--dry-run prints next-step hints by default" {
+  run "${SCRIPT}" --dry-run ozzy-labs/commons
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"Setup complete."* ]]
+  [[ "$output" == *"Next steps:"* ]]
+  [[ "$output" == *"sync.sh"* ]]
+  [[ "$output" == *"init-templates.sh"* ]]
+}
+
+@test "--quiet suppresses next-step hints" {
+  run "${SCRIPT}" --dry-run --quiet ozzy-labs/commons
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"Setup complete."* ]]
+  run ! grep -q "Next steps:" <<<"$output"
 }
