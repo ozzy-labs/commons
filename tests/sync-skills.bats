@@ -124,6 +124,15 @@ write_metadata() {
   [[ "$output" == *"Nothing to sync."* ]]
 }
 
+@test "empty skills_adapters prints opt-in guidance" {
+  write_metadata "commit: abc1234"
+  run "${SCRIPT}" -y "${SKILLS_DIST}" "${TARGET_DIR}"
+  [ "$status" -eq 0 ]
+  [[ "$output" == *"skills_adapters is empty"* ]]
+  [[ "$output" == *"claude-code, codex-cli, gemini-cli, copilot"* ]]
+  [[ "$output" == *"gh api repos/ozzy-labs/skills/commits/main --jq .sha"* ]]
+}
+
 @test "exits 1 on unknown adapter" {
   write_metadata "skills_adapters:
   - nonexistent-adapter"

@@ -174,8 +174,15 @@ while IFS= read -r a; do
   ADAPTERS+=("${a}")
 done < <(read_adapters)
 
+# Empty adapters list is non-fatal: print actionable guidance and exit 0 so
+# manual runs and CI workflows alike can opt-in by editing .commons/sync.yaml.
+# Auto-fetching the SHA would mask config drift — guidance only.
 if [[ ${#ADAPTERS[@]} -eq 0 ]]; then
-  echo "No skills_adapters configured in ${METADATA_FILE}."
+  echo "skills_adapters is empty in ${METADATA_FILE}."
+  echo "  To opt in, list adapter ids (e.g. claude-code, codex-cli, gemini-cli, copilot)"
+  echo "  in skills_adapters, and the skills repo's main HEAD SHA in skills_commit."
+  echo "  Fetch the SHA via:"
+  echo "    gh api repos/ozzy-labs/skills/commits/main --jq .sha"
   echo "Nothing to sync."
   exit 0
 fi

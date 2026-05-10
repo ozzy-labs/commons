@@ -97,7 +97,17 @@ commons check /path/to/target-repo
 
 ### Skills 同期（consumer ごとに opt-in）
 
-共有スキルは [`ozzy-labs/skills`](https://github.com/ozzy-labs/skills) に置かれ、エージェント別 adapter 出力として `dist/{adapter-id}/` 配下に生成される。consumer は `.commons/sync.yaml` に adapter id を列挙して opt-in する:
+共有スキルは [`ozzy-labs/skills`](https://github.com/ozzy-labs/skills) に置かれ、エージェント別 adapter 出力として `dist/{adapter-id}/` 配下に生成される。`commons sync` 初回実行時に `.commons/sync.yaml` に `skills_commit:` / `skills_adapters:` の空値キーと SHA 取得コマンドのコメントが seed されるため、consumer は当該キーを書き換えるだけで opt-in できる。seed される初期形:
+
+```yaml
+# Skills sync (opt-in). Add adapter ids to skills_adapters and a SHA
+# to skills_commit. The skills repo's main HEAD SHA can be obtained via:
+#   gh api repos/ozzy-labs/skills/commits/main --jq .sha
+skills_commit: ""
+skills_adapters: []
+```
+
+埋めた後の metadata:
 
 ```yaml
 # Renovate が @ozzylabs/skills preset 経由で更新
@@ -110,6 +120,8 @@ skills_adapters:
   - gemini-cli # → .gemini/settings.json + AGENTS.md snippet
   - copilot # → .github/copilot-instructions.md snippet
 ```
+
+`skills_adapters` が空のまま `sync-skills.sh` を実行しても fatal にはならず、opt-in 手順（SHA 取得コマンドを含む）を案内して exit 0 で終了する。consumer の sync workflow は opt-out 状態のまま成功し続ける。
 
 Consumer の sync workflow が `skills_commit:` の SHA で `ozzy-labs/skills` をクローンし、`sync-skills.sh` で opt-in した adapter 出力を反映する:
 
