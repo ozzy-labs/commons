@@ -4,3 +4,11 @@
 
 node_modules/
 pnpm-lock.yaml
+
+# Synced skill files (SSOT lives in ozzy-labs/skills/src/skills/). The skills
+# repo formats these via biome, which produces different line-wrapping than
+# commons' prettier config (e.g. compact pipes vs aligned pipes in markdown
+# tables). Ignoring them here keeps the SSOT format intact and avoids
+# repeated drift after each `/sync-consumers --source=skills` push.
+.agents/skills/
+.claude/skills/
