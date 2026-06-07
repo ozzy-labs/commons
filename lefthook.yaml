@@ -1,14 +1,2 @@
 extends:
   - lefthook-base.yaml
-
-pre-commit:
-  parallel: true
-  commands:
-    sync-targets-schema-validate:
-      # sync-targets.yaml / schemas/sync-targets.schema.json が staged のとき
-      # のみ走る。commons には現状 sync-targets.yaml は不在
-      # (ozzy-labs/skills epic #80 で導入予定)、その間は本 hook は no-op。
-      # 将来追加された際に即発火する形で skills 側 (ozzy-labs/skills#82) と
-      # 同形に揃えておく。
-      glob: "{sync-targets.yaml,schemas/sync-targets.schema.json}"
-      run: pnpm exec ajv validate -s schemas/sync-targets.schema.json -d sync-targets.yaml --strict=true --spec=draft2020
