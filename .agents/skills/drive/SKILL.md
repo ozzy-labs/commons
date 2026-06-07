@@ -71,11 +71,11 @@ ship スキルのワークフロー（lint → commit → PR 作成）を実行�
 
 review skill の観点別 `exit_criteria.drive_loop` を集約して終了判定する。loop 上限は `--review` モードで切替える:
 
-| `--review` | quick の最大回数 | deep の最大回数 | 備考 |
-| --- | --- | --- | --- |
-| `quick`（既定） | 3 | 0 | 全 review pass で quick |
-| `final-deep` | 2 | 1（最終 pass のみ） | quick で loop し、最終 pass のみ deep |
-| `deep` | 0 | 1 | 全 pass で deep。コスト爆発防止のため最大 1 回 |
+| `--review`      | quick の最大回数 | deep の最大回数     | 備考                                           |
+| --------------- | ---------------- | ------------------- | ---------------------------------------------- |
+| `quick`（既定） | 3                | 0                   | 全 review pass で quick                        |
+| `final-deep`    | 2                | 1（最終 pass のみ） | quick で loop し、最終 pass のみ deep          |
+| `deep`          | 0                | 1                   | 全 pass で deep。コスト爆発防止のため最大 1 回 |
 
 各 pass の手順:
 
@@ -231,12 +231,12 @@ wave を順に実行する。
 
 #### 失敗・merge-ready task の処理
 
-| 上流の状態 | downstream の扱い |
-|---|---|
-| merged（`--merge` 指定 + auto-merge 成功） | 進める（`git pull origin main` 後に main ベース） |
+| 上流の状態                                                         | downstream の扱い                                    |
+| ------------------------------------------------------------------ | ---------------------------------------------------- |
+| merged（`--merge` 指定 + auto-merge 成功）                         | 進める（`git pull origin main` 後に main ベース）    |
 | auto-merge enabled（`--merge` + polling タイムアウト等で未マージ） | 進める（前段 PR の headRefName ベースで stacked PR） |
-| merge-ready（`--merge` 未指定 / `--merge` 指定 + 残存指摘） | 進める（前段 PR の headRefName ベースで stacked PR） |
-| failed | `skipped (upstream failed: #N)` として除外 |
+| merge-ready（`--merge` 未指定 / `--merge` 指定 + 残存指摘）        | 進める（前段 PR の headRefName ベースで stacked PR） |
+| failed                                                             | `skipped (upstream failed: #N)` として除外           |
 
 - 失敗した target は記録する
 - 独立した（依存関係のない）他 task には影響させない
@@ -477,12 +477,12 @@ drive 完了 (3/5 merged, 1 merge-ready, 1 skipped):
 
 ## 失敗 semantics
 
-| 状況 | 扱い | downstream への影響 |
-|---|---|---|
-| review loop 上限後も観点別 exit_criteria 未達 | partial success（merge-ready） | 影響なし |
-| auto-merge セット失敗（branch protection 等） | failed | skipped |
-| implement / ship 中断（テスト失敗等） | failed | skipped |
-| 独立 task の失敗 | 他並列 task に影響させない | - |
+| 状況                                          | 扱い                           | downstream への影響 |
+| --------------------------------------------- | ------------------------------ | ------------------- |
+| review loop 上限後も観点別 exit_criteria 未達 | partial success（merge-ready） | 影響なし            |
+| auto-merge セット失敗（branch protection 等） | failed                         | skipped             |
+| implement / ship 中断（テスト失敗等）         | failed                         | skipped             |
+| 独立 task の失敗                              | 他並列 task に影響させない     | -                   |
 
 ## 注意事項
 

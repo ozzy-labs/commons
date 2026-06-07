@@ -9,32 +9,32 @@ review skill / `code-reviewer` agent が参照する観点定義の SSOT（[ADR-
 
 ## 採用観点（11 軸）
 
-| category | axis | 既定 |
-| --- | --- | --- |
-| required | [correctness](./correctness.md) | 常に適用 |
-| required | [security](./security.md) | 常に適用 |
-| required | [conventions](./conventions.md) | 常に適用 |
-| design | [architecture](./architecture.md) | applies_when マッチ時 |
-| design | [compatibility](./compatibility.md) | applies_when マッチ時 |
-| design | [maintainability](./maintainability.md) | applies_when マッチ時 |
-| quality | [testing](./testing.md) | applies_when マッチ時 |
-| quality | [performance](./performance.md) | applies_when マッチ時 |
-| quality | [observability](./observability.md) | applies_when マッチ時 |
-| ux | [usability](./usability.md) | applies_when マッチ時、consumer が opt-out 可 |
-| ux | [documentation](./documentation.md) | 常に適用 |
+| category | axis                                    | 既定                                          |
+| -------- | --------------------------------------- | --------------------------------------------- |
+| required | [correctness](./correctness.md)         | 常に適用                                      |
+| required | [security](./security.md)               | 常に適用                                      |
+| required | [conventions](./conventions.md)         | 常に適用                                      |
+| design   | [architecture](./architecture.md)       | applies_when マッチ時                         |
+| design   | [compatibility](./compatibility.md)     | applies_when マッチ時                         |
+| design   | [maintainability](./maintainability.md) | applies_when マッチ時                         |
+| quality  | [testing](./testing.md)                 | applies_when マッチ時                         |
+| quality  | [performance](./performance.md)         | applies_when マッチ時                         |
+| quality  | [observability](./observability.md)     | applies_when マッチ時                         |
+| ux       | [usability](./usability.md)             | applies_when マッチ時、consumer が opt-out 可 |
+| ux       | [documentation](./documentation.md)     | 常に適用                                      |
 
 ## frontmatter スキーマ
 
 ```yaml
 ---
-name: <axis>                                                    # ファイル名と一致させる
+name: <axis> # ファイル名と一致させる
 category: required | design | quality | ux
 description: <一行で観点の主旨>
-applies_when: ["<glob>", ...]                                   # diff にこの glob にマッチするファイルが含まれれば適用
-skip_when: { diff_only_in: ["<glob>", ...] }                    # 全変更ファイルがこの glob 部分集合なら不適用
-default_enabled: true | false                                   # false の場合は --axes 明示時のみ適用
+applies_when: ["<glob>", ...] # diff にこの glob にマッチするファイルが含まれれば適用
+skip_when: { diff_only_in: ["<glob>", ...] } # 全変更ファイルがこの glob 部分集合なら不適用
+default_enabled: true | false # false の場合は --axes 明示時のみ適用
 severity_rules: { critical: "<...>", warning: "<...>", info: "<...>" }
-exit_criteria: { drive_loop: { critical: <N>, warning: <N> } }  # warning キーは省略可（許容を意味する）
+exit_criteria: { drive_loop: { critical: <N>, warning: <N> } } # warning キーは省略可（許容を意味する）
 ---
 ```
 
