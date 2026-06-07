@@ -26,12 +26,12 @@ description: コード変更や PR を 11 観点（perspectives）でレビュ�
 
 観点定義は `perspectives/<axis>.md` を SSOT とする。frontmatter で `category` / `applies_when` / `skip_when` / `default_enabled` / 検査項目 / severity ガイド / `exit_criteria.drive_loop` を宣言する。
 
-| category | axis | 既定 |
-| --- | --- | --- |
-| required | correctness, security, conventions | 常に適用 |
-| design | architecture, compatibility, maintainability | applies_when マッチ時 |
-| quality | testing, performance, observability | applies_when マッチ時 |
-| ux | usability, documentation | applies_when マッチ時 |
+| category | axis                                         | 既定                  |
+| -------- | -------------------------------------------- | --------------------- |
+| required | correctness, security, conventions           | 常に適用              |
+| design   | architecture, compatibility, maintainability | applies_when マッチ時 |
+| quality  | testing, performance, observability          | applies_when マッチ時 |
+| ux       | usability, documentation                     | applies_when マッチ時 |
 
 ### 観点選別ロジック
 
