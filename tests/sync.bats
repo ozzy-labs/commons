@@ -550,3 +550,144 @@ EOF
   [ "$status" -eq 0 ]
   run ! grep -q "Next steps:" <<<"$output"
 }
+
+# --- Issue #136: preserve user-added comments in .commons/sync.yaml ---
+
+@test "write_metadata preserves user-added header block above pinned:" {
+  "${SRC_DIR}/sync.sh" -y "${TARGET_DIR}"
+
+  # User adds an explanatory header block above pinned and a path
+  local meta_file="${TARGET_DIR}/.commons/sync.yaml"
+  cat >"${meta_file}" <<'EOF'
+# Updated by /sync-consumers (push mode).
+commit: abc1234
+synced_at: 2026-04-05T00:00:00Z
+
+skills_commit: ""
+skills_adapters: []
+
+# Files excluded from commons sync. Preserves local overrides that diverge
+# from the commons baseline (PR-specific decisions, incident remediations,
+# version migrations).
+pinned:
+  - CLAUDE.md
+EOF
+
+  # Trigger a metadata rewrite via a non-pinned file change
+  echo "updated skill" >"${SRC_DIR}/dist/.claude/skills/commit/SKILL.md"
+  "${SRC_DIR}/sync.sh" -y "${TARGET_DIR}"
+
+  local meta
+  meta="$(cat "${meta_file}")"
+  [[ "$meta" == *"# Files excluded from commons sync."* ]]
+  [[ "$meta" == *"# from the commons baseline (PR-specific decisions, incident remediations,"* ]]
+  [[ "$meta" == *"# version migrations)."* ]]
+}
+
+@test "write_metadata preserves per-entry comments above pinned paths" {
+  "${SRC_DIR}/sync.sh" -y "${TARGET_DIR}"
+
+  local meta_file="${TARGET_DIR}/.commons/sync.yaml"
+  cat >"${meta_file}" <<'EOF'
+commit: abc1234
+synced_at: 2026-04-05T00:00:00Z
+
+skills_commit: ""
+skills_adapters: []
+
+pinned:
+  # PR #91: keep IDE/coverage/worktree/temp ignores; commons drops them
+  - CLAUDE.md
+  # PR #128: biome schema migrated; commons still on older version
+  - .editorconfig
+EOF
+
+  echo "updated skill" >"${SRC_DIR}/dist/.claude/skills/commit/SKILL.md"
+  "${SRC_DIR}/sync.sh" -y "${TARGET_DIR}"
+
+  local meta
+  meta="$(cat "${meta_file}")"
+  [[ "$meta" == *"# PR #91: keep IDE/coverage/worktree/temp ignores"* ]]
+  [[ "$meta" == *"# PR #128: biome schema migrated"* ]]
+  # Per-entry comment must immediately precede its path
+  grep -A1 "# PR #91:" "${meta_file}" | grep -q "  - CLAUDE.md"
+  grep -A1 "# PR #128:" "${meta_file}" | grep -q "  - .editorconfig"
+}
+
+@test "write_metadata drops comments for entries removed from pinned" {
+  "${SRC_DIR}/sync.sh" -y "${TARGET_DIR}"
+
+  local meta_file="${TARGET_DIR}/.commons/sync.yaml"
+  # User had two pinned entries with comments, then un-pinned .editorconfig
+  cat >"${meta_file}" <<'EOF'
+commit: abc1234
+synced_at: 2026-04-05T00:00:00Z
+
+skills_commit: ""
+skills_adapters: []
+
+pinned:
+  # PR #91: keep this for IDE override
+  - CLAUDE.md
+EOF
+
+  echo "updated skill" >"${SRC_DIR}/dist/.claude/skills/commit/SKILL.md"
+  "${SRC_DIR}/sync.sh" -y "${TARGET_DIR}"
+
+  local meta
+  meta="$(cat "${meta_file}")"
+  # Kept entry's comment is preserved
+  [[ "$meta" == *"# PR #91: keep this for IDE override"* ]]
+  # Dropped entry's comment must NOT reappear (no leftover from earlier state)
+  ! [[ "$meta" == *"# PR #999"* ]]
+  ! grep -q ".editorconfig" "${meta_file}"
+}
+
+@test "write_metadata uses default template on fresh init (no regression)" {
+  # No existing sync.yaml — init from scratch
+  run "${SRC_DIR}/sync.sh" -y "${TARGET_DIR}"
+  [ "$status" -eq 0 ]
+
+  local meta_file="${TARGET_DIR}/.commons/sync.yaml"
+  [ -f "${meta_file}" ]
+
+  local meta
+  meta="$(cat "${meta_file}")"
+  # Default heredoc keys are emitted
+  [[ "$meta" == *"# Updated by /sync-consumers (push mode)"* ]]
+  [[ "$meta" == *"skills_commit: \"\""* ]]
+  [[ "$meta" == *"skills_adapters: []"* ]]
+  # No leftover user-added header (none existed)
+  ! [[ "$meta" == *"# Files excluded from commons sync"* ]]
+}
+
+@test "write_metadata preserves both header and per-entry comments together" {
+  "${SRC_DIR}/sync.sh" -y "${TARGET_DIR}"
+
+  local meta_file="${TARGET_DIR}/.commons/sync.yaml"
+  cat >"${meta_file}" <<'EOF'
+commit: abc1234
+synced_at: 2026-04-05T00:00:00Z
+
+skills_commit: ""
+skills_adapters: []
+
+# Files excluded from commons sync.
+# See ADR-0001 for rationale.
+pinned:
+  # PR #91: keep IDE/coverage/worktree/temp ignores
+  - CLAUDE.md
+  - .editorconfig
+EOF
+
+  echo "updated skill" >"${SRC_DIR}/dist/.claude/skills/commit/SKILL.md"
+  "${SRC_DIR}/sync.sh" -y "${TARGET_DIR}"
+
+  local meta
+  meta="$(cat "${meta_file}")"
+  [[ "$meta" == *"# Files excluded from commons sync."* ]]
+  [[ "$meta" == *"# See ADR-0001 for rationale."* ]]
+  [[ "$meta" == *"# PR #91: keep IDE/coverage/worktree/temp ignores"* ]]
+  # The header block must be immediately above `pinned:`
+  grep -B2 "^pinned:" "${meta_file}" | grep -q "# Files excluded from commons sync."
+}
