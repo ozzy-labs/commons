@@ -2,7 +2,9 @@
 
 ## Status
 
-Accepted (2026-04-25)
+**Superseded** (2026-06-07) by push-mode `/sync-consumers` skill ([ozzy-labs/skills#80](https://github.com/ozzy-labs/skills/issues/80)). The `commons-sync.json` preset was removed in Step 4 of that epic. Consumer-side `extends` cleanup is scheduled for Step 3 of the same transition. Historical context below preserved for reference.
+
+Originally accepted: 2026-04-25.
 
 Relates to: [handbook ADR-0002](https://github.com/ozzy-labs/handbook/blob/main/adr/0002-skills-distribution-via-renovate.md) (skills distribution via Renovate)
 
