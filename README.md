@@ -32,7 +32,6 @@ templates/           -> Scaffold-only files (copied manually for new repos, neve
   AGENTS.md          -> Shared AI agent instructions template
   CLAUDE.md          -> Claude Code specific config
 sync.sh              -> Sync script
-sync-skills.sh       -> @ozzylabs/skills adapter sync script (opt-in per consumer)
 setup-repo.sh        -> GitHub repository setup script
 init-templates.sh    -> Bootstrap templates with placeholder substitution + repo metadata
 ```
@@ -75,7 +74,7 @@ End-to-end flow for a brand-new ozzy-labs repo. Each script ends with its own "N
      .
    ```
 
-5. **(Optional) Opt in to `@ozzylabs/skills`** — edit `.commons/sync.yaml`'s `skills_commit:` and `skills_adapters:`. The seeded comment in the file names the exact `gh` command for fetching the SHA. Then run `sync-skills.sh` against a local clone of `ozzy-labs/skills`.
+5. **(Optional) Install `@ozzylabs/skills` for local use** — run `npx @ozzylabs/skills install` once on your machine. This places the generic skill bundle under `~/.claude/skills/` (user skills only — no per-repo mirrors). See [ozzy-labs/skills](https://github.com/ozzy-labs/skills) for details. The CI integration uses `ozzy-labs/skills@v1` GitHub Action.
 
 6. **Add project-specific files** (`package.json`, `tsconfig.json`, `src/`, etc.) and edit `AGENTS.md` / `CLAUDE.md` to fill in tech stack and project specifics.
 
@@ -140,52 +139,28 @@ When a file is intentionally customized in a target repo, it can be **pinned** t
 
 ### Metadata path
 
-Sync metadata lives in the consumer repo at `.commons/sync.yaml`. `sync.sh` reads and writes this single canonical path, and the `/sync-consumers` skill bumps the `commit:` field whenever new commits are pushed to consumers.
+Sync metadata lives in the consumer repo at `.commons/sync.yaml`. `sync.sh` reads and writes this single canonical path.
 
 The earlier `.dev-config/sync.yaml` path was supported as a temporary fallback during the migration documented in [ADR-0014](https://github.com/ozzy-labs/handbook/blob/main/adr/0014-rename-dev-config-to-commons.md). All consumers have now completed the rename and the fallback has been removed.
 
-### Skills sync (opt-in per consumer)
+### Skills distribution (user skills only)
 
-Shared skills live in [`ozzy-labs/skills`](https://github.com/ozzy-labs/skills) and are produced as per-agent adapter outputs under `dist/{adapter-id}/`. The first run of `commons sync` seeds `.commons/sync.yaml` with empty `skills_commit:` and `skills_adapters:` keys plus a comment naming the exact `gh` command for fetching the SHA — opt-in is then a matter of editing those keys in place. The seeded shape:
-
-```yaml
-# Skills sync (opt-in). Add adapter ids to skills_adapters and a SHA
-# to skills_commit. The skills repo's main HEAD SHA can be obtained via:
-#   gh api repos/ozzy-labs/skills/commits/main --jq .sha
-skills_commit: ""
-skills_adapters: []
-```
-
-Once filled in, the metadata looks like:
-
-```yaml
-# Tracked by Renovate via the @ozzylabs/skills preset
-skills_commit: <40-char-sha>
-
-# Opt-in per consumer (manual)
-skills_adapters:
-  - claude-code # → .claude/skills/{name}/
-  - codex-cli # → .agents/skills/{name}/ + AGENTS.md snippet
-  - gemini-cli # → .gemini/settings.json + AGENTS.md snippet
-  - copilot # → .github/copilot-instructions.md snippet
-```
-
-Running `sync-skills.sh` against a repo with empty `skills_adapters` is non-fatal: it prints opt-in guidance (including the SHA fetch command) and exits 0, so the consumer's sync workflow keeps succeeding while the repo is still in opt-out state.
-
-The consumer's sync workflow clones `ozzy-labs/skills` at `skills_commit:` and runs `sync-skills.sh` to apply the opted-in adapter outputs:
+Shared skills live in [`ozzy-labs/skills`](https://github.com/ozzy-labs/skills) and are distributed as a single npm package + CLI installer (see [handbook ADR-0027](https://github.com/ozzy-labs/handbook/blob/main/adr/0027-skill-distribution-user-only.md)). End users install the generic skill bundle into `~/.claude/skills/` (or `~/.agents/skills/` for codex-cli) once on their machine:
 
 ```bash
-# Sync without confirmation (workflow use)
-/path/to/commons/sync-skills.sh -y /path/to/skills/dist /path/to/target-repo
-
-# Preview only
-/path/to/commons/sync-skills.sh --dry-run /path/to/skills/dist /path/to/target-repo
-
-# Check if files are in sync (CI, exits 1 if out of sync)
-/path/to/commons/sync-skills.sh --check /path/to/skills/dist /path/to/target-repo
+npx @ozzylabs/skills install
 ```
 
-Snippet targets (`AGENTS.md`, `.github/copilot-instructions.md`) must already contain the marker block — only the content between `<!-- begin: @ozzylabs/skills -->` and `<!-- end: @ozzylabs/skills -->` is replaced. `templates/AGENTS.md` ships with the marker block pre-installed, so new repos scaffolded from the template are ready for codex-cli / gemini-cli adapter opt-in without manual edits. `commons check` warns when the marker is missing from `AGENTS.md` so existing repos can be retrofitted before opt-in. Pinning a path in the metadata file's `pinned:` list (with a trailing `/` for whole directories) skips it across all adapters. Consumer-only skill directories under `.claude/skills/` or `.agents/skills/` are preserved.
+For CI, use the `ozzy-labs/skills@v1` GitHub Action:
+
+```yaml
+- uses: ozzy-labs/skills@v1
+  with:
+    skills: drive,review
+    adapter: claude-code
+```
+
+The legacy `sync-skills.sh` / `/sync-consumers` flow (Renovate-based per-repo mirror of `dist/{adapter-id}/` into each consumer's `.claude/skills/` / `.agents/skills/`) has been retired — `commons sync.sh` no longer touches the `skills_*` fields. Existing consumers were migrated in [ozzy-labs/skills#100](https://github.com/ozzy-labs/skills/issues/100) by removing project-scoped skill mirrors and dropping `skills_adapters` / `skills_commit` from `.commons/sync.yaml`.
 
 ### Repository setup
 
@@ -230,13 +205,14 @@ First-time setup for a consumer repo:
 2. The repo settings must allow creating PRs (already the case if `setup-repo.sh` was run)
 3. The weekly schedule takes over from the next Monday; `workflow_dispatch` lets you trigger it on demand
 
-### Push-mode sync via `/sync-consumers` (replaces the legacy Renovate preset)
+### Legacy push-mode sync (removed)
 
-Updates are pushed from `ozzy-labs/commons` via the `/sync-consumers` skill (see [ozzy-labs/skills#80](https://github.com/ozzy-labs/skills/issues/80)). When this repo's `main` advances, a maintainer runs `/sync-consumers --source=commons --auto-merge`, which opens one sync PR per consumer (driven by `commons/scripts/sync-consumers.sh`). The PR bumps the `commit:` field in `.commons/sync.yaml` and runs `sync.sh --yes` to copy `dist/` into the consumer.
+Earlier versions of this repo shipped:
 
-#### Legacy Renovate preset (removed)
+- A `commons-sync.json` Renovate preset (`extends: ["github>ozzy-labs/commons:commons-sync"]`) — removed in [ozzy-labs/skills#80](https://github.com/ozzy-labs/skills/issues/80) Step 4
+- A push-mode `/sync-consumers` skill + `commons/scripts/sync-consumers.sh` helper — removed in [ozzy-labs/skills#102](https://github.com/ozzy-labs/skills/issues/102) (epic [#96](https://github.com/ozzy-labs/skills/issues/96))
 
-Earlier versions of this repo shipped a `commons-sync.json` Renovate preset (`extends: ["github>ozzy-labs/commons:commons-sync"]`). The preset was removed in [ozzy-labs/skills#80](https://github.com/ozzy-labs/skills/issues/80) Step 4 in favor of the push-mode flow above. [ADR-0006](docs/adr/0006-renovate-auto-sync-preset.md) is now historical (status: superseded). Existing consumers should remove the `extends` reference from their `renovate.json` (see Step 3 of the transition for the consumer-side cleanup PRs).
+Both have been retired. Skills are now distributed via the npm package + CLI installer (`npx @ozzylabs/skills install`), and the consumer-side `sync-commons.yaml` workflow above remains the canonical path for shared config files. See [handbook ADR-0027](https://github.com/ozzy-labs/handbook/blob/main/adr/0027-skill-distribution-user-only.md) for the rationale.
 
 ## What stays in each repo
 
