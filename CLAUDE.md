@@ -16,6 +16,7 @@
 - `/review` — コード変更や PR をレビュー
 - `/ship` — lint・コミット・PR 作成を一括実行
 - `/drive` — implement + ship + review loop（Issue から merge-ready な PR まで自律駆動）
+- `/sync-consumers` — skills / commons の更新を `sync-targets.yaml` の 14 consumer リポへ並列に push（PR auto-merge まで）。drive 派生として subagent worktree 隔離 + Phase Final-1/2 を踏襲する
 
 ## Skills の共通ルール
 
