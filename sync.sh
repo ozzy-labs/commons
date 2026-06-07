@@ -268,6 +268,145 @@ merge_marker_section() {
   mv "${tmp}" "${dest}"
 }
 
+# Strip surrounding double or single quotes from a pinned path value.
+strip_yaml_quotes() {
+  local v="$1"
+  if [[ "${v}" =~ ^\".*\"$ ]]; then
+    v="${v:1:${#v}-2}"
+  elif [[ "${v}" =~ ^\'.*\'$ ]]; then
+    v="${v:1:${#v}-2}"
+  fi
+  printf '%s' "${v}"
+}
+
+# Extract user-added comments from an existing metadata file so the regenerated
+# template can preserve them. Two outputs are produced:
+#   1. ${header_out}: the contiguous comment block immediately above `pinned:`
+#      (excluding any blank line that separates it from prior content). Empty
+#      when no such block exists.
+#   2. ${entry_out}: a flat record stream where each pinned entry that has
+#      preceding comments emits one or more `<path>\t<comment-line>` records
+#      (one record per comment line, in source order). Records for paths that
+#      are no longer in the pinned list are simply ignored by the restore step.
+# Both outputs are truncated before writing. The function is a no-op when the
+# source file does not exist.
+extract_pinned_comments() {
+  local src="$1"
+  local header_out="$2"
+  local entry_out="$3"
+  : >"${header_out}"
+  : >"${entry_out}"
+  [[ -f "${src}" ]] || return 0
+
+  local line trimmed
+  local in_pinned=false
+  local -a header_buf=()
+  local -a entry_buf=()
+
+  while IFS= read -r line || [[ -n "${line}" ]]; do
+    if ! ${in_pinned}; then
+      if [[ "${line}" =~ ^[[:space:]]*# ]]; then
+        header_buf+=("${line}")
+      elif [[ -z "${line}" || "${line}" =~ ^[[:space:]]*$ ]]; then
+        # Blank line resets header candidate
+        header_buf=()
+      elif [[ "${line}" =~ ^pinned:[[:space:]]*$ ]]; then
+        # Flush header candidate as the pinned header block
+        if [[ ${#header_buf[@]} -gt 0 ]]; then
+          printf '%s\n' "${header_buf[@]}" >>"${header_out}"
+        fi
+        header_buf=()
+        in_pinned=true
+      else
+        # Other content line resets header candidate
+        header_buf=()
+      fi
+      continue
+    fi
+
+    # Inside `pinned:` section
+    if [[ "${line}" =~ ^[[:space:]]*# ]]; then
+      entry_buf+=("${line}")
+      continue
+    fi
+    if [[ "${line}" =~ ^[[:space:]]*-[[:space:]]+(.*)$ ]]; then
+      trimmed="${BASH_REMATCH[1]}"
+      # Strip trailing whitespace
+      trimmed="${trimmed%"${trimmed##*[![:space:]]}"}"
+      local path
+      path="$(strip_yaml_quotes "${trimmed}")"
+      if [[ ${#entry_buf[@]} -gt 0 ]]; then
+        local c
+        for c in "${entry_buf[@]}"; do
+          printf '%s\t%s\n' "${path}" "${c}" >>"${entry_out}"
+        done
+      fi
+      entry_buf=()
+      continue
+    fi
+    if [[ -z "${line}" || "${line}" =~ ^[[:space:]]*$ ]]; then
+      # Blank line: drop pending entry comments (they were detached)
+      entry_buf=()
+      continue
+    fi
+    # Any other content line ends the pinned section
+    in_pinned=false
+    entry_buf=()
+  done <"${src}"
+}
+
+# Restore header block (above `pinned:`) and per-entry comments inside the
+# regenerated metadata file. Operates in place on ${target}. Per-entry comments
+# whose path is no longer in the pinned list are dropped (entries removed from
+# pinned lose their comments by design).
+restore_pinned_comments() {
+  local target="$1"
+  local header_in="$2"
+  local entry_in="$3"
+  local tmp
+  tmp="$(mktemp)"
+
+  local in_pinned=false
+  local line trimmed path c
+  while IFS= read -r line || [[ -n "${line}" ]]; do
+    if ! ${in_pinned} && [[ "${line}" =~ ^pinned:[[:space:]]*$ ]]; then
+      # Emit preserved header block before `pinned:`
+      if [[ -s "${header_in}" ]]; then
+        cat "${header_in}" >>"${tmp}"
+      fi
+      printf '%s\n' "${line}" >>"${tmp}"
+      in_pinned=true
+      continue
+    fi
+    if ${in_pinned} && [[ "${line}" =~ ^[[:space:]]*-[[:space:]]+(.*)$ ]]; then
+      trimmed="${BASH_REMATCH[1]}"
+      trimmed="${trimmed%"${trimmed##*[![:space:]]}"}"
+      path="$(strip_yaml_quotes "${trimmed}")"
+      # Emit any preserved comment lines whose first field == path
+      if [[ -s "${entry_in}" ]]; then
+        while IFS=$'\t' read -r p c; do
+          if [[ "${p}" == "${path}" ]]; then
+            printf '%s\n' "${c}" >>"${tmp}"
+          fi
+        done <"${entry_in}"
+      fi
+      printf '%s\n' "${line}" >>"${tmp}"
+      continue
+    fi
+    if ${in_pinned}; then
+      # Section ends on any non-(`-`/`#`/blank) line
+      if [[ -n "${line}" && ! "${line}" =~ ^[[:space:]]*$ ]] &&
+        [[ ! "${line}" =~ ^[[:space:]]*- ]] &&
+        [[ ! "${line}" =~ ^[[:space:]]*# ]]; then
+        in_pinned=false
+      fi
+    fi
+    printf '%s\n' "${line}" >>"${tmp}"
+  done <"${target}"
+
+  mv "${tmp}" "${target}"
+}
+
 write_metadata() {
   local pinned_list=("$@")
   mkdir -p "${METADATA_DIR}"
@@ -289,6 +428,12 @@ write_metadata() {
     existing_skills_commit="$(grep '^skills_commit:' "${METADATA_FILE}" | awk '{print $2}' | tr -d '"' || true)"
     while IFS= read -r a; do existing_skills_adapters+=("${a}"); done < <(read_yaml_list "${METADATA_FILE}" "skills_adapters")
   fi
+
+  # Extract user-added comments (pinned header block + per-entry comments) so
+  # they survive the heredoc-style template regeneration. See Issue #136.
+  local header_tmp="${METADATA_FILE}.hdr.$$"
+  local entry_tmp="${METADATA_FILE}.ent.$$"
+  extract_pinned_comments "${METADATA_FILE}" "${header_tmp}" "${entry_tmp}"
 
   local tmp_file="${METADATA_FILE}.tmp.$$"
   {
@@ -322,7 +467,16 @@ write_metadata() {
         echo "  - ${p}"
       done
     fi
-  } >"${tmp_file}" && mv "${tmp_file}" "${METADATA_FILE}"
+  } >"${tmp_file}"
+
+  # Re-inject preserved comments (header above `pinned:` and per-entry blocks).
+  # No-op when both temp files are empty (e.g. first-time init).
+  if [[ -s "${header_tmp}" ]] || [[ -s "${entry_tmp}" ]]; then
+    restore_pinned_comments "${tmp_file}" "${header_tmp}" "${entry_tmp}"
+  fi
+  rm -f "${header_tmp}" "${entry_tmp}"
+
+  mv "${tmp_file}" "${METADATA_FILE}"
 }
 
 # --- Collect files ---
