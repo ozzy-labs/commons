@@ -292,13 +292,18 @@ write_metadata() {
 
   local tmp_file="${METADATA_FILE}.tmp.$$"
   {
-    echo "# Auto-updated by commons sync.sh"
-    echo "# 'pinned' is user-editable — add or remove paths freely"
+    echo "# Updated by /sync-consumers (push mode). 'commit' / 'skills_commit'"
+    echo "# log the last applied SHA; updates are pushed from ozzy-labs/commons"
+    echo "# (and ozzy-labs/skills) via the /sync-consumers skill, see"
+    echo "# ozzy-labs/skills#80. 'pinned' is user-editable — add or remove paths"
+    echo "# freely. 'commit' / 'skills_commit' / 'synced_at' should not be hand-"
+    echo "# edited; they are rewritten by sync.sh / sync-skills.sh on each push."
     echo "commit: ${COMMIT_HASH}"
     echo "synced_at: ${SYNCED_AT}"
     echo ""
-    echo "# Skills sync (opt-in). Add adapter ids to skills_adapters and a SHA"
-    echo "# to skills_commit. The skills repo's main HEAD SHA can be obtained via:"
+    echo "# Skills sync (opt-in). Add adapter ids to skills_adapters; skills_commit"
+    echo "# is bumped by /sync-consumers --source=skills. The skills repo's main"
+    echo "# HEAD SHA can be obtained via:"
     echo "#   gh api repos/ozzy-labs/skills/commits/main --jq .sha"
     if [[ -n "${existing_skills_commit:-}" ]]; then
       echo "skills_commit: ${existing_skills_commit}"
