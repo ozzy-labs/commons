@@ -140,7 +140,7 @@ commons check /path/to/target-repo
 
 ### メタデータパス
 
-同期メタデータは consumer リポ内の `.commons/sync.yaml` に置く。`sync.sh` はこの単一の canonical パスを読み書きし、Renovate preset（`commons-sync.json` の `managerFilePatterns`）も同じパスを追跡して `commit:` フィールドを更新する。
+同期メタデータは consumer リポ内の `.commons/sync.yaml` に置く。`sync.sh` はこの単一の canonical パスを読み書きし、`/sync-consumers` skill が consumer への push 配信時に `commit:` フィールドを更新する。
 
 過去のレガシーパス `.dev-config/sync.yaml` は [ADR-0014](https://github.com/ozzy-labs/handbook/blob/main/adr/0014-rename-dev-config-to-commons.md) で定義された移行期間中のみフォールバックとしてサポートされていた。全 consumer の rename 完了に伴いフォールバックは撤去済み。
 
@@ -230,20 +230,13 @@ Snippet 対象（`AGENTS.md` / `.github/copilot-instructions.md`）は対象フ�
 2. リポ設定で PR 作成が許可されていること（`setup-repo.sh` 実行済みなら OK）
 3. 翌週から scheduled で自動起動。`workflow_dispatch` で即時実行も可能
 
-### Renovate 経由の自動同期（opt-in）
+### Push 型 `/sync-consumers` 経由の同期（旧 Renovate preset を置換）
 
-週次 schedule の代替として、consumer リポは `commons-sync` Renovate preset を `extends` することで低レイテンシな更新検知に切り替えられる。Renovate は commons の `main` ブランチ HEAD を追跡し、新しい commit が来ると `.commons/sync.yaml` の `commit:` フィールドを書き換える PR を consumer に送る。実ファイルの反映は consumer 側の workflow が `sync.sh --yes` を Renovate PR ブランチ上で実行する役割。
+更新は `ozzy-labs/commons` 側から `/sync-consumers` skill 経由で push される（[ozzy-labs/skills#80](https://github.com/ozzy-labs/skills/issues/80) 参照）。本リポの `main` が進んだとき、maintainer が `/sync-consumers --source=commons --auto-merge` を実行すると、各 consumer に 1 件ずつ sync PR が作成される（内部的に `commons/scripts/sync-consumers.sh` が driver）。PR は `.commons/sync.yaml` の `commit:` を bump し、`sync.sh --yes` で `dist/` を consumer へコピーする。
 
-Consumer の `renovate.json`:
+#### 旧 Renovate preset（削除済み）
 
-```json
-{
-  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["github>ozzy-labs/commons:commons-sync"]
-}
-```
-
-設計の詳細は [ADR-0006](docs/adr/0006-renovate-auto-sync-preset.md) を参照。consumer 側の workflow 整備は Renovate PoC の roll-out（handbook#18 / handbook#42）で対応予定。それまでは scheduled workflow が推奨パス。
+旧版では `commons-sync.json` Renovate preset（`extends: ["github>ozzy-labs/commons:commons-sync"]`）を提供していた。本 preset は [ozzy-labs/skills#80](https://github.com/ozzy-labs/skills/issues/80) Step 4 で削除し、上記の push 型フローに置換した。[ADR-0006](docs/adr/0006-renovate-auto-sync-preset.md) は historical 扱い（superseded）。既存 consumer は `renovate.json` から `extends` 参照を削除する必要がある（transition の Step 3 で consumer 側 cleanup PR を配信予定）。
 
 ## リポジトリ固有のまま残すもの
 

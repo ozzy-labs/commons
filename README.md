@@ -140,7 +140,7 @@ When a file is intentionally customized in a target repo, it can be **pinned** t
 
 ### Metadata path
 
-Sync metadata lives in the consumer repo at `.commons/sync.yaml`. `sync.sh` reads and writes this single canonical path, and the Renovate preset (`commons-sync.json`'s `managerFilePatterns`) tracks it for `commit:` field bumps.
+Sync metadata lives in the consumer repo at `.commons/sync.yaml`. `sync.sh` reads and writes this single canonical path, and the `/sync-consumers` skill bumps the `commit:` field whenever new commits are pushed to consumers.
 
 The earlier `.dev-config/sync.yaml` path was supported as a temporary fallback during the migration documented in [ADR-0014](https://github.com/ozzy-labs/handbook/blob/main/adr/0014-rename-dev-config-to-commons.md). All consumers have now completed the rename and the fallback has been removed.
 
@@ -230,20 +230,13 @@ First-time setup for a consumer repo:
 2. The repo settings must allow creating PRs (already the case if `setup-repo.sh` was run)
 3. The weekly schedule takes over from the next Monday; `workflow_dispatch` lets you trigger it on demand
 
-### Automated sync via Renovate (opt-in)
+### Push-mode sync via `/sync-consumers` (replaces the legacy Renovate preset)
 
-As a lower-latency alternative to the weekly schedule, consumer repos can opt into the `commons-sync` Renovate preset. Renovate watches the commons `main` branch and opens a PR bumping the `commit:` field in `.commons/sync.yaml` whenever a new commit lands. Actual file materialisation remains the consumer workflow's job (it runs `sync.sh --yes` on the Renovate PR branch).
+Updates are pushed from `ozzy-labs/commons` via the `/sync-consumers` skill (see [ozzy-labs/skills#80](https://github.com/ozzy-labs/skills/issues/80)). When this repo's `main` advances, a maintainer runs `/sync-consumers --source=commons --auto-merge`, which opens one sync PR per consumer (driven by `commons/scripts/sync-consumers.sh`). The PR bumps the `commit:` field in `.commons/sync.yaml` and runs `sync.sh --yes` to copy `dist/` into the consumer.
 
-Consumer `renovate.json`:
+#### Legacy Renovate preset (removed)
 
-```json
-{
-  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["github>ozzy-labs/commons:commons-sync"]
-}
-```
-
-Design details are in [ADR-0006](docs/adr/0006-renovate-auto-sync-preset.md). Consumer-side workflow integration is tracked by the Renovate PoC rollout (handbook#18 / handbook#42); until that lands, the scheduled workflow above is the supported path.
+Earlier versions of this repo shipped a `commons-sync.json` Renovate preset (`extends: ["github>ozzy-labs/commons:commons-sync"]`). The preset was removed in [ozzy-labs/skills#80](https://github.com/ozzy-labs/skills/issues/80) Step 4 in favor of the push-mode flow above. [ADR-0006](docs/adr/0006-renovate-auto-sync-preset.md) is now historical (status: superseded). Existing consumers should remove the `extends` reference from their `renovate.json` (see Step 3 of the transition for the consumer-side cleanup PRs).
 
 ## What stays in each repo
 
