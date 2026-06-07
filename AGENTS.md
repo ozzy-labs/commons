@@ -27,7 +27,6 @@
 - `templates/` — scaffold 専用ファイル（`sync.sh` の対象外）
 - `tests/` — bats テスト
 - `sync.sh` — 配布ファイルの同期スクリプト
-- `sync-skills.sh` — `@ozzylabs/skills` adapter 出力を consumer の opt-in 設定に従って同期するスクリプト
 - `setup-repo.sh` — GitHub リポジトリ初期設定スクリプト
 - `docs/adr/` — Architecture Decision Records
 

@@ -14,9 +14,6 @@
     "test": "bats tests/"
   },
   "devDependencies": {
-    "ajv": "^8.17.1",
-    "ajv-cli": "^5.0.0",
-    "js-yaml": "^4.1.0",
     "prettier": "^3.0.0"
   }
 }
