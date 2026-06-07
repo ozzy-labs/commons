@@ -99,6 +99,15 @@ GENERIC_SKILLS=(
   lint-rules
 )
 
+# Internal-use skills (health/topics/phase-issue) も過去 sync の残骸として
+# 14 consumer に配布されたが、ADR-0027 で skills/commons 内部運用のみと決定。
+# migrate 経由で同時に清掃する。
+INTERNAL_SKILLS=(
+  health
+  topics
+  phase-issue
+)
+
 BRANCH="chore/migrate-to-user-skills"
 
 emit_json() {
@@ -149,7 +158,7 @@ REMOVED_SKILLS=()
 REMOVED_YAML_FIELDS=()
 ANY_CHANGE=false
 
-for skill in "${GENERIC_SKILLS[@]}"; do
+for skill in "${GENERIC_SKILLS[@]}" "${INTERNAL_SKILLS[@]}"; do
   if [[ -d ".claude/skills/$skill" ]]; then
     REMOVED_SKILLS+=("$skill")
     if ! $DRY_RUN; then
