@@ -176,11 +176,12 @@ trap_err() {
 
 # dry-run の場合: 想定処理を JSON で返す
 if $DRY_RUN; then
+  PLAN_COMMONS_REPO="${COMMONS_REPO:-${HOME}/github/ozzy-labs/commons}"
   PLAN_SYNC_CMD=""
   if [[ "$SOURCE" == "skills" ]]; then
-    PLAN_SYNC_CMD="$SOURCE_REPO/sync-skills.sh -y $SOURCE_REPO/dist <consumer-clone>"
+    PLAN_SYNC_CMD="$PLAN_COMMONS_REPO/sync-skills.sh -y $SOURCE_REPO/dist <consumer-clone>"
   else
-    PLAN_SYNC_CMD="$SOURCE_REPO/sync.sh -y <consumer-clone>"
+    PLAN_SYNC_CMD="$PLAN_COMMONS_REPO/sync.sh -y <consumer-clone>"
   fi
   MAYBE_AUTO_MERGE=""
   if $AUTO_MERGE; then
@@ -240,12 +241,20 @@ fi
 rm -f "${SYNC_YAML}.bak"
 
 # 4. sync.sh / sync-skills.sh 実行
+#
+# sync-skills.sh / sync.sh は両方 commons repo に置かれている (commons/sync.sh /
+# commons/sync-skills.sh)。--source=skills の場合も呼び出すのは commons の
+# sync-skills.sh で、第 1 引数として skills の dist を指す。
+COMMONS_SCRIPT_REPO="${COMMONS_REPO:-${HOME}/github/ozzy-labs/commons}"
+if [[ ! -d "$COMMONS_SCRIPT_REPO/.git" ]]; then
+  trap_err "commons repo not found at $COMMONS_SCRIPT_REPO (set COMMONS_REPO env to override)"
+fi
 if [[ "$SOURCE" == "skills" ]]; then
-  if ! "$SOURCE_REPO/sync-skills.sh" -y "$SOURCE_REPO/dist" "$CONSUMER_DIR" >&2; then
+  if ! "$COMMONS_SCRIPT_REPO/sync-skills.sh" -y "$SOURCE_REPO/dist" "$CONSUMER_DIR" >&2; then
     trap_err "sync-skills.sh failed"
   fi
 else
-  if ! "$SOURCE_REPO/sync.sh" -y "$CONSUMER_DIR" >&2; then
+  if ! "$COMMONS_SCRIPT_REPO/sync.sh" -y "$CONSUMER_DIR" >&2; then
     trap_err "sync.sh failed"
   fi
 fi
